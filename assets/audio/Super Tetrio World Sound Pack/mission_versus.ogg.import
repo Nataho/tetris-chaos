@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://cm75aegkpes2a"
+path="res://.godot/imported/mission_versus.ogg-d520c222743a72d63e424b5994f51c53.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/mission_versus.ogg"
+dest_files=["res://.godot/imported/mission_versus.ogg-d520c222743a72d63e424b5994f51c53.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://can4kvuondwub"]
+
+[ext_resource type="Script" uid="uid://vqed8lsulgg7" path="res://classes/extras/HandlingEditor/handling_editor.gd" id="1_8drq1"]
+
+[node name="HandlingEditor" type="LineEdit" unique_id=1457281527]
+script = ExtResource("1_8drq1")

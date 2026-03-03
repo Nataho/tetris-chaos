@@ -1,0 +1,465 @@
+[gd_scene format=3 uid="uid://clret6q5qt138"]
+
+[ext_resource type="Script" uid="uid://cbsdyountkqrd" path="res://scenes/main/main_menu.gd" id="1_sd5it"]
+[ext_resource type="AudioStream" uid="uid://cxkfkkchh6ne3" path="res://assets/audio/music/Tetris Chaos - Main Menu ost.mp3" id="2_5vafy"]
+[ext_resource type="Theme" uid="uid://dup756tvm3sht" path="res://assets/themes/main.tres" id="3_byqcc"]
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="4_hiibk"]
+[ext_resource type="Script" uid="uid://dvsmkslvd8o1g" path="res://classes/extras/RebindButton/RebindButton.gd" id="4_w6ykx"]
+[ext_resource type="Script" uid="uid://vqed8lsulgg7" path="res://classes/extras/HandlingEditor/handling_editor.gd" id="6_swlpu"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_swlpu"]
+font = ExtResource("4_hiibk")
+font_size = 80
+
+[node name="MainMenu" type="Control" unique_id=463708987 node_paths=PackedStringArray("marathon", "zen", "multiplayer_button", "settings", "local_versus", "lan", "ranked", "classic", "controls", "handling")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_sd5it")
+marathon = NodePath("main/empty_space/VBoxContainer/marathon")
+zen = NodePath("main/empty_space/VBoxContainer/zen")
+multiplayer_button = NodePath("main/empty_space/VBoxContainer/multiplayer")
+settings = NodePath("main/empty_space/VBoxContainer/settings")
+local_versus = NodePath("Multiplayer/empty_space/VBoxContainer/local_versus")
+lan = NodePath("Multiplayer/empty_space/VBoxContainer/lan")
+ranked = NodePath("Multiplayer/empty_space/VBoxContainer/ranked")
+classic = NodePath("Multiplayer/empty_space/VBoxContainer/classic")
+controls = NodePath("settings/empty_space/controls/controls")
+handling = NodePath("settings/empty_space/controls/handling")
+
+[node name="background" type="ColorRect" parent="." unique_id=1817507213]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.627451, 0, 0.9411765, 1)
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1254638202]
+stream = ExtResource("2_5vafy")
+
+[node name="main" type="HBoxContainer" parent="." unique_id=1709053038]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="empty_space" type="Panel" parent="main" unique_id=995239336]
+self_modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(662, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="main/empty_space" unique_id=437761423]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -317.0
+offset_right = 317.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="marathon" type="Button" parent="main/empty_space/VBoxContainer" unique_id=277865562]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+text = "MARATHON"
+
+[node name="zen" type="Button" parent="main/empty_space/VBoxContainer" unique_id=2011765997]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+disabled = true
+text = "ZEN"
+
+[node name="multiplayer" type="Button" parent="main/empty_space/VBoxContainer" unique_id=736456613]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+text = "MULTIPLAYER"
+
+[node name="settings" type="Button" parent="main/empty_space/VBoxContainer" unique_id=422496940]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+text = "SETTINGS"
+autowrap_mode = 2
+
+[node name="right_side" type="Panel" parent="main" unique_id=1246746338]
+custom_minimum_size = Vector2(1258, 1080)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="settings" type="HBoxContainer" parent="." unique_id=1353048682]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="empty_space" type="Panel" parent="settings" unique_id=734534242]
+self_modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(662, 0)
+layout_mode = 2
+
+[node name="controls" type="VBoxContainer" parent="settings/empty_space" unique_id=1991268743]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -317.0
+offset_right = 317.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="controls" type="Button" parent="settings/empty_space/controls" unique_id=762027653]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+text = "CONTROLS"
+
+[node name="handling" type="Button" parent="settings/empty_space/controls" unique_id=117304715]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+text = "HANDLING"
+
+[node name="graphics" type="Button" parent="settings/empty_space/controls" unique_id=474056489]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+disabled = true
+text = "GRAPHICS"
+
+[node name="customize" type="Button" parent="settings/empty_space/controls" unique_id=1741017591]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+disabled = true
+text = "CUSTOMIZE
+"
+
+[node name="change_server" type="Button" parent="settings/empty_space/controls" unique_id=1613754329]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+disabled = true
+text = "CHANGE SERVER"
+autowrap_mode = 2
+
+[node name="right_side" type="Panel" parent="settings" unique_id=681679251]
+custom_minimum_size = Vector2(1258, 1080)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="controls" type="VBoxContainer" parent="settings/right_side" unique_id=1863052449]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -526.0
+offset_top = -405.5
+offset_right = 526.0
+offset_bottom = 405.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 22
+alignment = 1
+
+[node name="ML" type="Label" parent="settings/right_side/controls" unique_id=1101297126]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Move Left"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="RebindButton" type="Button" parent="settings/right_side/controls/ML" unique_id=702116538]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+text = "Unbound"
+script = ExtResource("4_w6ykx")
+action_name = "move_left"
+metadata/_custom_type_script = "uid://dvsmkslvd8o1g"
+
+[node name="MR" type="Label" parent="settings/right_side/controls" unique_id=1183351647]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Move Right"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="RebindButton" type="Button" parent="settings/right_side/controls/MR" unique_id=1396104816]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+text = "Unbound"
+script = ExtResource("4_w6ykx")
+action_name = "move_right"
+metadata/_custom_type_script = "uid://dvsmkslvd8o1g"
+
+[node name="SD" type="Label" parent="settings/right_side/controls" unique_id=113885423]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Soft Drop"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="RebindButton" type="Button" parent="settings/right_side/controls/SD" unique_id=1200356400]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+text = "Unbound"
+script = ExtResource("4_w6ykx")
+action_name = "soft_drop"
+metadata/_custom_type_script = "uid://dvsmkslvd8o1g"
+
+[node name="HD" type="Label" parent="settings/right_side/controls" unique_id=1509896420]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Hard Drop"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="RebindButton" type="Button" parent="settings/right_side/controls/HD" unique_id=1024353807]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+text = "Unbound"
+script = ExtResource("4_w6ykx")
+action_name = "hard_drop"
+metadata/_custom_type_script = "uid://dvsmkslvd8o1g"
+
+[node name="RL" type="Label" parent="settings/right_side/controls" unique_id=2048753476]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Rotate Left"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="RebindButton" type="Button" parent="settings/right_side/controls/RL" unique_id=519088772]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+text = "Unbound"
+script = ExtResource("4_w6ykx")
+action_name = "rotate_left"
+metadata/_custom_type_script = "uid://dvsmkslvd8o1g"
+
+[node name="RR" type="Label" parent="settings/right_side/controls" unique_id=601879558]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Rotate Right"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="RebindButton" type="Button" parent="settings/right_side/controls/RR" unique_id=1580063293]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+text = "Unbound"
+script = ExtResource("4_w6ykx")
+action_name = "rotate_right"
+metadata/_custom_type_script = "uid://dvsmkslvd8o1g"
+
+[node name="H" type="Label" parent="settings/right_side/controls" unique_id=623345007]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Hold Piece"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="RebindButton" type="Button" parent="settings/right_side/controls/H" unique_id=1137107676]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+text = "Unbound"
+script = ExtResource("4_w6ykx")
+action_name = "hold"
+metadata/_custom_type_script = "uid://dvsmkslvd8o1g"
+
+[node name="handling" type="VBoxContainer" parent="settings/right_side" unique_id=353390960]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -528.0
+offset_top = -167.5
+offset_right = 528.0
+offset_bottom = 167.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 22
+alignment = 1
+
+[node name="DAS" type="Label" parent="settings/right_side/handling" unique_id=899561754]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "DAS ms"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="HandlingEditor" type="LineEdit" parent="settings/right_side/handling/DAS" unique_id=296009818]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+alignment = 1
+script = ExtResource("6_swlpu")
+handling_name = "DAS"
+metadata/_custom_type_script = "uid://vqed8lsulgg7"
+
+[node name="ARR" type="Label" parent="settings/right_side/handling" unique_id=1784374067]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "ARR ms"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="HandlingEditor" type="LineEdit" parent="settings/right_side/handling/ARR" unique_id=870722644]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+alignment = 1
+script = ExtResource("6_swlpu")
+handling_name = "ARR"
+metadata/_custom_type_script = "uid://vqed8lsulgg7"
+
+[node name="SD" type="Label" parent="settings/right_side/handling" unique_id=497089250]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Soft Drop ms"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="HandlingEditor" type="LineEdit" parent="settings/right_side/handling/SD" unique_id=2057265440]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+alignment = 1
+script = ExtResource("6_swlpu")
+handling_name = "SD"
+metadata/_custom_type_script = "uid://vqed8lsulgg7"
+
+[node name="Multiplayer" type="HBoxContainer" parent="." unique_id=524118982]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2.0
+offset_right = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="empty_space" type="Panel" parent="Multiplayer" unique_id=1466093521]
+self_modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(662, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Multiplayer/empty_space" unique_id=1869725605]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -317.0
+offset_right = 317.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="local_versus" type="Button" parent="Multiplayer/empty_space/VBoxContainer" unique_id=2062148699]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+text = "LOCAL VERSUS"
+
+[node name="lan" type="Button" parent="Multiplayer/empty_space/VBoxContainer" unique_id=1517169501]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+disabled = true
+text = "LAN"
+
+[node name="ranked" type="Button" parent="Multiplayer/empty_space/VBoxContainer" unique_id=741614244]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+disabled = true
+text = "RANKED"
+
+[node name="classic" type="Button" parent="Multiplayer/empty_space/VBoxContainer" unique_id=1482767415]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+text = "CLASSIC"
+autowrap_mode = 2
+
+[node name="right_side" type="Panel" parent="Multiplayer" unique_id=949642678]
+custom_minimum_size = Vector2(1258, 1080)
+layout_mode = 2
+size_flags_horizontal = 3

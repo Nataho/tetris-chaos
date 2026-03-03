@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dan8cx51lryal"
+path="res://.godot/imported/Tetris Chaos - Battle ost.mp3-56a8d54a7f997e25f9f51c7dab67260d.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Tetris Chaos - Battle ost.mp3"
+dest_files=["res://.godot/imported/Tetris Chaos - Battle ost.mp3-56a8d54a7f997e25f9f51c7dab67260d.mp3str"]
+
+[params]
+
+loop=true
+loop_offset=16.64
+bpm=129.99
+beat_count=356
+bar_beats=4

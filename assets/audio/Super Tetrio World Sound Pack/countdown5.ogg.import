@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://cn3ajlwb0pt4y"
+path="res://.godot/imported/countdown5.ogg-c3b77906bc9e81ec148c909c137ea944.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/countdown5.ogg"
+dest_files=["res://.godot/imported/countdown5.ogg-c3b77906bc9e81ec148c909c137ea944.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

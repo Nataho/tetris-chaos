@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cswc5yxc0ajka"
+path="res://.godot/imported/Tetris Chaos - Marathon ost.mp3-b829939570b6aca024cf1c5e0b9cdcd1.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Tetris Chaos - Marathon ost.mp3"
+dest_files=["res://.godot/imported/Tetris Chaos - Marathon ost.mp3-b829939570b6aca024cf1c5e0b9cdcd1.mp3str"]
+
+[params]
+
+loop=true
+loop_offset=3.7
+bpm=120.09
+beat_count=388
+bar_beats=4

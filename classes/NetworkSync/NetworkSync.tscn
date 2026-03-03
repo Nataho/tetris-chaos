@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://d0tp31r6v7jdh"]
+
+[ext_resource type="Script" uid="uid://diuppgsus17l4" path="res://classes/NetworkSync/network_sync.gd" id="1_36ltx"]
+
+[node name="NetworkSync" type="Node" unique_id=730453120]
+script = ExtResource("1_36ltx")

@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://bdwe2txfpegab"
+path="res://.godot/imported/timer2.ogg-a4fe620e6f642a1ccbdb48b5b459cff6.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/timer2.ogg"
+dest_files=["res://.godot/imported/timer2.ogg-a4fe620e6f642a1ccbdb48b5b459cff6.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

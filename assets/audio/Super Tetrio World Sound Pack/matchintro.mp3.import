@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://fd5m8skk1rqb"
+path="res://.godot/imported/matchintro.mp3-e428b54d429296dc939adc9b20c4ef5b.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/matchintro.mp3"
+dest_files=["res://.godot/imported/matchintro.mp3-e428b54d429296dc939adc9b20c4ef5b.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

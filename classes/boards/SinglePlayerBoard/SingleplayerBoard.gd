@@ -1,0 +1,2 @@
+extends Board
+class_name SingleplayerBoard

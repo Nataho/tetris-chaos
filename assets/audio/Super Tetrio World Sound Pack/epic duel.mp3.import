@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://c2iwudq374v0i"
+path="res://.godot/imported/epic duel.mp3-5887ca9c47fdac59a37379bea4d00098.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/epic duel.mp3"
+dest_files=["res://.godot/imported/epic duel.mp3-5887ca9c47fdac59a37379bea4d00098.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

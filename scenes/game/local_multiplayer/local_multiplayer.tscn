@@ -1,0 +1,223 @@
+[gd_scene format=3 uid="uid://dq7nufvkc8vxl"]
+
+[ext_resource type="Script" uid="uid://d3k6f13xh0kk8" path="res://scenes/game/local_multiplayer/local_multiplayer.gd" id="1_hj88h"]
+[ext_resource type="PackedScene" uid="uid://c2rodumqoa3fe" path="res://classes/boards/MultiplayerBoard/MultiplayerBoard.tscn" id="2_ylsce"]
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="3_buvxm"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_m40d3"]
+font = ExtResource("3_buvxm")
+font_size = 30
+
+[sub_resource type="LabelSettings" id="LabelSettings_buvxm"]
+font = ExtResource("3_buvxm")
+font_size = 200
+
+[sub_resource type="Animation" id="Animation_m40d3"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("fg:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_buvxm"]
+resource_name = "reset"
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("fg:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_myqay"]
+resource_name = "reset"
+length = 0.5
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("fg:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_m40d3"]
+_data = {
+&"RESET": SubResource("Animation_m40d3"),
+&"next_round_in": SubResource("Animation_buvxm"),
+&"next_round_out": SubResource("Animation_myqay")
+}
+
+[node name="local_multiplayer" type="Control" unique_id=565508775]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hj88h")
+
+[node name="bg" type="ColorRect" parent="." unique_id=1469003953]
+z_index = -1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.29296875, 0.29296875, 0.29296875, 1)
+
+[node name="p1_anchor" type="Control" parent="." unique_id=724853298]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="board" parent="p1_anchor" unique_id=987870610 instance=ExtResource("2_ylsce")]
+target_player = 2
+_player_index = 1
+
+[node name="name" type="Label" parent="p1_anchor" unique_id=1705263395]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = 351.0
+offset_right = 20.0
+offset_bottom = 374.0
+grow_horizontal = 2
+text = "(PRESS ENTER OR A)"
+label_settings = SubResource("LabelSettings_m40d3")
+
+[node name="p2_anchor" type="Control" parent="." unique_id=177337005]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="board" parent="p2_anchor" unique_id=1591048522 instance=ExtResource("2_ylsce")]
+target_player = 1
+_player_index = 2
+
+[node name="name" type="Label" parent="p2_anchor" unique_id=2050408524]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = 351.0
+offset_right = 20.0
+offset_bottom = 374.0
+grow_horizontal = 2
+text = "(PRESS ENTER OR A)"
+label_settings = SubResource("LabelSettings_m40d3")
+
+[node name="fg" type="ColorRect" parent="." unique_id=1805535816]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0)
+
+[node name="halves" type="HBoxContainer" parent="." unique_id=258158099]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="left_half" type="Control" parent="halves" unique_id=354601119]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="halves/left_half" unique_id=834581142]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.64705884, 0, 0, 0.39215687)
+
+[node name="score" type="Label" parent="halves/left_half" unique_id=666996314]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "0"
+label_settings = SubResource("LabelSettings_buvxm")
+
+[node name="right_half" type="Control" parent="halves" unique_id=1875734172]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="halves/right_half" unique_id=1567140350]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0.64705884, 0.39215687)
+
+[node name="score" type="Label" parent="halves/right_half" unique_id=1619800890]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "0"
+label_settings = SubResource("LabelSettings_buvxm")
+
+[node name="anim" type="AnimationPlayer" parent="." unique_id=729296281]
+libraries/ = SubResource("AnimationLibrary_m40d3")

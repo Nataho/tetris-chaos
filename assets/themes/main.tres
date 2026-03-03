@@ -1,0 +1,8 @@
+[gd_resource type="Theme" format=3 uid="uid://dup756tvm3sht"]
+
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="1_aiue4"]
+
+[resource]
+default_font = ExtResource("1_aiue4")
+default_font_size = 81
+Button/fonts/font = ExtResource("1_aiue4")

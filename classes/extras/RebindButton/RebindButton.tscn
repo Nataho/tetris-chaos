@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://dguvwmtoapkyx"]
+
+[ext_resource type="Script" uid="uid://dvsmkslvd8o1g" path="res://classes/extras/RebindButton/RebindButton.gd" id="1_44l8y"]
+
+[node name="RebindButton" type="Button" unique_id=1092108290]
+text = "Unbound"
+script = ExtResource("1_44l8y")

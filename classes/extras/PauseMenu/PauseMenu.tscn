@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://bi5x52ocv1j03"]
+
+[ext_resource type="Script" uid="uid://88fcp8rmwi1v" path="res://classes/extras/PauseMenu/PauseMenu.gd" id="1_ayckc"]
+[ext_resource type="Theme" uid="uid://dup756tvm3sht" path="res://assets/themes/main.tres" id="2_pncjn"]
+
+[node name="PauseMenu" type="Control" unique_id=664144780]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ayckc")
+
+[node name="Panel" type="Panel" parent="." unique_id=1904347121]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="vbox" type="VBoxContainer" parent="." unique_id=1310290930]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -404.0
+offset_top = -199.0
+offset_right = 404.0
+offset_bottom = 199.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+
+[node name="resume" type="Button" parent="vbox" unique_id=1756546484]
+layout_mode = 2
+theme = ExtResource("2_pncjn")
+text = "RESUME"
+
+[node name="restart" type="Button" parent="vbox" unique_id=1113727152]
+layout_mode = 2
+theme = ExtResource("2_pncjn")
+text = "RESTART"
+
+[node name="main_menu" type="Button" parent="vbox" unique_id=1265534182]
+layout_mode = 2
+theme = ExtResource("2_pncjn")
+text = "MAIN MENU"

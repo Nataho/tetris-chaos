@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://fljvd058xy4i"]
+
+[ext_resource type="TileSet" uid="uid://v0vnl271k60r" path="res://assets/tile_maps/textures.tres" id="1_lhy4a"]
+[ext_resource type="Script" uid="uid://1xfrqtjng3g2" path="res://classes/extras/ui_classes/background_piece.gd" id="1_vrtep"]
+
+[node name="BackgroundPiece" type="Node2D" unique_id=579852558]
+script = ExtResource("1_vrtep")
+
+[node name="piece" type="Node2D" parent="." unique_id=1617593702]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="piece" unique_id=518671943]
+self_modulate = Color(4.415934, 0, 4.415934, 1)
+position = Vector2(-15, -15)
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 10, 0, 0, 0, 0, 0)
+tile_set = ExtResource("1_lhy4a")
+
+[node name="Timer" type="Timer" parent="." unique_id=227589740]

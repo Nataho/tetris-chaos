@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://bph7ic0otei4y"
+path="res://.godot/imported/detonate2.ogg-287ddd1976cf4db580d1e27fa788eade.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/detonate2.ogg"
+dest_files=["res://.godot/imported/detonate2.ogg-287ddd1976cf4db580d1e27fa788eade.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

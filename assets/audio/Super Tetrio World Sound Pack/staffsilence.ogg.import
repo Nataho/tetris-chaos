@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://dctim1y07crsq"
+path="res://.godot/imported/staffsilence.ogg-de615e46961088f1b9cb63b99b8a168e.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/staffsilence.ogg"
+dest_files=["res://.godot/imported/staffsilence.ogg-de615e46961088f1b9cb63b99b8a168e.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

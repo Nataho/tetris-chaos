@@ -1,0 +1,262 @@
+[gd_scene format=4 uid="uid://bxxhw2iw0x7w6"]
+
+[ext_resource type="Script" uid="uid://qjgjhj8ux6jf" path="res://classes/boards/Board/Board.gd" id="1_fo5xl"]
+[ext_resource type="TileSet" uid="uid://v0vnl271k60r" path="res://assets/tile_maps/textures.tres" id="2_byeq6"]
+[ext_resource type="Script" uid="uid://cnaycdfqddik6" path="res://classes/QueueController/QueueController.gd" id="3_hj61u"]
+[ext_resource type="Script" uid="uid://ybbl5ym3mwlj" path="res://classes/BoardController/BoardController.gd" id="4_1ekxy"]
+[ext_resource type="Script" uid="uid://6a0ardrr0173" path="res://classes/PiecesController/PiecesController.gd" id="5_j4pvl"]
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="6_3eyai"]
+[ext_resource type="Script" uid="uid://dj6r8qc4bbwgk" path="res://scripts/rich_text_bounce.gd" id="7_mm1j1"]
+
+[sub_resource type="RichTextEffect" id="RichTextEffect_euthe"]
+script = ExtResource("7_mm1j1")
+metadata/_custom_type_script = "uid://dj6r8qc4bbwgk"
+
+[sub_resource type="LabelSettings" id="LabelSettings_fgaad"]
+font = ExtResource("6_3eyai")
+font_size = 25
+
+[sub_resource type="LabelSettings" id="LabelSettings_8mdgx"]
+font = ExtResource("6_3eyai")
+font_size = 32
+font_color = Color(0.86898494, 0.8689849, 0.8689849, 1)
+outline_size = 15
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_e5ijt"]
+font = ExtResource("6_3eyai")
+font_size = 32
+font_color = Color(0.86898494, 0.8689849, 0.8689849, 1)
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_euthe"]
+font = ExtResource("6_3eyai")
+font_size = 90
+
+[sub_resource type="LabelSettings" id="LabelSettings_pxijr"]
+font = ExtResource("6_3eyai")
+font_size = 80
+
+[node name="board" type="Node2D" unique_id=987870610 node_paths=PackedStringArray("board_controller", "pieces_controller", "queue_controller")]
+script = ExtResource("1_fo5xl")
+board_controller = NodePath("board_tiles")
+pieces_controller = NodePath("pieces")
+queue_controller = NodePath("queue_tiles")
+
+[node name="queue_tiles" type="TileMapLayer" parent="." unique_id=1202833647]
+texture_filter = 1
+tile_set = ExtResource("2_byeq6")
+script = ExtResource("3_hj61u")
+
+[node name="board_tiles" type="TileMapLayer" parent="." unique_id=1856813065 node_paths=PackedStringArray("pieces_controller", "placed_tiles")]
+texture_filter = 1
+tile_map_data = PackedByteArray("AAD7//X/AAAIAAAAAAD6//b/AAAIAAAAAAAEAPX/AAAIAAAAAAAFAPb/AAAIAAAAAAAFAAkAAAAIAAAAAAAEAAoAAAAIAAAAAAD6/wkAAAAIAAAAAAD7/woAAAAIAAAAAAAPAP3/AQAAAAAAAAAQAP3/AQAAAAAAAAAQAP7/AQAAAAAAAAARAP7/AQAAAAAAAAA=")
+tile_set = ExtResource("2_byeq6")
+script = ExtResource("4_1ekxy")
+pieces_controller = NodePath("../pieces")
+placed_tiles = NodePath("../placed_tiles")
+
+[node name="ghost_tiles" type="TileMapLayer" parent="." unique_id=702294583]
+modulate = Color(1, 1, 1, 0.20784314)
+texture_filter = 1
+tile_set = ExtResource("2_byeq6")
+
+[node name="placed_tiles" type="TileMapLayer" parent="." unique_id=489284848]
+texture_filter = 1
+tile_set = ExtResource("2_byeq6")
+
+[node name="pieces" type="TileMapLayer" parent="." unique_id=912887612 node_paths=PackedStringArray("board_controller", "queue_controller", "ghost_tiles", "soft_drop_timer", "das_timer", "arr_timer")]
+texture_filter = 1
+tile_set = ExtResource("2_byeq6")
+script = ExtResource("5_j4pvl")
+board_controller = NodePath("../board_tiles")
+queue_controller = NodePath("../queue_tiles")
+ghost_tiles = NodePath("../ghost_tiles")
+randomization_seed = 519
+soft_drop_ms = 50
+das_ms = 100
+arr_ms = 20
+soft_drop_timer = NodePath("../soft_drop_timer")
+das_timer = NodePath("../das_timer")
+arr_timer = NodePath("../arr_timer")
+
+[node name="Control" type="Control" parent="." unique_id=1029601117]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -151.0
+offset_top = -301.0
+offset_right = 151.0
+offset_bottom = 301.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Control" unique_id=1986626277]
+show_behind_parent = true
+z_index = -1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="line_clear_message" type="RichTextLabel" parent="Control" unique_id=1988366108]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -135.0
+offset_top = -142.0
+offset_right = -4.0
+offset_bottom = 1.0
+grow_vertical = 2
+theme_override_fonts/normal_font = ExtResource("6_3eyai")
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "[wave amp=50 freq=5][color=red]T[/color][color=green]E[/color][color=orange]T[/color][color=violet]R[/color][color=cyan]I[/color][color=orange]S[/color]![/wave]"
+horizontal_alignment = 1
+custom_effects = [SubResource("RichTextEffect_euthe")]
+
+[node name="lines_levels" type="Label" parent="Control" unique_id=1633840747]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -93.0
+offset_top = 20.0
+offset_right = -23.0
+offset_bottom = 207.0
+grow_vertical = 2
+text = "Lines:
+0/10
+
+lvl:
+1"
+label_settings = SubResource("LabelSettings_fgaad")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="score" type="Label" parent="Control" unique_id=934661956]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = 1.0
+offset_right = 20.0
+offset_bottom = 46.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "0"
+label_settings = SubResource("LabelSettings_8mdgx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="add" type="Label" parent="Control/score" unique_id=2058820509]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 162.5
+offset_top = -39.0
+offset_right = 202.5
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "0"
+label_settings = SubResource("LabelSettings_e5ijt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="score2" type="Label" parent="Control" unique_id=925141483]
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = 1.0
+offset_right = 20.0
+offset_bottom = 46.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "0"
+label_settings = SubResource("LabelSettings_8mdgx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="add" type="Label" parent="Control/score2" unique_id=1417753865]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 162.5
+offset_top = -39.0
+offset_right = 202.5
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "0"
+label_settings = SubResource("LabelSettings_e5ijt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="gameover" type="Label" parent="Control" unique_id=1495387268]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -258.0
+offset_top = -109.0
+offset_right = 258.0
+offset_bottom = 15.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "GAME
+OVER"
+label_settings = SubResource("LabelSettings_euthe")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="countdown" type="Label" parent="Control" unique_id=738067420]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -12.5
+offset_top = -11.5
+offset_right = 12.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "TETRIS"
+label_settings = SubResource("LabelSettings_pxijr")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="soft_drop_timer" type="Timer" parent="." unique_id=1939985344]
+process_callback = 0
+
+[node name="das_timer" type="Timer" parent="." unique_id=1490738818]
+one_shot = true
+
+[node name="arr_timer" type="Timer" parent="." unique_id=44269999]
+
+[node name="sfx" type="AudioStreamPlayer" parent="." unique_id=444017597]

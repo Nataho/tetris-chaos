@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dwxemhhlb1ldn"
+path="res://.godot/imported/combo_15_power.wav-34a5db0d73d16ddaf23b37697e1007a2.sample"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/combo_15_power.wav"
+dest_files=["res://.godot/imported/combo_15_power.wav-34a5db0d73d16ddaf23b37697e1007a2.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

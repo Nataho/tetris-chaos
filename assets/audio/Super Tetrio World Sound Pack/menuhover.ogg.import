@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://cksurbfhf0lfk"
+path="res://.godot/imported/menuhover.ogg-b6637db338c0743772e40ff6bf3c982a.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/menuhover.ogg"
+dest_files=["res://.godot/imported/menuhover.ogg-b6637db338c0743772e40ff6bf3c982a.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

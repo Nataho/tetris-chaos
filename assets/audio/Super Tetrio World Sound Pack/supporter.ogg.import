@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://dv1623acwy1i4"
+path="res://.godot/imported/supporter.ogg-24463f703f5ef0f02cc4b4f060005589.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/supporter.ogg"
+dest_files=["res://.godot/imported/supporter.ogg-24463f703f5ef0f02cc4b4f060005589.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

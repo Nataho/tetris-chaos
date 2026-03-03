@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://4ig58g5mpehk"
+path="res://.godot/imported/ranklower.ogg-54d7f2eaa7372e44d4fbbc5c24fdd632.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/ranklower.ogg"
+dest_files=["res://.godot/imported/ranklower.ogg-54d7f2eaa7372e44d4fbbc5c24fdd632.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://bimbbuyvtvmme"
+path="res://.godot/imported/thunder5.ogg-549d2c84530f961612e2d16c41c853ad.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/Super Tetrio World Sound Pack/thunder5.ogg"
+dest_files=["res://.godot/imported/thunder5.ogg-549d2c84530f961612e2d16c41c853ad.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

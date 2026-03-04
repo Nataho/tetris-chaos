@@ -14,6 +14,7 @@ const MAX_GARBAGE_PER_DROP: int = 100
 
 @export var random_seed:bool = true
 @export var seed:int = -1
+@export var handicap:float = 1 ##the amount of lines mutiplied or devided from 
 
 @onready var line_clear_message: RichTextLabel = $Control/line_clear_message
 @onready var lines_levels: Label = $Control/lines_levels
@@ -22,7 +23,6 @@ const MAX_GARBAGE_PER_DROP: int = 100
 
 enum game_modes {MARATHON, VERSUS}
 var game_mode:game_modes
-
 
 const max_message_duration:float = 5
 const message_fade_time:float = 2
@@ -36,6 +36,9 @@ var last_garbage_sender:int = -1 #player_id
 
 var knockout_credit = -1 ##the one who get's the KO score
 var garbage_queue: Array[Dictionary] = []
+var controller_keybinds = {
+	
+}
 
 func _ready() -> void:
 	#board_controller.start()
@@ -86,7 +89,7 @@ func start(countdown: float):
 	
 	# 2. Wait out that fraction of a second in silence FIRST
 	if decimal_part > 0.0:
-		await get_tree().create_timer(decimal_part).timeout
+		await get_tree().create_timer(decimal_part, false).timeout
 		countdown -= decimal_part
 		
 	# Now your countdown is a perfect whole number! (e.g., 5.0)
@@ -96,7 +99,7 @@ func start(countdown: float):
 		display_countdown(int(countdown))
 		
 		# Now we always wait exactly 1 second
-		await get_tree().create_timer(1.0).timeout
+		await get_tree().create_timer(1.0, false).timeout
 		countdown -= 1.0
 		
 	# 4. Hit 0! (Your display function turns this into "GO!")
@@ -239,6 +242,8 @@ func display_countdown(time_left:int):
 func reset():
 	_super_reset()
 	# 1. Hide Game Over screen and floating texts
+	garbage_queue = []
+	
 	$Control/gameover.hide()
 	line_clear_message.modulate.a = 0
 	add_score_message.modulate.a = 0

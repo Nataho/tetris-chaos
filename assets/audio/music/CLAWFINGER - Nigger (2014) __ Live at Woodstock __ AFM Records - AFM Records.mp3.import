@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cqhuq3p3n22qt"
+path="res://.godot/imported/CLAWFINGER - Nigger (2014) __ Live at Woodstock __ AFM Records - AFM Records.mp3-8491721635c732a027b46fd2ec56faae.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/CLAWFINGER - Nigger (2014) __ Live at Woodstock __ AFM Records - AFM Records.mp3"
+dest_files=["res://.godot/imported/CLAWFINGER - Nigger (2014) __ Live at Woodstock __ AFM Records - AFM Records.mp3-8491721635c732a027b46fd2ec56faae.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

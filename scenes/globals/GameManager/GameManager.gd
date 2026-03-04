@@ -9,7 +9,7 @@ var server_info := {
 	"server_id": 0
 }
 
-const default_controls = {
+const default_keyboard_controls = {
 	"ML": KEY_LEFT,
 	"MR": KEY_RIGHT,
 	"SD": KEY_DOWN,
@@ -18,6 +18,17 @@ const default_controls = {
 	"RR": KEY_X,
 	"H": KEY_C
 }
+
+const default_gamepad_controls = {
+	"ML": ["L"],
+	"MR": ["R"],
+	"SD": ["D"],
+	"HD": ["U"],
+	"RL": ["A"],
+	"RR": ["B"],
+	"H": ["LB","RB"]
+}
+
 const default_handling = {
 	"SD": 100,
 	"DAS": 167,
@@ -31,8 +42,9 @@ var player_data = {
 	"uid": "",
 	"name": "guest",
 	"high_score": 0,
+	"marathon_level": 1,
 }
-var controls = default_controls.duplicate()
+var controls = default_keyboard_controls.duplicate()
 var handling = default_handling.duplicate()
 
 var settings = {

@@ -222,6 +222,7 @@ func _set_gamepad_signals():
 func gamepad_button_pressed(button:ButtonData):
 	if button.player_index != board_parent._player_index and board_parent.game_mode == board_parent.game_modes.VERSUS: return
 	if !cur_piece_controller or cur_piece_controller.is_queued_for_deletion(): return
+	if !started: return
 	
 	# CRITICAL: This is what allows the piece to be HELD in _process!
 	held_gamepad_buttons[button.name] = true 
@@ -237,6 +238,7 @@ func gamepad_button_pressed(button:ButtonData):
 func gamepad_button_released(button:ButtonData):
 	if button.player_index != board_parent._player_index and board_parent.game_mode == board_parent.game_modes.VERSUS: return
 	if !cur_piece_controller or cur_piece_controller.is_queued_for_deletion(): return
+	if !started: return
 	
 	# CRITICAL: This tells _process to STOP holding the piece!
 	held_gamepad_buttons[button.name] = false 
@@ -252,6 +254,7 @@ func _input(event: InputEvent) -> void:
 	if board_parent.game_mode == board_parent.game_modes.VERSUS and not is_keyboard: return
 	if !cur_piece_controller: return
 	if board_controller.game_over: return
+	if !started: return
 
 	# MOVEMENT PRESSES
 	if event.is_action_pressed("move_left"):
@@ -346,17 +349,20 @@ func soft_drop_timeout():
 	#[TEST]
 	Audio.play_sound("soft_drop")
 
-func hard_drop(): # places the piece
-	if cur_piece_controller == null: return
-	if cur_piece_controller.is_queued_for_deletion(): return
+func hard_drop():
+	if cur_piece_controller == null or cur_piece_controller.is_queued_for_deletion(): return
 	
+	# SAFETY: If garbage is still rising, wait. 
+	# Otherwise, we place a piece while the board is shifting = CRASH.
+	#while board_controller.is_garbage_rising:
+		#await get_tree().process_frame
+		
 	cur_piece_controller.drop_piece()
-	
-	Events.player_placed.emit({
-		"player_id": board_parent._player_index
-	})
-	
+	Events.player_placed.emit({"player_id": board_parent._player_index})
 	Audio.play_sound("hard_drop")
+	
+	# Let the engine finish line clears before spawning next
+	await get_tree().process_frame 
 	spawn_piece()
 	
 func rotate_left(): # rotates counter_clockwise
@@ -411,30 +417,22 @@ func hold():
 
 func update_ghost_piece():
 	if !cur_piece_controller: return
+	ghost_tiles.clear()
 	
-	ghost_tiles.clear() #clear ghost tiles
+	var drop_offset: int = 0
+	var hit_bottom: bool = false
 	
-	var drop_offset:int = 0
-	var hit_bottom:bool = false
-	
-	while !hit_bottom: #loop when ghost hasn't hit the bottom
-		for tile:TileController in cur_piece_controller.tiles:
-			var test_pos: Vector2i = tile.coordinates + Vector2i(0,drop_offset)
-			
-			if !board_controller.is_pos_empty(test_pos):
+	# Safety cap of 25 rows prevents infinite while loops
+	while !hit_bottom and drop_offset < 25: 
+		for tile: TileController in cur_piece_controller.tiles:
+			var test_pos = tile.coordinates + Vector2i(0, drop_offset)
+			if !board_controller.is_pos_empty(test_pos) or !board_controller.is_in_bounds(test_pos):
 				hit_bottom = true
 				break
-			if !board_controller.is_in_bounds(test_pos):
-				hit_bottom = true
-				break
-		
-		if !hit_bottom:
-			drop_offset += 1
+		if !hit_bottom: drop_offset += 1
 	
-	for tile:TileController in cur_piece_controller.tiles:
-		var ghost_pos:Vector2i = tile.coordinates + Vector2i(0,drop_offset)
-		
-		ghost_tiles.set_cell(ghost_pos + Vector2i.UP, 0, Vector2i(7,0))
+	for tile in cur_piece_controller.tiles:
+		ghost_tiles.set_cell(tile.coordinates + Vector2i(0, drop_offset) + Vector2i.UP, 0, Vector2i(7,0))
 		
 func get_lock_delay(current_level: int) -> float:
 	# Loop through each key (100, then 75, then 50...)
@@ -466,3 +464,25 @@ func reset():
 	ghost_tiles.clear() # Clears the ghost layer
 	
 	current_bag.clear() # Empty the bag so a fresh one generates
+
+func stop():
+	# 1. STOP THE GRAVITY & AUTOMATIC LOCKING
+	# We stop the piece from falling on its own, but we DON'T kill the keyboard yet.
+	if cur_piece_controller and is_instance_valid(cur_piece_controller):
+		cur_piece_controller.stop()
+	
+	# 2. KILL THE HANDLING TIMERS
+	# This stops DAS (fast sliding) and ARR, so the piece can't be moved anymore.
+	das_timer.stop()
+	arr_timer.stop()
+	soft_drop_timer.stop()
+	
+	# 3. SET THE BARRIER
+	# Your _process loop checks this. Setting it to false stops gamepad polling.
+	started = false
+	
+	# 4. CLEAR THE BUFFERS
+	held_move_keys.clear()
+	held_gamepad_buttons.clear()
+
+	print("PiecesController: Logic frozen, but waiting for final place.")

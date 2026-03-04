@@ -1,0 +1,319 @@
+[gd_scene format=3 uid="uid://v32g77jnvn6k"]
+
+[ext_resource type="Script" uid="uid://vkmow02hd53g" path="res://classes/extras/ui_classes/PlayerSettings/player_settings.gd" id="1_tynoq"]
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="1_ukj41"]
+[ext_resource type="Script" uid="uid://dj6r8qc4bbwgk" path="res://scripts/rich_text_bounce.gd" id="2_feyjt"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_feyjt"]
+font = ExtResource("1_ukj41")
+font_size = 40
+
+[sub_resource type="Theme" id="Theme_feyjt"]
+default_font = ExtResource("1_ukj41")
+default_font_size = 40
+
+[sub_resource type="RichTextEffect" id="RichTextEffect_tynoq"]
+script = ExtResource("2_feyjt")
+metadata/_custom_type_script = "uid://dj6r8qc4bbwgk"
+
+[node name="player_settings" type="Control" unique_id=1938566742]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 88.0
+offset_top = 46.0
+offset_right = -88.0
+offset_bottom = -46.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tynoq")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=932780327]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="VBoxContainer" unique_id=867605591]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="ML" type="HBoxContainer" parent="VBoxContainer/Panel" unique_id=653326599]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel/ML" unique_id=1513620283]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 1
+text = "MOVE LEFT"
+label_settings = SubResource("LabelSettings_feyjt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="VBoxContainer/Panel/ML" unique_id=732953444]
+custom_minimum_size = Vector2(217, 49)
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/Panel/ML/Panel" unique_id=1299438173]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_feyjt")
+bbcode_enabled = true
+text = "unbound"
+horizontal_alignment = 1
+vertical_alignment = 1
+custom_effects = [SubResource("RichTextEffect_tynoq")]
+
+[node name="Panel2" type="Panel" parent="VBoxContainer" unique_id=1362194818]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="MR" type="HBoxContainer" parent="VBoxContainer/Panel2" unique_id=1908630921]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel2/MR" unique_id=2029475854]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 1
+text = "move right"
+label_settings = SubResource("LabelSettings_feyjt")
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="Panel" type="Panel" parent="VBoxContainer/Panel2/MR" unique_id=1032027983]
+custom_minimum_size = Vector2(217, 49)
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/Panel2/MR/Panel" unique_id=1406035629]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_feyjt")
+bbcode_enabled = true
+text = "unbound"
+horizontal_alignment = 1
+vertical_alignment = 1
+custom_effects = [SubResource("RichTextEffect_tynoq")]
+
+[node name="Panel3" type="Panel" parent="VBoxContainer" unique_id=433320903]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="SD" type="HBoxContainer" parent="VBoxContainer/Panel3" unique_id=1627641608]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel3/SD" unique_id=507989127]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 1
+text = "SOFT DROP"
+label_settings = SubResource("LabelSettings_feyjt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="VBoxContainer/Panel3/SD" unique_id=1037623879]
+custom_minimum_size = Vector2(217, 49)
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/Panel3/SD/Panel" unique_id=1344052144]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_feyjt")
+bbcode_enabled = true
+text = "unbound"
+horizontal_alignment = 1
+vertical_alignment = 1
+custom_effects = [SubResource("RichTextEffect_tynoq")]
+
+[node name="Panel4" type="Panel" parent="VBoxContainer" unique_id=880071800]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="HD" type="HBoxContainer" parent="VBoxContainer/Panel4" unique_id=1452988072]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel4/HD" unique_id=1368386210]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 1
+text = "HARD DROP"
+label_settings = SubResource("LabelSettings_feyjt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="VBoxContainer/Panel4/HD" unique_id=1244693148]
+custom_minimum_size = Vector2(217, 49)
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/Panel4/HD/Panel" unique_id=677131801]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_feyjt")
+bbcode_enabled = true
+text = "unbound"
+horizontal_alignment = 1
+vertical_alignment = 1
+custom_effects = [SubResource("RichTextEffect_tynoq")]
+
+[node name="Panel5" type="Panel" parent="VBoxContainer" unique_id=784419643]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="RL" type="HBoxContainer" parent="VBoxContainer/Panel5" unique_id=600409918]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel5/RL" unique_id=320131934]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 1
+text = "ROTATE LEFT"
+label_settings = SubResource("LabelSettings_feyjt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="VBoxContainer/Panel5/RL" unique_id=958616000]
+custom_minimum_size = Vector2(217, 49)
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/Panel5/RL/Panel" unique_id=787710106]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_feyjt")
+bbcode_enabled = true
+text = "unbound"
+horizontal_alignment = 1
+vertical_alignment = 1
+custom_effects = [SubResource("RichTextEffect_tynoq")]
+
+[node name="Panel6" type="Panel" parent="VBoxContainer" unique_id=1904002273]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="RR" type="HBoxContainer" parent="VBoxContainer/Panel6" unique_id=958735617]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel6/RR" unique_id=167078385]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 1
+text = "ROTATE RIGHT"
+label_settings = SubResource("LabelSettings_feyjt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="VBoxContainer/Panel6/RR" unique_id=853727237]
+custom_minimum_size = Vector2(217, 49)
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/Panel6/RR/Panel" unique_id=1190951960]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_feyjt")
+bbcode_enabled = true
+text = "unbound"
+horizontal_alignment = 1
+vertical_alignment = 1
+custom_effects = [SubResource("RichTextEffect_tynoq")]
+
+[node name="Panel7" type="Panel" parent="VBoxContainer" unique_id=1923042350]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="H" type="HBoxContainer" parent="VBoxContainer/Panel7" unique_id=1706656983]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel7/H" unique_id=379817123]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 1
+text = "HOLD"
+label_settings = SubResource("LabelSettings_feyjt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="VBoxContainer/Panel7/H" unique_id=294093696]
+custom_minimum_size = Vector2(217, 49)
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/Panel7/H/Panel" unique_id=1481663695]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_feyjt")
+bbcode_enabled = true
+text = "unbound"
+horizontal_alignment = 1
+vertical_alignment = 1
+custom_effects = [SubResource("RichTextEffect_tynoq")]

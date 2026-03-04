@@ -3,14 +3,24 @@
 [ext_resource type="Script" uid="uid://d3k6f13xh0kk8" path="res://scenes/game/local_multiplayer/local_multiplayer.gd" id="1_hj88h"]
 [ext_resource type="PackedScene" uid="uid://c2rodumqoa3fe" path="res://classes/boards/MultiplayerBoard/MultiplayerBoard.tscn" id="2_ylsce"]
 [ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="3_buvxm"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_m40d3"]
-font = ExtResource("3_buvxm")
-font_size = 30
+[ext_resource type="PackedScene" uid="uid://v32g77jnvn6k" path="res://classes/extras/ui_classes/PlayerSettings/player_settings.tscn" id="3_myqay"]
+[ext_resource type="Script" uid="uid://dj6r8qc4bbwgk" path="res://scripts/rich_text_bounce.gd" id="4_m40d3"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_buvxm"]
 font = ExtResource("3_buvxm")
 font_size = 200
+
+[sub_resource type="Theme" id="Theme_m40d3"]
+default_font = ExtResource("3_buvxm")
+default_font_size = 30
+
+[sub_resource type="Theme" id="Theme_buvxm"]
+default_font = ExtResource("3_buvxm")
+default_font_size = 30
+
+[sub_resource type="RichTextEffect" id="RichTextEffect_myqay"]
+script = ExtResource("4_m40d3")
+metadata/_custom_type_script = "uid://dj6r8qc4bbwgk"
 
 [sub_resource type="Animation" id="Animation_m40d3"]
 length = 0.001
@@ -75,6 +85,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_hj88h")
+first_to = 1
 
 [node name="bg" type="ColorRect" parent="." unique_id=1469003953]
 z_index = -1
@@ -86,71 +97,8 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.29296875, 0.29296875, 0.29296875, 1)
 
-[node name="p1_anchor" type="Control" parent="." unique_id=724853298]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="board" parent="p1_anchor" unique_id=987870610 instance=ExtResource("2_ylsce")]
-target_player = 2
-_player_index = 1
-
-[node name="name" type="Label" parent="p1_anchor" unique_id=1705263395]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_top = 351.0
-offset_right = 20.0
-offset_bottom = 374.0
-grow_horizontal = 2
-text = "(PRESS ENTER OR A)"
-label_settings = SubResource("LabelSettings_m40d3")
-
-[node name="p2_anchor" type="Control" parent="." unique_id=177337005]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="board" parent="p2_anchor" unique_id=1591048522 instance=ExtResource("2_ylsce")]
-target_player = 1
-_player_index = 2
-
-[node name="name" type="Label" parent="p2_anchor" unique_id=2050408524]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_top = 351.0
-offset_right = 20.0
-offset_bottom = 374.0
-grow_horizontal = 2
-text = "(PRESS ENTER OR A)"
-label_settings = SubResource("LabelSettings_m40d3")
-
-[node name="fg" type="ColorRect" parent="." unique_id=1805535816]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0)
-
 [node name="halves" type="HBoxContainer" parent="." unique_id=258158099]
-visible = false
+z_index = -1
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -174,6 +122,7 @@ grow_vertical = 2
 color = Color(0.64705884, 0, 0, 0.39215687)
 
 [node name="score" type="Label" parent="halves/left_half" unique_id=666996314]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -188,6 +137,50 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "0"
 label_settings = SubResource("LabelSettings_buvxm")
+
+[node name="player_settings" parent="halves/left_half" unique_id=1938566742 instance=ExtResource("3_myqay")]
+visible = false
+layout_mode = 1
+
+[node name="match" type="Control" parent="halves/left_half" unique_id=1832718827]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="halves/left_half/match" unique_id=1236508193]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -191.0
+offset_top = -38.0
+offset_right = 191.0
+offset_bottom = 38.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="rematch" type="Button" parent="halves/left_half/match/VBoxContainer" unique_id=1615219030]
+layout_mode = 2
+mouse_filter = 1
+mouse_behavior_recursive = 2
+theme_override_fonts/font = ExtResource("3_buvxm")
+theme_override_font_sizes/font_size = 40
+text = "REMATCH"
+
+[node name="exit" type="Button" parent="halves/left_half/match/VBoxContainer" unique_id=354982977]
+layout_mode = 2
+mouse_filter = 1
+mouse_behavior_recursive = 2
+theme_override_fonts/font = ExtResource("3_buvxm")
+theme_override_font_sizes/font_size = 40
+text = "EXIT"
 
 [node name="right_half" type="Control" parent="halves" unique_id=1875734172]
 layout_mode = 2
@@ -204,6 +197,7 @@ grow_vertical = 2
 color = Color(0, 0, 0.64705884, 0.39215687)
 
 [node name="score" type="Label" parent="halves/right_half" unique_id=1619800890]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -218,6 +212,139 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "0"
 label_settings = SubResource("LabelSettings_buvxm")
+
+[node name="match" type="Control" parent="halves/right_half" unique_id=1454365334]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="halves/right_half/match" unique_id=394936149]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -191.0
+offset_top = -38.0
+offset_right = 191.0
+offset_bottom = 38.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="rematch" type="Button" parent="halves/right_half/match/VBoxContainer" unique_id=2063887237]
+layout_mode = 2
+mouse_filter = 1
+mouse_behavior_recursive = 2
+theme_override_fonts/font = ExtResource("3_buvxm")
+theme_override_font_sizes/font_size = 40
+text = "REMATCH"
+
+[node name="exit" type="Button" parent="halves/right_half/match/VBoxContainer" unique_id=1421129652]
+layout_mode = 2
+mouse_filter = 1
+mouse_behavior_recursive = 2
+theme_override_fonts/font = ExtResource("3_buvxm")
+theme_override_font_sizes/font_size = 40
+text = "EXIT"
+
+[node name="p1_anchor" type="Control" parent="." unique_id=724853298]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="board" parent="p1_anchor" unique_id=987870610 instance=ExtResource("2_ylsce")]
+target_player = 2
+_player_index = 1
+
+[node name="name" type="RichTextLabel" parent="p1_anchor" unique_id=1582774485]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -178.17
+offset_top = 349.0
+offset_right = 178.17
+offset_bottom = 399.98
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_m40d3")
+bbcode_enabled = true
+text = "(PRESS [img=64]uid://bmnsg3vh6320g[/img] OR [img=64]uid://6ckyl4ggwwrt[/img])"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="p2_anchor" type="Control" parent="." unique_id=177337005]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="board" parent="p2_anchor" unique_id=1591048522 instance=ExtResource("2_ylsce")]
+target_player = 1
+_player_index = 2
+
+[node name="name" type="RichTextLabel" parent="p2_anchor" unique_id=335877254]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -178.17
+offset_top = 349.0
+offset_right = 178.17
+offset_bottom = 399.98
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_m40d3")
+bbcode_enabled = true
+text = "(PRESS [img=64]uid://bmnsg3vh6320g[/img] OR [img=64]uid://6ckyl4ggwwrt[/img])"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="score" type="RichTextLabel" parent="." unique_id=1988233883]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -161.0
+offset_top = 76.0
+offset_right = 161.0
+offset_bottom = 125.0
+grow_horizontal = 2
+theme = SubResource("Theme_buvxm")
+bbcode_enabled = true
+text = "[color=red](0/0)[/color] FT5 [color=blue](0/0)[/color]"
+horizontal_alignment = 1
+vertical_alignment = 1
+custom_effects = [SubResource("RichTextEffect_myqay")]
+
+[node name="fg" type="ColorRect" parent="." unique_id=1805535816]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
 
 [node name="anim" type="AnimationPlayer" parent="." unique_id=729296281]
 libraries/ = SubResource("AnimationLibrary_m40d3")

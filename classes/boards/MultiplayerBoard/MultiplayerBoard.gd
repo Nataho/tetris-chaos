@@ -5,9 +5,9 @@ signal knocked_out(node: MultiplayerBoard)
 
 @onready var anim: AnimationPlayer = $AnimationPlayer
 
-
 var kos: int = 0
 var center_pos = Vector2.ZERO
+var player_ready = false
 
 #region shake variables
 signal shake_finished
@@ -21,30 +21,54 @@ func set_player(player_index:int):
 #func _super_ready() -> void:
 	#print("huh?")
 
-func _super_reset() -> void:
+# Inside Board.gd or MultiplayerBoard.gd
+func setup_multiplayer(my_id: int, enemy_id: int):
+	_player_index = my_id
+	target_player = enemy_id
+	# Now the logic in _check_ko will have real IDs to compare against
+
+func reset():
+	super.reset()
 	anim.play("RESET")
-	#position = Vector2(0,0)
-	#modulate = Color(1,1,1,1)
-#func _super_physics_process(_delta) -> void:
-	#position = center_pos
+	player_ready = false # Ensure they aren't auto-ready for the next round
+	_initial_position = position
+
+func stop():
+	#pieces_controller.cur_piece_controller.stop()
+	pieces_controller.stop()
 
 func _check_ko(payload):
-	#print("checking knockout")
-	var KO_credit = payload["knockout_credit"] #player who gets the credit
-	var kod_id = payload["player_id"] #player who toped out
+	var credit_id = payload["knockout_credit"] 
+	var victim_id = payload["player_id"]
 	
-	if KO_credit == _player_index:
+	if _player_index == -1: return
+
+	# 1. HANDLE SELF-KO (Fixed Logic)
+	# Only re-map the credit if the victim of the KO is NOT me.
+	# If my opponent died and no one was credited, then I must be the winner!
+	if victim_id != _player_index and (credit_id == victim_id or credit_id == -1):
+		credit_id = _player_index
+	
+	# 2. ASSIGN POINTS
+	if credit_id == _player_index:
 		kos += 1
-		push_warning("player %d, has kod player, %d" % [_player_index, kod_id])
-	elif kod_id == _player_index:
-		Audio.play_sound("topout")
-		knocked_out.emit(self)
-		shake(100)
-		await shake_finished
-		
-		anim.play("knockout")
-		#await anim.animation_finished
-		
+		# Explicitly tell the UI to update
+		#get_parent().get_parent().update_scoreboard()
+
+	# 3. DEATH SEQUENCE
+	if victim_id == _player_index:
+		handle_death_sequence()
+
+func handle_death_sequence():
+	Audio.play_sound("topout")
+	knocked_out.emit(self)
+	
+	shake(100)
+	await shake_finished
+	
+	anim.play("knockout")
+	# You can add a 'yield' or 'await' here if you need to pause 
+	# before resetting the board
 
 func shake(intensity: float = 8.0, duration: float = 0.2):
 	# FIX: Capture the starting position if we haven't yet
@@ -81,4 +105,10 @@ func shake(intensity: float = 8.0, duration: float = 0.2):
 
 func _on_shake_finished():
 	shake_finished.emit()
-	
+
+func toggle_ready() -> bool:
+	player_ready = !player_ready
+	if player_ready:
+		#Audio.play_sound("ready_up")
+		pass
+	return player_ready

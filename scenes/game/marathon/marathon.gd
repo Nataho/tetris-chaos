@@ -35,6 +35,7 @@ var selected_level: int = 1
 # BUILT-IN ENGINE FUNCTIONS
 # ==========================================
 func _ready() -> void:
+	_on_level_text_changed(str(GameManager.player_data["marathon_level"]))
 	Audio.play_music("main_menu")
 	
 	# 1. Initial Hardcoded Layouts
@@ -118,6 +119,8 @@ func _on_level_text_changed(text: String) -> void:
 	if parsed_input == 0: 
 		parsed_input = 1
 	selected_level = parsed_input
+	GameManager.player_data["marathon_level"] = parsed_input
+	GameManager.SAVE_GAME()
 	board_node.update_details(parsed_input)
 
 func _on_start_button_pressed() -> void:

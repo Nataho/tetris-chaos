@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://pa7k62fmcl33"
+path="res://.godot/imported/Tetris Battle Versus - suno remix short.mp3-d72fcd16fdbc93df0ffa0a9c7b44e379.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Tetris Battle Versus - suno remix short.mp3"
+dest_files=["res://.godot/imported/Tetris Battle Versus - suno remix short.mp3-d72fcd16fdbc93df0ffa0a9c7b44e379.mp3str"]
+
+[params]
+
+loop=true
+loop_offset=0.5
+bpm=120.25
+beat_count=221
+bar_beats=4

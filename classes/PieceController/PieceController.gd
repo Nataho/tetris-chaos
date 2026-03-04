@@ -64,6 +64,8 @@ var ghost_tiles: Array[TileController]
 var piece_type: PIECE_TYPE
 var piece_offset: Vector2i
 var is_all_spin:bool
+var is_stopped: bool = false
+
 
 var current_lock_delay:float = 3.0
 var max_lock_delay:float = 3.0
@@ -85,7 +87,8 @@ func _init(PcC: PiecesController, BC:BoardController) -> void:
 	reset_fall_time()
 
 func _physics_process(delta: float) -> void:
-	if board_controller.game_over:
+			
+	if board_controller.game_over or is_stopped:
 		return
 	# 1. Handle Gravity (Falling)
 	if not is_on_floor:
@@ -212,6 +215,7 @@ func _are_tiles_spawnable() -> bool:
 	return true
 
 func rotate_piece(is_clockwise:bool, should_offset:bool):
+	if is_stopped: return
 	var old_rotation_index = rotation_index
 	rotation_index += 1 if is_clockwise else -1
 	rotation_index = mod(rotation_index,4)
@@ -290,6 +294,8 @@ func can_move_piece(movement:Vector2i) -> bool:
 	return true
 
 func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = false) -> bool:
+	if is_stopped: return false
+	
 	for tile:TileController in tiles:
 		tile.remove_tile()
 	
@@ -421,3 +427,16 @@ func get_spawn_pos() -> Vector2i:
 	var absolute_spawn_pos = board_controller.grid_start + spawn_pos
 	
 	return absolute_spawn_pos
+
+#var is_frozen: bool = false
+
+func stop():
+	# 1. Stop the physics engine from ever looking at this node
+	set_physics_process(false)
+	set_process(false)
+	
+	# 2. Reset visual state
+	pieces_controller.modulate = Color.WHITE
+	
+	# 3. Mark as frozen for any other scripts trying to access it
+	is_stopped = true

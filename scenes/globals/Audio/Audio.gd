@@ -24,6 +24,9 @@ const sound := {
 	"lvlup":[preload("uid://c8ikouvnemetn"), 10],
 	"new_high_score":[preload("uid://b02c72sgb1j6y"), 0],
 	"topout": [preload("uid://b0qj646pe160e"), 10],
+	"connect": [preload("uid://ckq7v80blwc4n"), 5],
+	"match_point": [preload("uid://bgnw6a7s535qx"),0],
+	
 	
 	"garbage_rise":[preload("uid://cu6jrki6jgrqe"),5],
 	
@@ -48,13 +51,33 @@ const sound := {
 	"combo14": [preload("uid://8vehfnir5128"), 0],
 	"combo15": [preload("uid://hmn4qnhil04h"), 0],
 	"combo16": [preload("uid://bxpehpwfaus1"), 0],
+	
+	"power_combo1": [preload("uid://bq1l6xpfw5ykg"), 5],
+	"power_combo2": [preload("uid://b2pe3fs0r800o"), 5],
+	"power_combo3": [preload("uid://o7pjgrhiadh4"), 5],
+	"power_combo4": [preload("uid://beeofy3f4g4cw"), 5],
+	"power_combo5": [preload("uid://h07d37f6s4x"), 5],
+	"power_combo6": [preload("uid://bbm7qed62efec"), 5],
+	"power_combo7": [preload("uid://cbubd0hqt1eax"), 5],
+	"power_combo8": [preload("uid://cvqcd0qghxrtr"), 5],
+	"power_combo9": [preload("uid://vcyiyylvnq5a"), 5],
+	"power_combo10": [preload("uid://bifvxjgns8fpx"), 5],
+	"power_combo11": [preload("uid://cjix6ov4r1wn8"), 5],
+	"power_combo12": [preload("uid://dw1e88dpwyxnd"), 5],
+	"power_combo13": [preload("uid://bl6jtool4k6m1"), 5],
+	"power_combo14": [preload("uid://dq768naost2fu"), 5],
+	"power_combo15": [preload("uid://cur5gty33icuo"), 5],
+	"power_combo16": [preload("uid://cg4wfprouu7my"), 5],
+	
 }
 
 const music := {
 	"marathon": [preload("uid://cswc5yxc0ajka"), 0],
 	"main_menu": [preload("uid://cxkfkkchh6ne3"), 0],
 	"battle": [preload("uid://dan8cx51lryal"), 0],
+	"neo battle": [preload("uid://pa7k62fmcl33"), 0],
 	"game_over": [preload("uid://biqalsdu1ga07"), 0],
+	"victory": [preload("uid://dwlf71kw2aaw1"), 0]
 }
 
 func play_sound(sound_key:String):

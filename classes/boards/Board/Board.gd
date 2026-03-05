@@ -21,7 +21,7 @@ const MAX_GARBAGE_PER_DROP: int = 100
 @onready var score: Label = $Control/score
 @onready var add_score_message: Label = $Control/score/add
 
-enum game_modes {MARATHON, VERSUS}
+enum game_modes {MARATHON, VERSUS, ONLINE}
 var game_mode:game_modes
 
 const max_message_duration:float = 5
@@ -54,11 +54,13 @@ func initialize_game_mode(gamemode:String, randomization_seed = -1):
 		random_seed = false
 		seed = randomization_seed
 		
-	match gamemode: 
+	match gamemode.to_lower(): 
 		"marathon":
 			game_mode = game_modes.MARATHON
 		"versus":
 			game_mode = game_modes.VERSUS
+		"online":
+			game_mode = game_modes.ONLINE
 			
 	board_controller.start()
 	queue_controller.start(board_controller.grid_start,pieces_controller)

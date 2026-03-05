@@ -41,6 +41,7 @@ func _enter_tree() -> void:
 		)
 
 func _process(delta: float) -> void:
+	if !_gamepad_handler or _gamepad_handler == null: return
 	_gamepad_handler.handle_controller_input()
 
 func _input(event: InputEvent) -> void:

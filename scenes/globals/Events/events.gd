@@ -21,8 +21,18 @@ signal sent_garbage(payload)
 #endregion
 
 #region server-client signals
+signal client_joined_lobby(payload)
+signal client_disconnected()
+
 signal client_searching
 signal client_connected
+signal server_accepted_join
+signal server_rejected_join
+
+signal sync_interaction(payload)
+signal sync_data(payload)
+signal recieved_board_data(payload)
+#endregion
 
 func _notification(what: int) -> void:
 	# This listens specifically for the Android Back Button / Gesture

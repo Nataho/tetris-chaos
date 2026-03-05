@@ -90,6 +90,10 @@ func connect_buttons():
 		get_tree().change_scene_to_file("res://scenes/game/local_multiplayer/local_multiplayer.tscn")
 		)
 	
+	lan.pressed.connect(func():
+		get_tree().change_scene_to_file("res://scenes/game/lan_lobby/lan_lobby.tscn")
+		)
+	
 	Events.android_back_pressed.connect(_back)
 	
 func change_tab(tab:tabs):

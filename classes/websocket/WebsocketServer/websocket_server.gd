@@ -1,5 +1,7 @@
 extends Node
 
+var active_players = []
+
 #region Variables
 @export var listen_port: int = 8080
 @export var broadcast_port: int = 4242
@@ -14,7 +16,7 @@ var broadcast_timer := 0.0
 
 func start() -> void:
 	if server_active: return
-	
+	NetworkSync.is_client = false
 	# Start TCP Listener for WebSockets
 	var err = tcp_server.listen(listen_port)
 	if err != OK:
@@ -86,19 +88,40 @@ func _read_packets(ws: WebSocketPeer) -> void:
 		if typeof(parsed_msg) != TYPE_DICTIONARY or not parsed_msg.has("signal"):
 			continue
 
+		print("hiiii")
 		_handle_signal(ws, parsed_msg)
 
 func _handle_signal(ws: WebSocketPeer, data: Dictionary) -> void:
 	# Generic routing via Events bus
 	match data["signal"]:
+		"join_lobby":
+			var new_data = data["data"]
+			new_data["socket"] = ws
+			if active_players.size() > 0:
+				send_to_client(ws, "join_rejected")
+			else:
+				active_players.append(data["data"])
+				Events.client_joined_lobby.emit(data["data"])
+				send_to_client(ws, "join_accepted")
 		"enter_game":
 			Events.enter_game.emit()
+		
+		"send_board_data":
+			Events.recieved_board_data.emit(data["data"])
+			
 		"sync_interaction":
 			Events.sync_interaction.emit(data)
 			# Relay to all other clients if needed
 			broadcast_signal("sync_interaction", data)
-		"interact":
-			Events.server_interaction.emit(data)
+		#"send_board_data":
+			#Events.recieved_board_data.emit(data["data"])
+		#"interact":
+			#Events.server_interaction.emit(data)
+		"testing":
+			print(data["data"])
+			#for tile in data["data"]:
+				#print(tile.coordinates)
+			#print(.coordinates)
 		_:
 			print("Server| Received unknown signal: ", data["signal"])
 
@@ -120,6 +143,27 @@ func stop_server():
 	print("Server| Offline.")
 #endregion
 
+func sync_interaction(action: String):
+	var payload = {
+		"signal": "sync_interaction",
+		"action": action
+	}
+	broadcast_signal(payload["signal"],payload)
+	
+	Events.sync_interaction.emit(payload)
+	print("Serveer| Sync Interaction")
+
+func sync_data(data:Dictionary):
+	var payload = {
+		"signal": "sync_data",
+		"data": data
+	}
+	
+	broadcast_signal(payload["signal"], payload)
+	
+	Events.sync_data.emit(payload)
+	print("Client| Sent 'sync_data'")
+
 #region Outbound Communication
 func broadcast_signal(signal_name: String, extra_data: Dictionary = {}) -> void:
 	var payload = {"signal": signal_name}
@@ -132,7 +176,7 @@ func broadcast_signal(signal_name: String, extra_data: Dictionary = {}) -> void:
 
 func send_to_client(ws: WebSocketPeer, signal_name: String, extra_data: Dictionary = {}) -> void:
 	var payload = {"signal": signal_name}
-	payload.merge(extra_data)
+	payload["data"] = extra_data
 	ws.send_text(JSON.stringify(payload))
 
 func _send_welcome(ws: WebSocketPeer) -> void:

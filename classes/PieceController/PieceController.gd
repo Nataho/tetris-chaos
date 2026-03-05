@@ -234,9 +234,11 @@ func rotate_piece(is_clockwise:bool, should_offset:bool):
 	if !can_offset:
 		rotate_piece(!is_clockwise,false)
 	pieces_controller.update_ghost_piece()
+	
 	Events.player_rotated.emit({
-		"name":"local",
-		"value": tiles
+		"player_id": board_controller.board_parent._player_index,
+		"rotation": rotation_index,
+		"tiles": get_tile_data()
 	})
 	reset_fall_time()
 
@@ -312,20 +314,22 @@ func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = fal
 			#if movement == Vector2.DOWN:
 				#set_piece()
 			pieces_controller.update_ghost_piece()
-			Events.player_moved.emit({
-				"name":"local",
-				"value": tiles
-			})
+			#Events.player_moved.emit({
+				#"name":"local",
+				#"value": tiles
+			#})
 			#reset_fall_time()
 			return false
 
 	for tile:TileController in tiles:
 		tile.move_tile(movement,is_rotate)
-		pieces_controller.update_ghost_piece()
-		Events.player_moved.emit({
-			"name":"local",
-			"value": tiles
-		})
+	pieces_controller.update_ghost_piece()
+	Events.player_moved.emit({
+		"player_id": board_controller.board_parent._player_index,
+		"tiles": get_tile_data(),
+		"ghost": pieces_controller.get_ghost_data()
+	})
+		
 	if is_on_floor:
 		reset_fall_time()
 		
@@ -348,6 +352,11 @@ func place(): #places the piece tiles on the placed_tiles_layer
 		tile.remove_tile()
 		
 		#await pieces_controller.get_tree().create_timer(0.25).timeout
+	
+	Events.player_placed.emit({
+		"player_id": board_controller.board_parent._player_index,
+		"placed_tiles": get_tile_data() # Sends the 4 tiles that just locked
+	})
 	
 	var is_spin = false
 	var is_mini = false
@@ -440,3 +449,21 @@ func stop():
 	
 	# 3. Mark as frozen for any other scripts trying to access it
 	is_stopped = true
+
+func get_tile_data():
+	var data = []
+	for tile:TileController in tiles:
+		var tile_data = tile.get_tile_data()
+		data.append(tile_data)
+	return data
+
+func _emit_network_sync():
+	# We include piece_type and rotation_index so the remote client 
+	# has all the context it needs to render correctly.
+	Events.player_moved.emit({
+		"player_id": board_controller.board_parent._player_index,
+		"piece_type": piece_type,
+		"rotation": rotation_index,
+		"tiles": get_tile_data(),
+		"ghost": pieces_controller.get_ghost_data()
+	})

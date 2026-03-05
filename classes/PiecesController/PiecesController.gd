@@ -486,3 +486,37 @@ func stop():
 	held_gamepad_buttons.clear()
 
 	print("PiecesController: Logic frozen, but waiting for final place.")
+
+func get_ghost_data() -> Array:
+	if !cur_piece_controller: 
+		return []
+		
+	var ghost_data = []
+	var drop_offset: int = 0
+	var hit_bottom: bool = false
+	
+	# 1. Calculate the vertical offset (copy-paste of your ghost logic)
+	# Safety cap of 25 rows prevents infinite while loops
+	while !hit_bottom and drop_offset < 25: 
+		for tile: TileController in cur_piece_controller.tiles:
+			var test_pos = tile.coordinates + Vector2i(0, drop_offset)
+			if !board_controller.is_pos_empty(test_pos) or !board_controller.is_in_bounds(test_pos):
+				hit_bottom = true
+				break
+		if !hit_bottom: 
+			drop_offset += 1
+	
+	# The actual offset is drop_offset - 1 because the loop increments 
+	# one last time before breaking, or use your specific TileMap offset logic
+	var final_offset = drop_offset + Vector2i.UP.y # Aligning with your set_cell logic
+	
+	# 2. Build the array of coordinates
+	for tile: TileController in cur_piece_controller.tiles:
+		var ghost_pos = tile.coordinates + Vector2i(0, final_offset)
+		ghost_data.append({
+			"pos_x": ghost_pos.x,
+			"pos_y": ghost_pos.y,
+			"type": "ghost" # You can use this to differentiate tile types on the other end
+		})
+		
+	return ghost_data

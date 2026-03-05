@@ -180,6 +180,13 @@ func check_line_clears(is_spin:bool = false, is_mini:bool = true, piece_type:Str
 				4: 
 					Audio.play_sound("quad_clear")
 					is_b2b = true
+		#Events.player_cleared.emit({
+				#"player_id": board_parent._player_index,
+				#"lines": cleared_count,
+				#"piece_type": piece_type,
+				#"is_spin": is_spin,
+				#"is_mini": is_mini
+			#})
 	
 	# Clear marked lines
 	for line_y in lines_to_clear:
@@ -509,3 +516,20 @@ func reset():
 	score = 0
 	game_over = false
 	is_power_combo = false
+
+func get_placed_tiles_data() -> Array:
+	var placed_data = []
+	# Assuming 'self' is the TileMapLayer where locked blocks are placed
+	var cells = placed_tiles.get_used_cells()
+	
+	for cell in cells:
+		if cell.x == grid_start.x-1: continue
+		var atlas_coords = placed_tiles.get_cell_atlas_coords(cell)
+		print("atlas_coords", atlas_coords)
+		placed_data.append({
+			"pos_x": cell.x,
+			"pos_y": cell.y,
+			"type": atlas_coords.x # The piece type / color index
+		})
+		
+	return placed_data

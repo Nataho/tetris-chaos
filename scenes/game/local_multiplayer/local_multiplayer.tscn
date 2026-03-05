@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dq7nufvkc8vxl"]
 
 [ext_resource type="Script" uid="uid://d3k6f13xh0kk8" path="res://scenes/game/local_multiplayer/local_multiplayer.gd" id="1_hj88h"]
-[ext_resource type="PackedScene" uid="uid://c2rodumqoa3fe" path="res://classes/boards/MultiplayerBoard/MultiplayerBoard.tscn" id="2_ylsce"]
+[ext_resource type="PackedScene" uid="uid://c2rodumqoa3fe" path="res://classes/boards/LocalBoard/LocalBoard.tscn" id="2_ylsce"]
 [ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="3_buvxm"]
 [ext_resource type="PackedScene" uid="uid://v32g77jnvn6k" path="res://classes/extras/ui_classes/PlayerSettings/player_settings.tscn" id="3_myqay"]
 [ext_resource type="Script" uid="uid://dj6r8qc4bbwgk" path="res://scripts/rich_text_bounce.gd" id="4_m40d3"]

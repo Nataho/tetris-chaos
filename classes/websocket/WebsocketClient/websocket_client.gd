@@ -52,7 +52,6 @@ func _search_for_server() -> void:
 		
 		var url = "ws://" + found_server_ip + ":" + str(server_port)
 		client.connect_to_url(url)
-		Events.client_connected.emit()
 
 func _handle_disconnection() -> void:
 	print("Client| Connection lost. Reverting to discovery mode...")
@@ -84,14 +83,57 @@ func _process_server_signal(data: Dictionary) -> void:
 	match data["signal"]:
 		"server_connected":
 			print("Client| Handshake complete.")
+			Events.client_connected.emit()
+		
+		"join_accepted":
+			print("Client| server has accepted the join request")
+			Events.server_accepted_join.emit()
+
+		"join_rejected":
+			print("Client| server has rejected the join request")
+			Events.server_rejected_join.emit()
+		
+		"send_board_data":
+			Events.recieved_board_data.emit(data["data"])
+		
+		#"start_match":
+			#print("Client| server is starting match")
+			#Events.server_started_match.emit()
 		"sync_interaction":
 			Events.sync_interaction.emit(data)
-		"interact":
-			Events.client_interaction.emit(data)
+		"sync_data":
+			Events.sync_data.emit(data)
+		#"interact":
+			#Events.client_interaction.emit(data)
 		"error":
 			print("Client| Server Error: ", data.get("message", "Unknown"))
 		_:
 			print("Client| Unhandled signal: ", data["signal"])
+
+func sync_interaction(action: String):
+	if client.get_ready_state() != WebSocketPeer.STATE_OPEN:
+		return
+	
+	var payload = {
+		"signal": "sync_interaction",
+		"action": action
+	}
+	
+	client.send_text(JSON.stringify(payload))
+	print("Client| Sent 'sync_interaction")
+
+func sync_data(data:Dictionary):
+	if client.get_ready_state() != WebSocketPeer.STATE_OPEN:
+		return
+	var payload = {
+		"signal": "sync_data",
+		"data": data
+	}
+	
+	#Events.sync_data.emit(payload)
+	client.send_text(JSON.stringify(payload))
+	print("Client| Sent 'sync_data'")
+
 #endregion
 
 #region Outbound Communication
@@ -100,7 +142,7 @@ func send_signal(signal_name: String, extra_data: Dictionary = {}) -> void:
 		return
 		
 	var payload = {"signal": signal_name}
-	payload.merge(extra_data)
+	payload["data"] = extra_data
 	
 	client.send_text(JSON.stringify(payload))
 	

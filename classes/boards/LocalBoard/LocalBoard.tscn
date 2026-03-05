@@ -1,6 +1,6 @@
-[gd_scene format=4 uid="uid://cxe4qml4rsqvo"]
+[gd_scene format=4 uid="uid://c2rodumqoa3fe"]
 
-[ext_resource type="Script" uid="uid://qfads8tv36op" path="res://classes/boards/MultiplayerBoard/MultiplayerBoard.gd" id="1_85aws"]
+[ext_resource type="Script" uid="uid://4ewndbbup0wd" path="res://classes/boards/LocalBoard/LocalBoard.gd" id="1_85aws"]
 [ext_resource type="TileSet" uid="uid://v0vnl271k60r" path="res://assets/tile_maps/textures.tres" id="2_23c52"]
 [ext_resource type="Script" uid="uid://cnaycdfqddik6" path="res://classes/QueueController/QueueController.gd" id="3_lq2j3"]
 [ext_resource type="Script" uid="uid://ybbl5ym3mwlj" path="res://classes/BoardController/BoardController.gd" id="4_vlpwf"]
@@ -134,13 +134,14 @@ texture_filter = 1
 tile_set = ExtResource("2_23c52")
 script = ExtResource("3_lq2j3")
 
-[node name="board_tiles" type="TileMapLayer" parent="." unique_id=1856813065 node_paths=PackedStringArray("pieces_controller", "placed_tiles")]
+[node name="board_tiles" type="TileMapLayer" parent="." unique_id=1856813065 node_paths=PackedStringArray("pieces_controller", "placed_tiles", "board_parent")]
 texture_filter = 1
 tile_map_data = PackedByteArray("AAD7//X/AAAIAAAAAAD6//b/AAAIAAAAAAAEAPX/AAAIAAAAAAAFAPb/AAAIAAAAAAAFAAkAAAAIAAAAAAAEAAoAAAAIAAAAAAD6/wkAAAAIAAAAAAD7/woAAAAIAAAAAAAPAP3/AQAAAAAAAAAQAP3/AQAAAAAAAAAQAP7/AQAAAAAAAAARAP7/AQAAAAAAAAA=")
 tile_set = ExtResource("2_23c52")
 script = ExtResource("4_vlpwf")
 pieces_controller = NodePath("../pieces")
 placed_tiles = NodePath("../placed_tiles")
+board_parent = NodePath("..")
 
 [node name="ghost_tiles" type="TileMapLayer" parent="." unique_id=702294583]
 modulate = Color(1, 1, 1, 0.20784314)

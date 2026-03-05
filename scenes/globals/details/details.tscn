@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://n8swy1x2hhdk"]
+
+[ext_resource type="Script" uid="uid://2veuot8m2ns" path="res://scenes/globals/details/details.gd" id="1_b613u"]
+[ext_resource type="FontFile" uid="uid://b4vif8qlndc3e" path="res://assets/fonts/BAHNSCHRIFT.TTF" id="2_3o0v5"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_finkb"]
+font = ExtResource("2_3o0v5")
+font_size = 28
+
+[node name="Details" type="Control" unique_id=1519246657]
+z_index = 218
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_b613u")
+
+[node name="Label" type="Label" parent="." unique_id=449053978]
+layout_mode = 1
+offset_left = 29.0
+offset_top = 26.0
+offset_right = 85.0
+offset_bottom = 55.0
+text = "FPS:"
+label_settings = SubResource("LabelSettings_finkb")

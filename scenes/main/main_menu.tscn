@@ -444,7 +444,6 @@ text = "LOCAL VERSUS"
 [node name="lan" type="Button" parent="Multiplayer/empty_space/VBoxContainer" unique_id=1517169501]
 layout_mode = 2
 theme = ExtResource("3_byqcc")
-disabled = true
 text = "LAN"
 
 [node name="ranked" type="Button" parent="Multiplayer/empty_space/VBoxContainer" unique_id=741614244]

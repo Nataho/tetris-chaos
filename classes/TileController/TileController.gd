@@ -118,3 +118,11 @@ func is_piece_immobile() -> bool:
 		if piece_controller.can_move_to_offset(dir):
 			return false
 	return true
+
+func get_tile_data():
+	var data = {
+		"pos_x": coordinates.x,
+		"pos_y": coordinates.y,
+		"type": piece_type
+	}
+	return data

@@ -1,40 +1,40 @@
-[gd_scene format=4 uid="uid://cxe4qml4rsqvo"]
+[gd_scene format=4 uid="uid://d2l8ojou1pilf"]
 
-[ext_resource type="Script" uid="uid://qfads8tv36op" path="res://classes/boards/MultiplayerBoard/MultiplayerBoard.gd" id="1_85aws"]
-[ext_resource type="TileSet" uid="uid://v0vnl271k60r" path="res://assets/tile_maps/textures.tres" id="2_23c52"]
-[ext_resource type="Script" uid="uid://cnaycdfqddik6" path="res://classes/QueueController/QueueController.gd" id="3_lq2j3"]
-[ext_resource type="Script" uid="uid://ybbl5ym3mwlj" path="res://classes/BoardController/BoardController.gd" id="4_vlpwf"]
-[ext_resource type="Script" uid="uid://6a0ardrr0173" path="res://classes/PiecesController/PiecesController.gd" id="5_jld4j"]
-[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="6_8oonn"]
-[ext_resource type="Script" uid="uid://dj6r8qc4bbwgk" path="res://scripts/rich_text_bounce.gd" id="7_rpmvs"]
+[ext_resource type="Script" uid="uid://ch4j1kf8sv0uw" path="res://classes/boards/NetworkBoard/NetworkBoard.gd" id="1_61skl"]
+[ext_resource type="TileSet" uid="uid://v0vnl271k60r" path="res://assets/tile_maps/textures.tres" id="2_uxre4"]
+[ext_resource type="Script" uid="uid://cnaycdfqddik6" path="res://classes/QueueController/QueueController.gd" id="3_1oyru"]
+[ext_resource type="Script" uid="uid://ybbl5ym3mwlj" path="res://classes/BoardController/BoardController.gd" id="4_wdbuw"]
+[ext_resource type="Script" uid="uid://6a0ardrr0173" path="res://classes/PiecesController/PiecesController.gd" id="5_iijya"]
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="6_bu5we"]
+[ext_resource type="Script" uid="uid://dj6r8qc4bbwgk" path="res://scripts/rich_text_bounce.gd" id="7_7shup"]
 
 [sub_resource type="RichTextEffect" id="RichTextEffect_euthe"]
-script = ExtResource("7_rpmvs")
+script = ExtResource("7_7shup")
 metadata/_custom_type_script = "uid://dj6r8qc4bbwgk"
 
 [sub_resource type="LabelSettings" id="LabelSettings_fgaad"]
-font = ExtResource("6_8oonn")
+font = ExtResource("6_bu5we")
 font_size = 25
 
 [sub_resource type="LabelSettings" id="LabelSettings_8mdgx"]
-font = ExtResource("6_8oonn")
+font = ExtResource("6_bu5we")
 font_size = 32
 font_color = Color(0.86898494, 0.8689849, 0.8689849, 1)
 outline_size = 15
 outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_e5ijt"]
-font = ExtResource("6_8oonn")
+font = ExtResource("6_bu5we")
 font_size = 32
 font_color = Color(0.86898494, 0.8689849, 0.8689849, 1)
 outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_euthe"]
-font = ExtResource("6_8oonn")
+font = ExtResource("6_bu5we")
 font_size = 90
 
 [sub_resource type="LabelSettings" id="LabelSettings_pxijr"]
-font = ExtResource("6_8oonn")
+font = ExtResource("6_bu5we")
 font_size = 80
 
 [sub_resource type="Animation" id="Animation_23c52"]
@@ -124,37 +124,38 @@ _data = {
 }
 
 [node name="board" type="Node2D" unique_id=987870610 node_paths=PackedStringArray("board_controller", "pieces_controller", "queue_controller")]
-script = ExtResource("1_85aws")
+script = ExtResource("1_61skl")
 board_controller = NodePath("board_tiles")
 pieces_controller = NodePath("pieces")
 queue_controller = NodePath("queue_tiles")
 
 [node name="queue_tiles" type="TileMapLayer" parent="." unique_id=1202833647]
 texture_filter = 1
-tile_set = ExtResource("2_23c52")
-script = ExtResource("3_lq2j3")
+tile_set = ExtResource("2_uxre4")
+script = ExtResource("3_1oyru")
 
-[node name="board_tiles" type="TileMapLayer" parent="." unique_id=1856813065 node_paths=PackedStringArray("pieces_controller", "placed_tiles")]
+[node name="board_tiles" type="TileMapLayer" parent="." unique_id=1856813065 node_paths=PackedStringArray("pieces_controller", "placed_tiles", "board_parent")]
 texture_filter = 1
 tile_map_data = PackedByteArray("AAD7//X/AAAIAAAAAAD6//b/AAAIAAAAAAAEAPX/AAAIAAAAAAAFAPb/AAAIAAAAAAAFAAkAAAAIAAAAAAAEAAoAAAAIAAAAAAD6/wkAAAAIAAAAAAD7/woAAAAIAAAAAAAPAP3/AQAAAAAAAAAQAP3/AQAAAAAAAAAQAP7/AQAAAAAAAAARAP7/AQAAAAAAAAA=")
-tile_set = ExtResource("2_23c52")
-script = ExtResource("4_vlpwf")
+tile_set = ExtResource("2_uxre4")
+script = ExtResource("4_wdbuw")
 pieces_controller = NodePath("../pieces")
 placed_tiles = NodePath("../placed_tiles")
+board_parent = NodePath("..")
 
 [node name="ghost_tiles" type="TileMapLayer" parent="." unique_id=702294583]
 modulate = Color(1, 1, 1, 0.20784314)
 texture_filter = 1
-tile_set = ExtResource("2_23c52")
+tile_set = ExtResource("2_uxre4")
 
 [node name="placed_tiles" type="TileMapLayer" parent="." unique_id=489284848]
 texture_filter = 1
-tile_set = ExtResource("2_23c52")
+tile_set = ExtResource("2_uxre4")
 
 [node name="pieces" type="TileMapLayer" parent="." unique_id=912887612 node_paths=PackedStringArray("board_controller", "queue_controller", "ghost_tiles", "board_parent", "soft_drop_timer", "das_timer", "arr_timer")]
 texture_filter = 1
-tile_set = ExtResource("2_23c52")
-script = ExtResource("5_jld4j")
+tile_set = ExtResource("2_uxre4")
+script = ExtResource("5_iijya")
 board_controller = NodePath("../board_tiles")
 queue_controller = NodePath("../queue_tiles")
 ghost_tiles = NodePath("../ghost_tiles")
@@ -201,7 +202,7 @@ offset_top = -142.0
 offset_right = -4.0
 offset_bottom = 1.0
 grow_vertical = 2
-theme_override_fonts/normal_font = ExtResource("6_8oonn")
+theme_override_fonts/normal_font = ExtResource("6_bu5we")
 theme_override_font_sizes/normal_font_size = 20
 bbcode_enabled = true
 text = "[wave amp=50 freq=5][color=red]T[/color][color=green]E[/color][color=orange]T[/color][color=violet]R[/color][color=cyan]I[/color][color=orange]S[/color]![/wave]"

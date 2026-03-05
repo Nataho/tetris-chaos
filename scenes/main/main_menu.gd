@@ -46,6 +46,9 @@ var target_color:Color
 
 func _ready() -> void:
 	#display_input_Key(%test,"soft_drop")
+	if OS.get_name() == "Android":
+		$Multiplayer/empty_space/VBoxContainer/local_versus.hide()
+	
 	for i in range(get_children().size()):
 		if i <2: continue
 		
@@ -54,6 +57,8 @@ func _ready() -> void:
 	$main.show()
 	
 	Audio.play_music("main_menu")
+	#Audio.music_player_node.stream = Audio.music["main_menu"][0]
+	#Audio.music_player_node.play()
 	change_background(Color("a000f0"))
 	connect_buttons()
 

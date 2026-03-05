@@ -85,7 +85,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_hj88h")
-first_to = 1
 
 [node name="bg" type="ColorRect" parent="." unique_id=1469003953]
 z_index = -1

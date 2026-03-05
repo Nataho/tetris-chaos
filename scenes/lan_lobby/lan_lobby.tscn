@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://ctlnsfeb47mv"]
+
+[ext_resource type="Script" uid="uid://rpnsmyjsdxsf" path="res://scenes/lan_lobby/lan_lobby.gd" id="1_qwmjo"]
+[ext_resource type="Theme" uid="uid://dup756tvm3sht" path="res://assets/themes/main.tres" id="1_wyl6v"]
+
+[node name="LanLobby" type="Control" unique_id=493069010]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qwmjo")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2000240318]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="host" type="Button" parent="VBoxContainer" unique_id=80272893]
+layout_mode = 2
+theme = ExtResource("1_wyl6v")
+text = "HOST SERVER"
+
+[node name="join" type="Button" parent="VBoxContainer" unique_id=1551784156]
+layout_mode = 2
+theme = ExtResource("1_wyl6v")
+text = "JOIN SERVER"
+
+[node name="Control" type="Control" parent="." unique_id=856645804]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2

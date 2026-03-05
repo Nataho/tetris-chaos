@@ -74,10 +74,16 @@ const sound := {
 const music := {
 	"marathon": [preload("uid://cswc5yxc0ajka"), 0],
 	"main_menu": [preload("uid://cxkfkkchh6ne3"), 0],
-	"battle": [preload("uid://dan8cx51lryal"), 0],
 	"neo battle": [preload("uid://pa7k62fmcl33"), 0],
 	"game_over": [preload("uid://biqalsdu1ga07"), 0],
-	"victory": [preload("uid://dwlf71kw2aaw1"), 0]
+	"victory": [preload("uid://dwlf71kw2aaw1"), 0],
+	
+	"battle": [preload("uid://dan8cx51lryal"), 0],
+	"fb_battle": [preload("uid://gruf7jo6n77n"), 0],
+	"neo_battle": [preload("uid://pa7k62fmcl33"), 0],
+	"pro_battle": [preload("uid://ba1odmd1yas60"), 0],
+	"synthwave_battle": [preload("uid://86sqfygu7hs0"), 0],
+	"epic_battle": [preload("uid://33hhwbkttud0"), 0]
 }
 
 func play_sound(sound_key:String):
@@ -97,41 +103,43 @@ func play_sound(sound_key:String):
 func play_music(music_key: String,
 	end_effect: SOUND_END_EFFECTS = SOUND_END_EFFECTS.NONE, 
 	start_effect: SOUND_START_EFFECTS = SOUND_START_EFFECTS.NONE) -> void:
-	assert(music_key in music, "The sound key is not found in the dictionary.")
+	
+	if not music.has(music_key):
+		push_error("The sound key is not found in the dictionary: ", music_key)
+		return
 	
 	var loaded_file = music[music_key][0]
 	var target_volume = music[music_key][1]
-	var bus = &"Music" # Consider changing this to &"Music" later if you want separate volume sliders!
 	
 	# If this exact track is already playing, don't restart it
 	if music_player_node.stream == loaded_file and music_player_node.playing:
 		return
 		
-	# 1. Handle the END effect of the currently playing track
+	# 1. Handle the END effect
 	if music_player_node.playing:
-		match end_effect:
-			SOUND_END_EFFECTS.VINYL:
-				await trigger_vinyl_stop(2.0)
-			SOUND_END_EFFECTS.FADE:
-				await trigger_fade_out(1.5)
-			SOUND_END_EFFECTS.NONE:
-				music_player_node.stop()
+		if end_effect == SOUND_END_EFFECTS.VINYL:
+			await trigger_vinyl_stop(2.0)
+		elif end_effect == SOUND_END_EFFECTS.FADE:
+			await trigger_fade_out(1.5)
+		else:
+			# For NONE, we stop instantly and do NOT await
+			music_player_node.stop()
 				
 	# 2. Setup the NEW track
 	music_player_node.stream = loaded_file
-	music_player_node.bus = bus
-	music_player_node.pitch_scale = 1.0 # Ensure pitch is reset in case vinyl stop warped it
+	music_player_node.pitch_scale = 1.0 
 	
-	# 3. Handle the START effect for the new track
-	match start_effect:
-		SOUND_START_EFFECTS.FADE:
-			music_player_node.volume_db = -80.0 # Start silent
-			music_player_node.play()
-			trigger_fade_in(target_volume, 1.5)
-		SOUND_START_EFFECTS.NONE:
-			music_player_node.volume_db = target_volume
-			music_player_node.play()
-
+	# 3. Handle the START effect
+	if start_effect == SOUND_START_EFFECTS.FADE:
+		music_player_node.volume_db = -80.0 
+		music_player_node.play()
+		trigger_fade_in(target_volume, 1.5)
+	else:
+		music_player_node.volume_db = target_volume
+		music_player_node.play()
+		
+	print("Now playing: ", music_key)
+	print("is playing?: ", music_player_node.playing)
 # ==========================================
 # AUDIO EFFECTS LOGIC
 # ==========================================

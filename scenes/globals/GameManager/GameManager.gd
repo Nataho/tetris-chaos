@@ -145,5 +145,14 @@ func LOAD_GAME() -> bool:
 func _exit_tree() -> void:
 	SAVE_GAME()
 
+func change_resolution(width: int, height: int):
+	# Set the window size
+	DisplayServer.window_set_size(Vector2i(width, height))
+	
+	# Optional: Center the window on the screen after resizing
+	var screen_size = DisplayServer.screen_get_size()
+	var window_size = DisplayServer.window_get_size()
+	DisplayServer.window_set_position(screen_size / 2 - window_size / 2)
+
 func get_port_and_ip() -> String:
 	return server_info["ip"] + ":" + server_info["port"]

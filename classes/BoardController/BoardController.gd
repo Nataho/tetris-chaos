@@ -5,12 +5,13 @@ const grid_offset := Vector2i(1,1)
 enum garbage_types{INSTANT, GRADUAL}
 @export var grid_size: Vector2i = Vector2i(10,20)
 @export var grid_start: Vector2i = Vector2i((grid_size.x /2)*-1,-10) 
-
+@export var lerp_weight: float = 10.0 # Speed of the visual meter update
 @export var pieces_controller : PiecesController
 @export var placed_tiles: TileMapLayer
 @export var board_parent: Board = null 
 
 @export var current_level:int = 1
+var visual_garbage_total: float = 0.0 # The "chasing" value for the meter
 var consecutive_clear:int = 0 #combo
 var b2b_count:int = -1
 const max_level:int = 100
@@ -52,6 +53,69 @@ func start():
 	clear()
 	board_parent = get_parent()
 
+func _process(delta: float) -> void:
+	var actual_total: int = 0
+	if board_parent and board_parent.garbage_queue:
+		for attack in board_parent.garbage_queue:
+			actual_total += attack["amount"]
+	
+	var target = float(actual_total)
+	
+	if target < visual_garbage_total:
+		# INSTANT reduction (Snap down for gameplay clarity)
+		visual_garbage_total = target
+		_render_garbage_meter(floori(visual_garbage_total))
+	elif target > visual_garbage_total:
+		# LERP-ish increase (Smooth glide up)
+		# We use a higher weight for bigger attacks to make them "feel" faster/heavier
+		var distance = target - visual_garbage_total
+		var dynamic_weight = lerp_weight * remap(clampi(distance, 0, 20), 0, 20, 1.0, 2.5)
+		
+		# Standard lerp formula: current = current + (target - current) * weight * delta
+		visual_garbage_total = lerp(visual_garbage_total, target, dynamic_weight * delta)
+		
+		# If we're close enough, just snap to the target to stop the rendering loop
+		if distance < 0.1:
+			visual_garbage_total = target
+			
+		_render_garbage_meter(floori(visual_garbage_total))
+
+func pos_equal_approx(a: float, b: float) -> bool:
+	return abs(a - b) < 0.01
+
+func _render_garbage_meter(amount_to_draw: int) -> void:
+	var meter_x: int = grid_start.x - 1 
+	var grid_bottom: int = grid_start.y + grid_size.y - 1 
+	
+	# Clear previous meter cells
+	for y in range(grid_start.y - 20, grid_bottom + 1):
+		placed_tiles.erase_cell(Vector2i(meter_x, y))
+		
+	if amount_to_draw <= 0: return 
+
+	# Calculate wraps and colors
+	var visual_lines = amount_to_draw % grid_size.y
+	var full_wraps = amount_to_draw / grid_size.y
+	
+	if visual_lines == 0 and amount_to_draw > 0:
+		visual_lines = grid_size.y
+		full_wraps -= 1
+
+	var tier_colors: Array[Vector2i] = [
+		Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0), Vector2i(4, 0), 
+		Vector2i(5, 0), Vector2i(6, 0), Vector2i(8, 0)
+	]
+	
+	var fg_tier = min(full_wraps, tier_colors.size() - 1)
+	var bg_tier = min(max(0, full_wraps - 1), tier_colors.size() - 1)
+	
+	for i in range(grid_size.y):
+		var y_pos = grid_bottom - i
+		if i < visual_lines:
+			placed_tiles.set_cell(Vector2i(meter_x, y_pos), 2, tier_colors[fg_tier])
+		elif full_wraps > 0:
+			placed_tiles.set_cell(Vector2i(meter_x, y_pos), 2, tier_colors[bg_tier])
+			
 func create_grid() -> void:
 	for y in range(grid_size.y +2):
 		for x in range(grid_size.x +2):
@@ -120,6 +184,7 @@ func check_line_clears(is_spin:bool = false, is_mini:bool = true, piece_type:Str
 	# Clear marked lines
 	for line_y in lines_to_clear:
 		for x in range(grid_start.x, grid_end.x):
+			add_clear_particle(Vector2i(x,line_y))
 			placed_tiles.erase_cell(Vector2i(x, line_y))
 	
 	var shift_start_y: int = grid_start.y - 20 
@@ -204,7 +269,7 @@ func check_line_clears(is_spin:bool = false, is_mini:bool = true, piece_type:Str
 			else:
 				incoming_attack["amount"] -= garbage
 				garbage = 0 
-		update_garbage_meter()
+		#update_garbage_meter()
 
 	# Send remaining garbage
 	if garbage > 0:
@@ -256,7 +321,7 @@ func process_garbage_queue():
 				current_attack["amount"] -= amount_to_take
 				if current_attack["amount"] <= 0: garbage_queue.pop_front()
 		lines_added_this_turn += amount_to_take
-	update_garbage_meter()
+	#update_garbage_meter()
 
 func apply_garbage_instant(amount: int, gap_index: int, KO_credit:int):
 	var grid_end: Vector2i = grid_start + grid_size
@@ -303,7 +368,7 @@ func apply_garbage_gradual(amount: int, gap_index: int, KO_credit:int):
 			queue[0]["amount"] -= 1
 			if queue[0]["amount"] <= 0: queue.pop_front()
 		
-		update_garbage_meter()
+		#update_garbage_meter()
 		Audio.play_sound("garbage_rise")
 		board_parent.knockout_credit = KO_credit
 		await get_tree().create_timer(0.05).timeout
@@ -426,6 +491,12 @@ func _calculate_score(payload_data):
 func add_spin_particle(center_pos:Vector2i, clockwise:bool):
 	var particle := SpinParticle.create(clockwise)
 	var local_pos := map_to_local(center_pos)
+	particle.position = local_pos
+	board_parent.add_child(particle)
+
+func add_clear_particle(pos:Vector2i):
+	var particle := ClearParticle.create()
+	var local_pos := map_to_local(pos)
 	particle.position = local_pos
 	board_parent.add_child(particle)
 

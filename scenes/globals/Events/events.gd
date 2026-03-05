@@ -22,6 +22,7 @@ signal sent_garbage(payload)
 
 #region server-client signals
 signal client_searching
+signal client_connected
 
 func _notification(what: int) -> void:
 	# This listens specifically for the Android Back Button / Gesture

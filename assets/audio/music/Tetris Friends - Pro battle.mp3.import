@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ba1odmd1yas60"
+path="res://.godot/imported/Tetris Friends - Pro battle.mp3-04e434aa4bcff88eb808253df237023f.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Tetris Friends - Pro battle.mp3"
+dest_files=["res://.godot/imported/Tetris Friends - Pro battle.mp3-04e434aa4bcff88eb808253df237023f.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0.7
+bpm=120.15
+beat_count=353
+bar_beats=4

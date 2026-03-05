@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://f08e0rrudit0"]
+
+[ext_resource type="Script" uid="uid://tddimgam8374" path="res://classes/extras/ClearParticles/ClearParticles.gd" id="1_spsrk"]
+
+[sub_resource type="Gradient" id="Gradient_spsrk"]
+offsets = PackedFloat32Array(0, 0.67346936, 0.9591837)
+colors = PackedColorArray(1, 1, 1, 0.078431375, 1, 1, 1, 0.078431375, 1, 1, 1, 0)
+
+[node name="ClearParticles" type="CPUParticles2D" unique_id=39826258]
+emitting = false
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+emission_shape = 1
+emission_sphere_radius = 3.85
+gravity = Vector2(0, 490)
+initial_velocity_max = 42.37
+scale_amount_max = 30.0
+color_ramp = SubResource("Gradient_spsrk")
+script = ExtResource("1_spsrk")

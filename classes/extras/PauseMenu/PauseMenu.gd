@@ -3,7 +3,7 @@ class_name PauseMenu
 
 const FILE = preload("uid://bi5x52ocv1j03")
 var _gamepad_handler:GamepadHandler
-var _args
+var _args = []
 #@onready var buttons = {
 	#"resume": $vbox/resume,
 	#"restart": $vbox/restart,

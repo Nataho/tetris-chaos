@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://86sqfygu7hs0"
+path="res://.godot/imported/Tetris Friends - Synthwave battle.mp3-b6df520532ef06e35ea4a9ecbf210a9d.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Tetris Friends - Synthwave battle.mp3"
+dest_files=["res://.godot/imported/Tetris Friends - Synthwave battle.mp3-b6df520532ef06e35ea4a9ecbf210a9d.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0.22
+bpm=120.15
+beat_count=438
+bar_beats=4

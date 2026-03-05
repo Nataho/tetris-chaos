@@ -50,9 +50,12 @@ func _input(event: InputEvent) -> void:
 	if not event is InputEventKey:
 		return
 	
-	if event.is_action_pressed("pause") and game_started:
-		var current_p_index = gamepad_handler.controllers.get(-1, -1)
-		_button_input(ButtonData.new("START", current_p_index, 1, true))
+	if event.is_action_pressed("pause"):
+		if game_started:
+			var current_p_index = gamepad_handler.controllers.get(-1, -1)
+			_button_input(ButtonData.new("START", current_p_index, 1, true))
+		else:
+			get_tree().change_scene_to_file("res://scenes/main/main_menu.tscn")
 	
 	if event.is_action_pressed("ready") and !game_started:
 		var current_p_index = gamepad_handler.controllers.get(-1, -1)
@@ -166,7 +169,11 @@ func check_start_condition() -> void:
 			
 			
 			await _reset_players()
-			Audio.play_music("neo battle")
+			Audio.play_music("epic_battle")
+			
+			#Audio.play_music("pro_battle")
+			
+			#Audio.play_loop()
 			$p1_anchor/name.text = p1_display_text
 			$p2_anchor/name.text = p2_display_text
 			

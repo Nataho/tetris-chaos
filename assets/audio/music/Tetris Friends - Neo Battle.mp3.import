@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://pa7k62fmcl33"
+path="res://.godot/imported/Tetris Friends - Neo Battle.mp3-21d2c6caa41bd44b6fba23b18b36cd25.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Tetris Friends - Neo Battle.mp3"
+dest_files=["res://.godot/imported/Tetris Friends - Neo Battle.mp3-21d2c6caa41bd44b6fba23b18b36cd25.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0.5
+bpm=120.27
+beat_count=221
+bar_beats=4

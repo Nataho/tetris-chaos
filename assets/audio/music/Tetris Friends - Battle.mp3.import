@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://gruf7jo6n77n"
+path="res://.godot/imported/Tetris Friends - Battle.mp3-d83781ea58ed659d0b7d7b13af990a21.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Tetris Friends - Battle.mp3"
+dest_files=["res://.godot/imported/Tetris Friends - Battle.mp3-d83781ea58ed659d0b7d7b13af990a21.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0.18
+bpm=120.0
+beat_count=176
+bar_beats=4

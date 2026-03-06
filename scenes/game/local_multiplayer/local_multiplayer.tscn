@@ -265,6 +265,7 @@ grow_vertical = 2
 [node name="board" parent="p1_anchor" unique_id=987870610 instance=ExtResource("2_ylsce")]
 target_player = 2
 _player_index = 1
+handicap = 0.25
 
 [node name="name" type="RichTextLabel" parent="p1_anchor" unique_id=1582774485]
 layout_mode = 1

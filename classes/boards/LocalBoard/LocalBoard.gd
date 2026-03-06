@@ -19,10 +19,11 @@ func initialize(seed_val:int = -1):
 	
 
 func _connect_signals():
+	#Events.player_placed.connect(get_all_board_tile_info)
 	Events.player_moved.connect(get_all_board_tile_info)
 	Events.player_cleared.connect(get_all_board_tile_info)
-	Events.player_placed.connect(get_all_board_tile_info)
 	Events.player_rotated.connect(get_all_board_tile_info)
+	Events.player_spawned_piece.connect(get_all_board_tile_info)
 	pass
 
 func get_all_board_tile_info(payload):
@@ -31,12 +32,15 @@ func get_all_board_tile_info(payload):
 	var active_piece_tiles = pieces_controller.cur_piece_controller.get_tile_data()
 	var active_ghost_tiles = pieces_controller.get_ghost_data()
 	var active_placed_tiles = board_controller.get_placed_tiles_data()
+	await get_tree().process_frame
 	var active_queue = queue_controller.queue
+	var active_hold_piece = queue_controller.hold_piece
 	var data = {
 		"piece_tiles": active_piece_tiles,
 		"ghost_tiles": active_ghost_tiles,
 		"placed_tiles": active_placed_tiles,
-		"queue": active_queue
+		"queue": active_queue,
+		"hold_piece": active_hold_piece
 	}
 	
 	if NetworkClient.client_active:

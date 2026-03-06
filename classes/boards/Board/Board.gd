@@ -48,6 +48,9 @@ func _ready() -> void:
 	Events.player_cleared.connect(display_line_clear_message)
 	Events.player_kod.connect(_check_ko)
 	Events.sent_garbage.connect(receive_garbage)
+	pieces_controller.spawned_piece.connect(func(is_hold):
+		Events.player_spawned_piece.emit(is_hold)
+		)
 
 func initialize_game_mode(gamemode:String, randomization_seed = -1):
 	if randomization_seed != -1:

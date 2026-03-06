@@ -525,7 +525,7 @@ func get_placed_tiles_data() -> Array:
 	for cell in cells:
 		if cell.x == grid_start.x-1: continue
 		var atlas_coords = placed_tiles.get_cell_atlas_coords(cell)
-		print("atlas_coords", atlas_coords)
+		#print("atlas_coords", atlas_coords)
 		placed_data.append({
 			"pos_x": cell.x,
 			"pos_y": cell.y,

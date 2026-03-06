@@ -5,6 +5,7 @@ signal gamepad_handler_activity
 
 #region local player
 signal player_placed(payload)
+signal player_spawned_piece(payload)
 signal player_moved(payload)
 signal player_rotated(payload)
 signal player_cleared(payload)

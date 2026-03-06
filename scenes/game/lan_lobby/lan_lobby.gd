@@ -8,7 +8,7 @@ extends Control
 var seed_val = -1
 
 func _ready() -> void:
-	GameManager.change_resolution(1280,720)
+	#GameManager.change_resolution(1280,720)
 	_connect_signals()
 
 

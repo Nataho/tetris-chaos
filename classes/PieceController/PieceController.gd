@@ -295,7 +295,7 @@ func can_move_piece(movement:Vector2i) -> bool:
 			return false
 	return true
 
-func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = false) -> bool:
+func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = false, hard_drop:bool = false) -> bool:
 	if is_stopped: return false
 	
 	for tile:TileController in tiles:
@@ -324,11 +324,14 @@ func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = fal
 	for tile:TileController in tiles:
 		tile.move_tile(movement,is_rotate)
 	pieces_controller.update_ghost_piece()
-	Events.player_moved.emit({
-		"player_id": board_controller.board_parent._player_index,
-		"tiles": get_tile_data(),
-		"ghost": pieces_controller.get_ghost_data()
-	})
+	if !hard_drop:
+		Events.player_moved.emit({
+			"player_id": board_controller.board_parent._player_index,
+			"tiles": get_tile_data(),
+			"ghost": pieces_controller.get_ghost_data()
+		})
+	#else:
+		#Events.player_placed.emit()
 		
 	if is_on_floor:
 		reset_fall_time()
@@ -342,7 +345,7 @@ func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = fal
 	return true
 
 func drop_piece() -> void:
-	while move_piece(Vector2i.DOWN): pass
+	while move_piece(Vector2i.DOWN,false,false,true): pass
 	place()
 
 func place(): #places the piece tiles on the placed_tiles_layer

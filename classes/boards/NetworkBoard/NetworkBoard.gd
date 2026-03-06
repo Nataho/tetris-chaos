@@ -23,10 +23,12 @@ func _ready() -> void:
 		var ghost_tiles = payload["ghost_tiles"]
 		var placed_tiles = payload["placed_tiles"]
 		var queue = payload["queue"]
+		var hold_piece = payload["hold_piece"]
 		set_piece_tiles(piece_tiles)
 		set_ghost_tiles(ghost_tiles)
 		#print("placed_tiles: ", placed_tiles)
 		set_placed_tiles(placed_tiles)
+		set_queue_tiles(queue, hold_piece)
 		)
 
 func set_piece_tiles(data:Array):
@@ -51,19 +53,31 @@ func set_ghost_tiles(data:Array):
 	return true
 
 func set_placed_tiles(data:Array):
-	print("placing tiles?")
+	#print("placing tiles?")
 	var placed_tiles = board_controller.placed_tiles
 	placed_tiles.clear()
-	print("data: ", data)
+	#print("data: ", data)
 	for tile_data in data:
 		var pos_x = int(tile_data["pos_x"])
 		var pos_y = int(tile_data["pos_y"])
 		var piece_type = int(tile_data["type"])
 		#if NetworkSync.is_client: print("tile_data: ", tile_data)
-		print("asdf",tile_data)
+		#print("asdf",tile_data)
 		placed_tiles.set_cell(Vector2i(pos_x,pos_y), 0, Vector2i(piece_type, 0))
 	return true
 
+func set_queue_tiles(data:Array, hold_piece):
+	#print("queue: ", data)
+	#print("hold_piece: ", hold_piece)
+	
+	queue_controller.queue.clear()
+	queue_controller.queue.append_array(data)
+	#if queue_controller.queue.is_empty():
+		#
+	#else: queue_controller.queue = data
+	if hold_piece != null:
+		queue_controller.hold_piece = hold_piece
+	queue_controller.update_queue()
 	#pieces_controller.ghost_tiles.set_cell(Vector2)
 #signal knocked_out(node: MultiplayerBoard)
 #

@@ -1,6 +1,6 @@
 extends MultiplayerBoard
 class_name LocalBoard
-
+const FILE = preload("uid://c2rodumqoa3fe")
 func setup_client():
 	_player_index = 2
 	target_player = 1
@@ -10,6 +10,12 @@ func setup_server():
 	_player_index = 1
 	target_player = 2
 	print("server board set")
+
+static func create(id: int, target: int) -> LocalBoard:
+	var inst:LocalBoard = FILE.instantiate()
+	inst._player_index = id
+	inst.target_player = target
+	return inst
 
 func initialize(seed_val: int = -1):
 	super.initialize_game_mode("online", seed_val)

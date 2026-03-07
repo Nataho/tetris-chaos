@@ -27,13 +27,15 @@ signal sent_garbage(payload)
 
 #region server-client signals
 signal client_joined_lobby(payload)
+signal client_left_lobby(player_data: Dictionary)
 signal client_disconnected()
 
 signal connection_timeout()
 signal client_searching()
 signal client_connected
-signal server_accepted_join
+signal server_accepted_join(payload)
 signal server_rejected_join
+
 
 signal sync_interaction(payload)
 signal sync_data(payload)

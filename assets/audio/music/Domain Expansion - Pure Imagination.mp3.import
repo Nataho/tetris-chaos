@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bamimtu3mj4k4"
+path="res://.godot/imported/Domain Expansion - Pure Imagination.mp3-5f1d5a5f0758d3a8dcb3d528a599c3c5.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Domain Expansion - Pure Imagination.mp3"
+dest_files=["res://.godot/imported/Domain Expansion - Pure Imagination.mp3-5f1d5a5f0758d3a8dcb3d528a599c3c5.mp3str"]
+
+[params]
+
+loop=true
+loop_offset=1.31
+bpm=119.62
+beat_count=112
+bar_beats=4

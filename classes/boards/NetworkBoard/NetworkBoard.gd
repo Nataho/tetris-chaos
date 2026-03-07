@@ -1,7 +1,14 @@
 extends MultiplayerBoard
 class_name NetworkBoard
+const FILE = preload("uid://d2l8ojou1pilf")
 
 var _just_spun: bool = false
+
+static func create(id: int, target: int) -> NetworkBoard:
+	var inst:NetworkBoard = FILE.instantiate()
+	inst._player_index = id
+	inst.target_player = target
+	return inst
 
 func set_board(playerid: int, target: int):
 	_player_index = playerid

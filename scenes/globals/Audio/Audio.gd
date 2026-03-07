@@ -26,6 +26,7 @@ const sound := {
 	"topout": [preload("uid://b0qj646pe160e"), 10],
 	"connect": [preload("uid://ckq7v80blwc4n"), 5],
 	"match_point": [preload("uid://bgnw6a7s535qx"),0],
+	"match_intro": [preload("uid://fd5m8skk1rqb"), 0],
 	
 	
 	"garbage_rise":[preload("uid://cu6jrki6jgrqe"),5],
@@ -77,6 +78,7 @@ const music := {
 	"neo battle": [preload("uid://pa7k62fmcl33"), 0],
 	"game_over": [preload("uid://biqalsdu1ga07"), 0],
 	"victory": [preload("uid://dwlf71kw2aaw1"), 0],
+	"lobby": [preload("uid://bamimtu3mj4k4"), 0],
 	
 	"battle": [preload("uid://dan8cx51lryal"), 0],
 	"fb_battle": [preload("uid://gruf7jo6n77n"), 0],
@@ -86,7 +88,7 @@ const music := {
 	"epic_battle": [preload("uid://33hhwbkttud0"), 0]
 }
 
-func play_sound(sound_key:String):
+func play_sound(sound_key:String, offset:float = 0.0):
 	if sound_key not in sound.keys(): 
 		push_error("sound not found:", sound_key)
 		return
@@ -96,7 +98,7 @@ func play_sound(sound_key:String):
 	sfx.bus = &"Sfx"
 	
 	add_child(sfx)
-	sfx.play()
+	sfx.play(offset)
 	await sfx.finished
 	sfx.queue_free()
 

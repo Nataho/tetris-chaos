@@ -15,6 +15,10 @@ var _initial_position: Vector2
 var _shake_tween: Tween
 #endregion shake variables
 
+#static func create(id, target):
+	
+	#pass
+
 func set_player(player_index:int):
 	_player_index = player_index
 

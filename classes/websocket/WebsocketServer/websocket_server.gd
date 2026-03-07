@@ -12,11 +12,16 @@ var connected_clients: Array[WebSocketPeer] = []
 
 var udp_broadcaster := PacketPeerUDP.new()
 var broadcast_timer := 0.0
+
 #endregion
 
 func start() -> void:
 	if server_active: return
 	NetworkSync.is_client = false
+	
+	active_players.clear()
+	active_players.append(GameManager.player_data)
+	
 	# Start TCP Listener for WebSockets
 	var err = tcp_server.listen(listen_port)
 	if err != OK:
@@ -76,9 +81,14 @@ func _process_client_messages() -> void:
 			_read_packets(ws)
 			
 		elif state == WebSocketPeer.STATE_CLOSED:
+			# Scrub them from active_players AND tell the UI they left
 			for p in range(active_players.size() - 1, -1, -1):
 				if active_players[p].get("socket") == ws:
+					var leaving_player = active_players[p]
 					active_players.remove_at(p)
+					
+					# Tell the Host's UI to remove them!
+					Events.client_left_lobby.emit(leaving_player)
 					
 			connected_clients.remove_at(i)
 			print("Server| Client disconnected and removed.")
@@ -99,20 +109,49 @@ func _handle_signal(ws: WebSocketPeer, data: Dictionary) -> void:
 	# Generic routing via Events bus
 	match data["signal"]:
 		"join_lobby":
-			var new_data = data["data"]
-			new_data["socket"] = ws
-			if active_players.size() > 0:
-				send_to_client(ws, "join_rejected")
-			else:
-				active_players.append(data["data"])
-				Events.client_joined_lobby.emit(data["data"])
-				send_to_client(ws, "join_accepted")
+			# The client sent their database profile (GameManager.player_data)
+			var profile_data = data["data"] 
+			var joining_name = str(profile_data.get("name", "Unknown"))
+			
+			# 1. Check for duplicate names FIRST
+			var is_name_taken = false
+			for p in active_players:
+				if str(p.get("name", "")) == joining_name:
+					is_name_taken = true
+					break
+			
+			if is_name_taken:
+				print("Server| Rejecting join: Name '", joining_name, "' is already taken.")
+				send_to_client(ws, "join_rejected", {"reason": "Name already taken"})
+				return # Stop right here, don't let them in!
+			
+			# 2. Check if the lobby is full
+			if active_players.size() >= 10: 
+				print("Server| Rejecting join: Lobby is full.")
+				send_to_client(ws, "join_rejected", {"reason": "Lobby is full"})
+				return # Stop right here!
+			
+			# 3. If they passed the checks, create their session and let them in
+			var session_player = {
+				"socket": ws,
+				"name": joining_name,
+				"player_id": active_players.size() + 1,      # Session ID
+				"wants_to_play": true                        # Default to wanting to play
+			}
+			
+			active_players.append(session_player)
+			Events.client_joined_lobby.emit(session_player)
+			send_to_client(ws, "join_accepted", {"player_id": session_player["player_id"]})
 		"enter_game":
 			Events.enter_game.emit()
 		
 		"send_board_data":
 			Events.received_board_data.emit(data["data"])
-			
+		
+		"sync_data":
+			Events.sync_data.emit(data)
+			broadcast_signal("sync_data", data)
+		
 		"sync_interaction":
 			Events.sync_interaction.emit(data)
 			# Relay to all other clients if needed

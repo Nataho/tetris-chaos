@@ -4,30 +4,39 @@ extends Node
 @export var listen_port: int = 4242
 @export var server_port: int = 8080
 
+# The Timer node from the scene tree
+@onready var timer: Timer = $Timer
+
 var client := WebSocketPeer.new()
 var udp_listener := PacketPeerUDP.new()
 
 var client_active: bool = false
 var found_server_ip: String = ""
-
 var is_connecting: bool = false
-var connection_timer: float = 0.0
+
+# We'll use 15 seconds as our search window
 const CONNECTION_TIMEOUT: float = 15.0
 #endregion
 
+func _ready() -> void:
+	# Connect the timer's signal once at the start
+	timer.timeout.connect(_on_timeout)
+	timer.one_shot = true # Ensure it only fires once per search
+
 func start(direct_ip: String = "") -> void:
-	# Prevent multiple searches if we are already trying!
 	if client_active or is_connecting:
 		print("Client| Already searching or active. Ignoring request.")
 		return
 	
-	is_connecting = true
-	connection_timer = 0.0
 	client_active = true
 	found_server_ip = ""
 	
+	# Start the timeout timer immediately
+	timer.start(CONNECTION_TIMEOUT)
+	
 	if direct_ip != "":
 		print("Client| Force connecting directly to IP: ", direct_ip)
+		is_connecting = true
 		found_server_ip = direct_ip
 		var url = "ws://" + found_server_ip + ":" + str(server_port)
 		client.connect_to_url(url)
@@ -37,35 +46,35 @@ func start(direct_ip: String = "") -> void:
 			Events.client_searching.emit() 
 		else:
 			push_error("Client| Could not bind UDP listener.")
-			stop() # Clean up immediately on error
+			stop()
 
 func stop() -> void:
-	# 1. Close the UDP listener if it's bound
+	timer.stop() # Stop the timer so it doesn't fire after we've quit
+	
 	if udp_listener.is_bound():
 		udp_listener.close()
 		
-	# 2. Close the WebSocket if it's running
 	if client.get_ready_state() != WebSocketPeer.STATE_CLOSED:
 		client.close()
 		
-	# 3. Reset all states so we can search again later
 	client_active = false
 	is_connecting = false
 	found_server_ip = ""
-	connection_timer = 0.0
 	print("Client| Stopped and ready for new connection attempts.")
+	
+func _on_timeout() -> void:
+	if client_active and (found_server_ip == "" or is_connecting):
+		print("Client| Connection/Discovery timed out.")
+		stop()
+		Events.connection_timeout.emit() # Remember to add this to Events.gd!
 	
 func _process(delta: float) -> void:
 	if not client_active: return
 
 	# TIMEOUT LOGIC
 	if is_connecting:
-		connection_timer += delta
-		if connection_timer >= CONNECTION_TIMEOUT:
-			print("Client| Connection timed out after 15 seconds.")
-			stop()
-			Events.connection_timeout.emit() # Make sure you add this to Events.gd!
-			return
+			is_connecting = false 
+			timer.stop() # WE FOUND IT! Stop the timer immediately.
 
 	# Discovery Mode
 	if found_server_ip == "":
@@ -134,8 +143,9 @@ func _process_server_signal(data: Dictionary) -> void:
 			Events.client_connected.emit()
 		
 		"join_accepted":
-			print("Client| Server accepted join request.")
-			Events.server_accepted_join.emit()
+			print("Client| Server accepted join.")
+			# Pass the data dictionary that the server sent us!
+			Events.server_accepted_join.emit(data["data"])
 
 		"join_rejected":
 			print("Client| Server rejected join request.")

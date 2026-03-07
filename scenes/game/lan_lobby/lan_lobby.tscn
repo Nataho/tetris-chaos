@@ -3,17 +3,85 @@
 [ext_resource type="Script" uid="uid://rpnsmyjsdxsf" path="res://scenes/game/lan_lobby/lan_lobby.gd" id="1_qwmjo"]
 [ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="2_u8wp2"]
 [ext_resource type="FontFile" uid="uid://b4vif8qlndc3e" path="res://assets/fonts/BAHNSCHRIFT.TTF" id="2_vyc6s"]
-[ext_resource type="PackedScene" uid="uid://c2rodumqoa3fe" path="res://classes/boards/LocalBoard/LocalBoard.tscn" id="3_u8wp2"]
-[ext_resource type="PackedScene" uid="uid://d2l8ojou1pilf" path="res://classes/boards/NetworkBoard/NetworkBoard.tscn" id="4_p6f1r"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_vyc6s"]
-font = ExtResource("2_vyc6s")
-font_size = 30
 
 [sub_resource type="Theme" id="Theme_jh0a4"]
 default_font = ExtResource("2_u8wp2")
 default_font_size = 37
 Button/fonts/font = ExtResource("2_u8wp2")
+
+[sub_resource type="LabelSettings" id="LabelSettings_vyc6s"]
+font = ExtResource("2_vyc6s")
+font_size = 30
+
+[sub_resource type="Theme" id="Theme_vyc6s"]
+default_font = ExtResource("2_u8wp2")
+default_font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_1oqdv"]
+font = ExtResource("2_u8wp2")
+font_size = 100
+
+[sub_resource type="Animation" id="Animation_vyc6s"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../../../../ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../../..:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_1oqdv"]
+resource_name = "intro"
+length = 8.0
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../../../../ColorRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../../..:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_42jex"]
+_data = {
+&"RESET": SubResource("Animation_vyc6s"),
+&"intro": SubResource("Animation_1oqdv")
+}
 
 [node name="LanLobby" type="Control" unique_id=493069010]
 layout_mode = 3
@@ -23,6 +91,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qwmjo")
+metadata/_edit_horizontal_guides_ = [79.0]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1906291870]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.4, 0.2, 0.6, 1)
 
 [node name="Control" type="Control" parent="." unique_id=1556018175]
 layout_mode = 1
@@ -37,13 +115,20 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -715.0
-offset_top = 81.0
-offset_bottom = 138.0
+offset_left = -512.0
+offset_top = 80.0
+offset_right = -12.0
+offset_bottom = 343.0
 grow_horizontal = 0
 
-[node name="Label" type="Label" parent="Control/side bar" unique_id=2036888336]
-custom_minimum_size = Vector2(715, 65)
+[node name="host" type="Button" parent="Control/side bar" unique_id=1541712131]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme = SubResource("Theme_jh0a4")
+text = "HOST SERVER"
+
+[node name="guide" type="Label" parent="Control/side bar" unique_id=2036888336]
+custom_minimum_size = Vector2(500, 65)
 layout_mode = 2
 text = "pressing connect without an IP address will look for servers in LAN"
 label_settings = SubResource("LabelSettings_vyc6s")
@@ -55,15 +140,16 @@ autowrap_mode = 2
 layout_mode = 2
 
 [node name="ip_text_box" type="LineEdit" parent="Control/side bar/IP_bar" unique_id=278900513]
-custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("2_vyc6s")
 theme_override_font_sizes/font_size = 40
 placeholder_text = "ip address"
 alignment = 1
 max_length = 100
 
-[node name="ip_connect_button" type="Button" parent="Control/side bar/IP_bar" unique_id=2032779596]
+[node name="join" type="Button" parent="Control/side bar/IP_bar" unique_id=2032779596]
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_u8wp2")
 theme_override_font_sizes/font_size = 40
@@ -78,47 +164,103 @@ placeholder_text = "username"
 alignment = 1
 max_length = 15
 
-[node name="host" type="Button" parent="Control" unique_id=1541712131]
+[node name="HSeparator" type="HSeparator" parent="Control/side bar" unique_id=1313607821]
+custom_minimum_size = Vector2(2.19, 30)
+layout_mode = 2
+
+[node name="player_toggle" type="Button" parent="Control/side bar" unique_id=855428848]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_u8wp2")
+theme_override_font_sizes/font_size = 40
+disabled = true
+text = "PLAYER"
+
+[node name="Players" type="VBoxContainer" parent="Control" unique_id=1255947484]
+layout_mode = 1
+offset_top = 80.0
+offset_right = 336.0
+offset_bottom = 129.0
+
+[node name="Player" type="RichTextLabel" parent="Control/Players" unique_id=545032300]
+custom_minimum_size = Vector2(336, 49)
+layout_mode = 2
+theme = SubResource("Theme_vyc6s")
+bbcode_enabled = true
+text = "you"
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="Control/Players/Player" unique_id=1591295691]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MasterTimer" type="Timer" parent="." unique_id=981869990]
+one_shot = true
+
+[node name="versus" type="Control" parent="." unique_id=552511055]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="versus" unique_id=1320960449]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="left_side" type="ColorRect" parent="versus/HBoxContainer" unique_id=329208236]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.64705884, 0, 0, 0.39215687)
+
+[node name="Label" type="Label" parent="versus/HBoxContainer/left_side" unique_id=1647083559]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -126.5
-offset_top = -26.5
-offset_right = 126.5
-offset_bottom = 26.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource("Theme_jh0a4")
-text = "HOST SERVER"
+text = "RADIOACTIVE R"
+label_settings = SubResource("LabelSettings_1oqdv")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2000240318]
-visible = false
+[node name="right_side" type="ColorRect" parent="versus/HBoxContainer" unique_id=458506442]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0, 0.64705884, 0.39215687)
+
+[node name="Label" type="Label" parent="versus/HBoxContainer/right_side" unique_id=1146429566]
 layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
+anchors_preset = 8
+anchor_left = 0.5
 anchor_top = 0.5
-anchor_right = 1.0
+anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -253.0
-offset_top = -55.0
-offset_bottom = 55.0
-grow_horizontal = 0
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
 grow_vertical = 2
+text = "RADIOACTIVE R"
+label_settings = SubResource("LabelSettings_1oqdv")
 
-[node name="host" type="Button" parent="VBoxContainer" unique_id=80272893]
-layout_mode = 2
-theme = SubResource("Theme_jh0a4")
-text = "HOST SERVER"
-
-[node name="join" type="Button" parent="VBoxContainer" unique_id=1551784156]
-layout_mode = 2
-theme = SubResource("Theme_jh0a4")
-text = "JOIN SERVER"
-
-[node name="local_anchor" type="Control" parent="." unique_id=856645804]
+[node name="player1_anchor" type="Control" parent="versus" unique_id=856645804]
 visible = false
 layout_mode = 1
 anchor_right = 0.5
@@ -130,9 +272,7 @@ offset_bottom = -540.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="board" parent="local_anchor" unique_id=987870610 instance=ExtResource("3_u8wp2")]
-
-[node name="network_anchor" type="Control" parent="." unique_id=1006756022]
+[node name="player2_anchor" type="Control" parent="versus" unique_id=1006756022]
 visible = false
 layout_mode = 1
 anchor_left = 0.5
@@ -145,4 +285,6 @@ offset_bottom = -540.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="board" parent="network_anchor" unique_id=762631717 instance=ExtResource("4_p6f1r")]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="versus" unique_id=865883507]
+root_node = NodePath("../HBoxContainer/left_side/Label")
+libraries/ = SubResource("AnimationLibrary_42jex")

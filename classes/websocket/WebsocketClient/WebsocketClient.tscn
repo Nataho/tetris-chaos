@@ -4,3 +4,7 @@
 
 [node name="WebsocketClient" type="Node" unique_id=818617543]
 script = ExtResource("1_ljmep")
+
+[node name="Timer" type="Timer" parent="." unique_id=2056647092]
+wait_time = 15.0
+one_shot = true

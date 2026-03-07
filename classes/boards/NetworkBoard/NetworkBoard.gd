@@ -1,192 +1,165 @@
 extends MultiplayerBoard
 class_name NetworkBoard
 
-func set_board(playerid:int , target:int):
+var _just_spun: bool = false
+
+func set_board(playerid: int, target: int):
 	_player_index = playerid
 	target_player = target
 
-func initialze():
-	initialize_game_mode("online")
+func initialize():
+	# Initialize the visual grids
+	super.initialize_game_mode("online")
+	# Kill the local physics so the opponent's board doesn't play itself!
+	pieces_controller.set_physics_process(false)
+	pieces_controller.set_process(false)
 
 func _ready() -> void:
 	super._ready()
 	
-	Events.recieved_board_data.connect(func(payload):
-		if payload == null: return
-		if payload.size() <1: return
-		#for key in payload:
-			#print("%s: %s" % [key, payload[key]])
-		#payload = payload["data"]
-		#if NetworkServer.server_active:
-			#print("recieved_board_data_payload: ", payload)
-		var piece_tiles = payload["piece_tiles"]
-		var ghost_tiles = payload["ghost_tiles"]
-		var placed_tiles = payload["placed_tiles"]
-		var queue = payload["queue"]
-		var hold_piece = payload["hold_piece"]
-		set_piece_tiles(piece_tiles)
-		set_ghost_tiles(ghost_tiles)
-		#print("placed_tiles: ", placed_tiles)
-		set_placed_tiles(placed_tiles)
-		set_queue_tiles(queue, hold_piece)
-		)
+	Events.received_board_data.connect(func(payload):
+		if payload == null or payload.size() < 1: return
+		
+		var type = payload.get("update_type")
+		
+		# --- 1. THE GARBAGE CATCHER (Bypasses the sender check!) ---
+		if type == "garbage":
+			var target = payload["value"]["target"]
+			
+			# Is this garbage targeted at the player this NetworkBoard represents?
+			if target == _player_index:
+				receive_garbage(payload)
+			
+			#return # We are done with this packet, stop here!
+			
+			
+		# --- 2. THE BOUNCER ---
+		# For moves, locks, and spins, ONLY listen if the opponent sent them!
+		if payload.get("player_id") != _player_index: return
+		
+		elif type == "take_garbage":
+			var instructions = payload["instructions"]
+			board_controller.process_garbage_queue(instructions)
+		
+		elif type == "sync_garbage_queue":
+			# Overwrite the puppet's queue with the exact state from the local player
+			garbage_queue.clear()
+			garbage_queue.append_array(payload["queue"])
+		
+		# --- 3. NORMAL BOARD UPDATES ---
+		# Route the packet to the right function
+		if type == "piece_update":
+			# 1. Force the exact positions so it can never desync
+			set_piece_tiles(payload["piece_tiles"])
+			set_ghost_tiles(payload["ghost_tiles"])
+			
+			# 2. Read the action to play the right feedback!
+			var action = payload.get("action", "move")
+			var extra_data = payload["extra_data"]
+			
+			if action == "rotate":
+				_handle_rotate_sound()
+				
+			elif action == "move":
+				# Safely get the dict, defaulting to a zero dict if it's somehow missing
+				var dir_dict = extra_data.get("direction", {"x": 0, "y": 0})
+				
+				# Rebuild the Vector2i!
+				var direction = Vector2i(dir_dict["x"], dir_dict["y"])
+				
+				#print("Rebuilt direction: ", direction)
+				#print("extra_data", extra_data)
+				
+				if direction == Vector2i.DOWN and extra_data.get("soft_drop", false):
+					Audio.play_sound("soft_drop")
+					pass
+				else:
+					pass # Audio.play_sound("move")
+			
+		elif type == "lock":
+			set_placed_tiles(payload["placed_tiles"])
+			
+			pieces_controller.clear()
+			pieces_controller.ghost_tiles.clear()
+			
+			# --- NEW: Sync the puppet's garbage queue with the real player's queue! ---
+			if payload.has("garbage_queue"):
+				garbage_queue.clear()
+				garbage_queue.append_array(payload["garbage_queue"])
+			# --------------------------------------------------------------------------
+			
+			var event_data = payload.get("event_data")
+			if event_data != null and typeof(event_data) == TYPE_DICTIONARY:
+				var clear_info: Dictionary = event_data.get("value", event_data)
+				
+				var lines = int(clear_info.get("lines_to_clear", 0))
+				var is_spin = bool(clear_info.get("is_spin", false))
+				var is_all_spin = bool(clear_info.get("is_all_spin", false))
+				
+				if lines > 0 or is_spin or is_all_spin:
+					if lines > 0:
+						board_controller.play_network_clear_animation(clear_info)
+					
+					if lines > 0 or is_spin or is_all_spin:
+						event_data["player_index"] = _player_index 
+						display_line_clear_message(event_data)
+			
+		
+		elif type == "spin":
+			var center_x: int = int(payload["center_pos"]["x"])
+			var center_y: int = int(payload["center_pos"]["y"])
+			var center_pos := Vector2i(center_x, center_y)
+			var clockwise: bool = bool(payload["clockwise"])
+			
+			_just_spun = true # Flag that a spin happened this exact frame!
+			board_controller.add_spin_particle(center_pos, clockwise)
+			Audio.play_sound("spin")
+		
+		elif type == "hard_drop":
+			Audio.play_sound("hard_drop")
+			
+		elif type == "queue":
+			set_queue_tiles(payload["queue"], payload.get("hold_piece"))
+			
+		elif type == "player_kod":
+			# Just pass the internet packet straight into your existing logic!
+			_check_ko(payload)
+	)
 
-func set_piece_tiles(data:Array):
+func set_piece_tiles(data: Array):
 	pieces_controller.clear()
 	for tile_data in data:
-		var pos_x = tile_data["pos_x"]
-		var pos_y = tile_data["pos_y"]
-		var piece_type = tile_data["type"]
-		
-		pieces_controller.set_cell(Vector2i(pos_x,pos_y), 0, Vector2i(piece_type, 0))
-	return true
+		pieces_controller.set_cell(Vector2i(tile_data["pos_x"], tile_data["pos_y"]), 0, Vector2i(tile_data["type"], 0))
 
-func set_ghost_tiles(data:Array):
+func set_ghost_tiles(data: Array):
 	var ghost_tiles = pieces_controller.ghost_tiles
 	ghost_tiles.clear()
 	for tile_data in data:
-		var pos_x = tile_data["pos_x"]
-		var pos_y = tile_data["pos_y"]
-		var piece_type = 7
-		
-		ghost_tiles.set_cell(Vector2i(pos_x,pos_y), 0, Vector2i(piece_type, 0))
-	return true
+		ghost_tiles.set_cell(Vector2i(tile_data["pos_x"], tile_data["pos_y"]), 0, Vector2i(7, 0))
 
-func set_placed_tiles(data:Array):
-	#print("placing tiles?")
+func set_placed_tiles(data: Array):
 	var placed_tiles = board_controller.placed_tiles
-	placed_tiles.clear()
-	#print("data: ", data)
+	placed_tiles.clear() # NOW this heavy operation only happens when a piece locks!
 	for tile_data in data:
-		var pos_x = int(tile_data["pos_x"])
-		var pos_y = int(tile_data["pos_y"])
-		var piece_type = int(tile_data["type"])
-		#if NetworkSync.is_client: print("tile_data: ", tile_data)
-		#print("asdf",tile_data)
-		placed_tiles.set_cell(Vector2i(pos_x,pos_y), 0, Vector2i(piece_type, 0))
-	return true
+		var atlas_id:int = 0
+		if tile_data["type"] == 9: atlas_id = 2
+		placed_tiles.set_cell(Vector2i(int(tile_data["pos_x"]), int(tile_data["pos_y"])), atlas_id, Vector2i(int(tile_data["type"]), 0))
 
-func set_queue_tiles(data:Array, hold_piece):
-	#print("queue: ", data)
-	#print("hold_piece: ", hold_piece)
-	
+func set_queue_tiles(data: Array, hold_piece):
 	queue_controller.queue.clear()
 	queue_controller.queue.append_array(data)
-	#if queue_controller.queue.is_empty():
-		#
-	#else: queue_controller.queue = data
 	if hold_piece != null:
 		queue_controller.hold_piece = hold_piece
 	queue_controller.update_queue()
-	#pieces_controller.ghost_tiles.set_cell(Vector2)
-#signal knocked_out(node: MultiplayerBoard)
-#
-#@onready var anim: AnimationPlayer = $AnimationPlayer
-#
-#var kos: int = 0
-#var center_pos = Vector2.ZERO
-#var player_ready = false
-#
-##region shake variables
-#signal shake_finished
-#var _initial_position: Vector2
-#var _shake_tween: Tween
-##endregion shake variables
-#
-#func set_player(player_index:int):
-	#_player_index = player_index
-#
-##func _super_ready() -> void:
-	##print("huh?")
-#
-## Inside Board.gd or MultiplayerBoard.gd
-#func setup_multiplayer(my_id: int, enemy_id: int):
-	#_player_index = my_id
-	#target_player = enemy_id
-	## Now the logic in _check_ko will have real IDs to compare against
-#
-#func reset():
-	#super.reset()
-	#anim.play("RESET")
-	#player_ready = false # Ensure they aren't auto-ready for the next round
-	#_initial_position = position
-#
-#func stop():
-	##pieces_controller.cur_piece_controller.stop()
-	#pieces_controller.stop()
-#
-#func _check_ko(payload):
-	#var credit_id = payload["knockout_credit"] 
-	#var victim_id = payload["player_id"]
-	#
-	#if _player_index == -1: return
-#
-	## 1. HANDLE SELF-KO (Fixed Logic)
-	## Only re-map the credit if the victim of the KO is NOT me.
-	## If my opponent died and no one was credited, then I must be the winner!
-	#if victim_id != _player_index and (credit_id == victim_id or credit_id == -1):
-		#credit_id = _player_index
-	#
-	## 2. ASSIGN POINTS
-	#if credit_id == _player_index:
-		#kos += 1
-		## Explicitly tell the UI to update
-		##get_parent().get_parent().update_scoreboard()
-#
-	## 3. DEATH SEQUENCE
-	#if victim_id == _player_index:
-		#handle_death_sequence()
-#
-#func handle_death_sequence():
-	#Audio.play_sound("topout")
-	#knocked_out.emit(self)
-	#
-	#shake(100)
-	#await shake_finished
-	#
-	#anim.play("knockout")
-	## You can add a 'yield' or 'await' here if you need to pause 
-	## before resetting the board
-#
-#func shake(intensity: float = 8.0, duration: float = 0.2):
-	## FIX: Capture the starting position if we haven't yet
-	#if _initial_position == Vector2.ZERO:
-		#_initial_position = position
-#
-	## Clean up any active tweens to prevent "position drifting"
-	#if _shake_tween:
-		#_shake_tween.kill()
-	#
-	#_shake_tween = create_tween()
-	#
-	#var shake_count: int = 10 
-	#var step_time: float = duration / shake_count
-	#
-	#for i in range(shake_count):
-		## Calculate the random offset
-		#var offset := Vector2(
-			#randf_range(-intensity, intensity),
-			#randf_range(-intensity, intensity)
-		#)
-		#
-		## Animate to the new offset relative to the original center
-		#_shake_tween.tween_property(self, "position", _initial_position + offset, step_time)
-		#
-		## Gradually reduce intensity for a "settling" feel
-		#intensity *= 0.8 
-#
-	## Final step: Snap back to the exact starting point
-	#_shake_tween.tween_property(self, "position", _initial_position, step_time)
-	#
-	## Emit the custom signal when done
-	#_shake_tween.finished.connect(func(): shake_finished.emit())
-#
-#func _on_shake_finished():
-	#shake_finished.emit()
-#
-#func toggle_ready() -> bool:
-	#player_ready = !player_ready
-	#if player_ready:
-		##Audio.play_sound("ready_up")
-		#pass
-	#return player_ready
+
+
+func _handle_rotate_sound() -> void:
+	# Wait until the absolute end of the current frame
+	await get_tree().process_frame
+	
+	# If a spin packet didn't also arrive and flip this to true, play the normal sound
+	if not _just_spun:
+		Audio.play_sound("rotate")
+		
+	# Reset the flag for the next time the player rotates
+	_just_spun = false

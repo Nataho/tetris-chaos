@@ -11,155 +11,160 @@ func setup_server():
 	target_player = 2
 	print("server board set")
 
-func initialize(seed_val:int = -1):
+func initialize(seed_val: int = -1):
 	super.initialize_game_mode("online", seed_val)
 	if NetworkClient.client_active: setup_client()
 	if NetworkServer.server_active: setup_server()
 	_connect_signals()
-	
 
 func _connect_signals():
-	#Events.player_placed.connect(get_all_board_tile_info)
-	Events.player_moved.connect(get_all_board_tile_info)
-	Events.player_cleared.connect(get_all_board_tile_info)
-	Events.player_rotated.connect(get_all_board_tile_info)
-	Events.player_spawned_piece.connect(get_all_board_tile_info)
-	pass
+	# CHEAP: Just the piece moving (High frequency)
+	Events.player_moved.connect(_on_player_moved)
+	Events.player_rotated.connect(_on_player_rotated)
+	
+	# HEAVY: The piece locked or cleared lines (Low frequency)
+	Events.player_placed.connect(_send_board_correction)
+	Events.player_cleared.connect(_send_board_correction)
+	
+	# QUEUE: Piece spawned (Low frequency)
+	Events.player_spawned_piece.connect(func(_is_hold): 
+		_send_queue_data.call_deferred()
+		_send_movement_delta.call_deferred()
+		)
+		
+	Events.player_spun.connect(_send_spin_data)
+	Events.player_hard_dropped.connect(_send_hard_drop_data)
+	Events.sent_garbage.connect(_on_local_garbage_sent)
+	Events.player_took_garbage.connect(_send_garbage_taken)
+	Events.garbage_queue_updated.connect(_on_garbage_queue_updated)
+	Events.received_board_data.connect(_on_network_data_received)
+	
+	Events.player_kod.connect(_send_ko_data)
+	
+# --- Packet Generators ---
 
-func get_all_board_tile_info(payload):
-	#print("am i working?")
-	#var placed_tiles = pieces_controller.cur_piece_controller.tiles
-	var active_piece_tiles = pieces_controller.cur_piece_controller.get_tile_data()
-	var active_ghost_tiles = pieces_controller.get_ghost_data()
-	var active_placed_tiles = board_controller.get_placed_tiles_data()
-	await get_tree().process_frame
-	var active_queue = queue_controller.queue
-	var active_hold_piece = queue_controller.hold_piece
+func _on_local_garbage_sent(payload: Dictionary) -> void:
+	# Only send it to the network if WE generated it
+	if payload.get("player_id") == _player_index:
+		var network_packet = {
+			"update_type": "garbage",
+			"player_id": _player_index,
+			"value": payload["value"]
+		}
+		_dispatch_to_network(network_packet)
+
+func _send_garbage_taken(payload: Dictionary) -> void:
+	if payload.get("player_id") == _player_index:
+		var data = {
+			"update_type": "take_garbage",
+			"instructions": payload["instructions"] # Sending the whole batch!
+		}
+		_dispatch_to_network(data)
+
+func _on_garbage_queue_updated(payload: Dictionary) -> void:
+	if payload.get("player_id") == _player_index:
+		var data = {
+			"update_type": "sync_garbage_queue",
+			"queue": payload["new_queue"]
+		}
+		_dispatch_to_network(data)
+
+func _on_network_data_received(payload: Dictionary) -> void:
+	if payload == null or payload.size() < 1: return
+	
+	var type = payload.get("update_type")
+	
+	# We ONLY care about incoming garbage right now
+	if type == "garbage":
+		var target = payload["value"]["target"]
+		
+		# Is the internet trying to attack ME?
+		if target == _player_index:
+			# Pass it directly into the Board.gd function you already wrote!
+			receive_garbage(payload)
+
+func _send_hard_drop_data(payload: Dictionary) -> void:
+	if payload.get("player_id") == _player_index:
+		var data = {
+			"update_type": "hard_drop"
+		}
+		_dispatch_to_network(data)
+
+func _on_player_moved(payload: Dictionary = {}) -> void:
+	var direction = payload.get("direction", Vector2i.ZERO)
+	
+	# Break it down into primitive numbers so JSON/Network doesn't delete it!
+	var safe_direction = {"x": direction.x, "y": direction.y}
+	
+	_send_movement_delta("move", {
+		"direction": safe_direction,
+		"soft_drop": payload.get("soft_drop", false)
+		
+		})
+
+func _on_player_rotated(payload: Dictionary = {}) -> void:
+	# Extract the clockwise bool from the dictionary!
+	var clockwise = payload.get("clockwise", true)
+	_send_movement_delta("rotate", {"clockwise": clockwise})
+
+
+func _send_spin_data(payload: Dictionary) -> void:
+	# Make sure we only broadcast OUR player's spins!
+	if payload.get("player_id") == _player_index:
+		
+		# Package the data for the network
+		var data = {
+			"update_type": "spin", # <--- Fixed to match your architecture!
+			"center_pos": payload["center_pos"],
+			"clockwise": payload["clockwise"]
+		}
+		
+		_dispatch_to_network(data)
+
+func _send_movement_delta(action_type: String = "move", extra_data: Dictionary = {}):
 	var data = {
-		"piece_tiles": active_piece_tiles,
-		"ghost_tiles": active_ghost_tiles,
-		"placed_tiles": active_placed_tiles,
-		"queue": active_queue,
-		"hold_piece": active_hold_piece
+		"update_type": "piece_update", # Changed from "move" to be more generic
+		"action": action_type,         # "move" or "rotate"
+		"extra_data": extra_data,      # Contains direction or clockwise bool
+		"piece_tiles": pieces_controller.cur_piece_controller.get_tile_data(),
+		"ghost_tiles": pieces_controller.get_ghost_data()
 	}
+	_dispatch_to_network(data)
+
+func _send_board_correction(_payload = null):
+	var data = {
+		"update_type": "lock",
+		"placed_tiles": board_controller.get_placed_tiles_data(),
+		"event_data": _payload,
+		# NEW: Send our actual garbage queue state to the opponent!
+		"garbage_queue": garbage_queue 
+	}
+	_dispatch_to_network(data)
+
+func _send_queue_data():
+	var data = {
+		"update_type": "queue",
+		"queue": queue_controller.queue,
+		"hold_piece": queue_controller.hold_piece
+	}
+	_dispatch_to_network(data)
+
+func _send_ko_data(payload: Dictionary) -> void:
+	# Only broadcast if WE died
+	if payload.get("player_id") == _player_index:
+		var data = {
+			"update_type": "player_kod",
+			"player_id": payload["player_id"],
+			"knockout_credit": payload.get("knockout_credit", -1),
+			"score": payload.get("score", 0)
+		}
+		_dispatch_to_network(data)
+
+# --- Dispatcher ---
+func _dispatch_to_network(data: Dictionary):
+	data["player_id"] = _player_index
 	
 	if NetworkClient.client_active:
 		NetworkClient.send_signal("send_board_data", data)
-	else:
+	elif NetworkServer.server_active and NetworkServer.active_players.size() > 0:
 		NetworkServer.send_to_client(NetworkServer.active_players[0]["socket"], "send_board_data", data)
-
-#func start(countdown: float):
-	#board
-	#pass
-
-#signal knocked_out(node: MultiplayerBoard)
-#
-#@onready var anim: AnimationPlayer = $AnimationPlayer
-#
-#var kos: int = 0
-#var center_pos = Vector2.ZERO
-#var player_ready = false
-#
-##region shake variables
-#signal shake_finished
-#var _initial_position: Vector2
-#var _shake_tween: Tween
-##endregion shake variables
-#
-#func set_player(player_index:int):
-	#_player_index = player_index
-#
-##func _super_ready() -> void:
-	##print("huh?")
-#
-## Inside Board.gd or MultiplayerBoard.gd
-#func setup_multiplayer(my_id: int, enemy_id: int):
-	#_player_index = my_id
-	#target_player = enemy_id
-	## Now the logic in _check_ko will have real IDs to compare against
-#
-#func reset():
-	#super.reset()
-	#anim.play("RESET")
-	#player_ready = false # Ensure they aren't auto-ready for the next round
-	#_initial_position = position
-#
-#func stop():
-	##pieces_controller.cur_piece_controller.stop()
-	#pieces_controller.stop()
-#
-#func _check_ko(payload):
-	#var credit_id = payload["knockout_credit"] 
-	#var victim_id = payload["player_id"]
-	#
-	#if _player_index == -1: return
-#
-	## 1. HANDLE SELF-KO (Fixed Logic)
-	## Only re-map the credit if the victim of the KO is NOT me.
-	## If my opponent died and no one was credited, then I must be the winner!
-	#if victim_id != _player_index and (credit_id == victim_id or credit_id == -1):
-		#credit_id = _player_index
-	#
-	## 2. ASSIGN POINTS
-	#if credit_id == _player_index:
-		#kos += 1
-		## Explicitly tell the UI to update
-		##get_parent().get_parent().update_scoreboard()
-#
-	## 3. DEATH SEQUENCE
-	#if victim_id == _player_index:
-		#handle_death_sequence()
-#
-#func handle_death_sequence():
-	#Audio.play_sound("topout")
-	#knocked_out.emit(self)
-	#
-	#shake(100)
-	#await shake_finished
-	#
-	#anim.play("knockout")
-	## You can add a 'yield' or 'await' here if you need to pause 
-	## before resetting the board
-#
-#func shake(intensity: float = 8.0, duration: float = 0.2):
-	## FIX: Capture the starting position if we haven't yet
-	#if _initial_position == Vector2.ZERO:
-		#_initial_position = position
-#
-	## Clean up any active tweens to prevent "position drifting"
-	#if _shake_tween:
-		#_shake_tween.kill()
-	#
-	#_shake_tween = create_tween()
-	#
-	#var shake_count: int = 10 
-	#var step_time: float = duration / shake_count
-	#
-	#for i in range(shake_count):
-		## Calculate the random offset
-		#var offset := Vector2(
-			#randf_range(-intensity, intensity),
-			#randf_range(-intensity, intensity)
-		#)
-		#
-		## Animate to the new offset relative to the original center
-		#_shake_tween.tween_property(self, "position", _initial_position + offset, step_time)
-		#
-		## Gradually reduce intensity for a "settling" feel
-		#intensity *= 0.8 
-#
-	## Final step: Snap back to the exact starting point
-	#_shake_tween.tween_property(self, "position", _initial_position, step_time)
-	#
-	## Emit the custom signal when done
-	#_shake_tween.finished.connect(func(): shake_finished.emit())
-#
-#func _on_shake_finished():
-	#shake_finished.emit()
-#
-#func toggle_ready() -> bool:
-	#player_ready = !player_ready
-	#if player_ready:
-		##Audio.play_sound("ready_up")
-		#pass
-	#return player_ready

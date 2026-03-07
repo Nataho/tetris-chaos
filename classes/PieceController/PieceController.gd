@@ -238,6 +238,7 @@ func rotate_piece(is_clockwise:bool, should_offset:bool):
 	Events.player_rotated.emit({
 		"player_id": board_controller.board_parent._player_index,
 		"rotation": rotation_index,
+		"clockwise": is_clockwise, # <--- ADD THIS LINE
 		"tiles": get_tile_data()
 	})
 	reset_fall_time()
@@ -295,7 +296,7 @@ func can_move_piece(movement:Vector2i) -> bool:
 			return false
 	return true
 
-func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = false, hard_drop:bool = false) -> bool:
+func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = false, hard_drop:bool = false, soft_drop:bool = false) -> bool:
 	if is_stopped: return false
 	
 	for tile:TileController in tiles:
@@ -327,8 +328,10 @@ func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = fal
 	if !hard_drop:
 		Events.player_moved.emit({
 			"player_id": board_controller.board_parent._player_index,
+			"direction": movement, # <--- ADD THIS LINE
 			"tiles": get_tile_data(),
-			"ghost": pieces_controller.get_ghost_data()
+			"ghost": pieces_controller.get_ghost_data(),
+			"soft_drop": soft_drop
 		})
 	#else:
 		#Events.player_placed.emit()
@@ -339,6 +342,14 @@ func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = fal
 	if (corner_spin_tiles >= 3 or is_all_spin) and is_rotate :
 		Audio.play_sound("spin")
 		board_controller.add_spin_particle(center_tile.coordinates,clockwise)
+		
+		# --- NEW: Broadcast the spin event with the payload! ---
+		Events.player_spun.emit({
+			"player_id": board_controller.board_parent._player_index,
+			"center_pos": {"x": center_tile.coordinates.x, "y": center_tile.coordinates.y},
+			"clockwise": clockwise
+		})
+		
 	elif is_rotate:
 		Audio.play_sound("rotate")
 		print("playing rotate")
@@ -346,6 +357,9 @@ func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = fal
 
 func drop_piece() -> void:
 	while move_piece(Vector2i.DOWN,false,false,true): pass
+	Events.player_hard_dropped.emit({
+		"player_id": board_controller.board_parent._player_index
+	})
 	place()
 
 func place(): #places the piece tiles on the placed_tiles_layer

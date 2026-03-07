@@ -231,12 +231,14 @@ func check_line_clears(is_spin:bool = false, is_mini:bool = true, piece_type:Str
 			
 		_add_cleared_lines(cleared_count)
 
-	# --- CALCULATION BLOCK ---
+# --- CALCULATION BLOCK ---
 	var payload_to_signal = {
 		"name":"local",
 		"player_index": board_parent._player_index,
 		"value": {
 			"lines_to_clear": cleared_count,
+			"cleared_y_coords": lines_to_clear,
+			"is_power_combo": is_power_combo,
 			"is_spin": is_spin,
 			"b2b_count": b2b_count,
 			"is_mini": is_mini,
@@ -266,9 +268,11 @@ func check_line_clears(is_spin:bool = false, is_mini:bool = true, piece_type:Str
 		Events.player_cleared.emit(payload_to_signal)
 	
 	# Cancel incoming garbage
+	var queue_was_changed: bool = false
 	if garbage > 0:
 		var queue = board_parent.garbage_queue
 		while garbage > 0 and not queue.is_empty():
+			queue_was_changed = true
 			var incoming_attack = queue[0]
 			if garbage >= incoming_attack["amount"]:
 				garbage -= incoming_attack["amount"]
@@ -276,8 +280,14 @@ func check_line_clears(is_spin:bool = false, is_mini:bool = true, piece_type:Str
 			else:
 				incoming_attack["amount"] -= garbage
 				garbage = 0 
-		#update_garbage_meter()
-
+				
+	# --- NEW: Sync the updated queue to the network! ---
+	if queue_was_changed:
+		Events.garbage_queue_updated.emit({
+			"player_id": board_parent._player_index,
+			"new_queue": board_parent.garbage_queue.duplicate(true) # Send a safe, deep copy
+		})
+		
 	# Send remaining garbage
 	if garbage > 0:
 		var final_amount: int = int(garbage * board_parent.handicap)
@@ -309,26 +319,79 @@ func _add_cleared_lines(amount:int):
 		Audio.play_sound("lvlup")
 		if current_level > max_level: current_level = max_level
 
-func process_garbage_queue():
+func process_garbage_queue(network_instructions: Array = []) -> void:
+	
+	# ==========================================
+	# PATH A: NETWORK BOARD (Just follow orders)
+	# ==========================================
+	if network_instructions.size() > 0:
+		for instruction in network_instructions:
+			var amount = instruction["amount"]
+			var gap = instruction["gap_index"]
+			var ko = instruction["KO_credit"]
+			
+			match garbage_type:
+				garbage_types.GRADUAL:
+					await apply_garbage_gradual(amount, gap, ko)
+				_:
+					apply_garbage_instant(amount, gap, ko)
+					var q = board_parent.garbage_queue
+					if not q.is_empty():
+						q[0]["amount"] -= amount
+						if q[0]["amount"] <= 0: q.pop_front()
+		return
+
+	# ==========================================
+	# PATH B: LOCAL BOARD (Do the math & send)
+	# ==========================================
 	var garbage_queue = board_parent.garbage_queue
 	if garbage_queue.is_empty(): return
 	
 	var lines_added_this_turn: int = 0
-	while not garbage_queue.is_empty() and lines_added_this_turn < board_parent.MAX_GARBAGE_PER_DROP:
-		var current_attack = garbage_queue[0]
+	var batch_to_send: Array = []
+	
+	# Create a temporary copy of the queue to do the math instantly
+	var simulated_queue = []
+	for q in garbage_queue: 
+		simulated_queue.append(q.duplicate())
+		
+	# 1. PEEK AND CALCULATE INSTANTLY
+	while not simulated_queue.is_empty() and lines_added_this_turn < board_parent.MAX_GARBAGE_PER_DROP:
+		var current_attack = simulated_queue[0]
 		var space_left = board_parent.MAX_GARBAGE_PER_DROP - lines_added_this_turn
 		var amount_to_take = min(current_attack["amount"], space_left)
+		
 		if amount_to_take <= 0: break
-			
+		
+		batch_to_send.append({
+			"amount": amount_to_take,
+			"gap_index": current_attack["gap_index"],
+			"KO_credit": current_attack["sender"]
+		})
+		
+		lines_added_this_turn += amount_to_take
+		current_attack["amount"] -= amount_to_take
+		if current_attack["amount"] <= 0: simulated_queue.pop_front()
+		
+	if batch_to_send.is_empty(): return
+	
+	# 2. FIRE THE NETWORK SIGNAL BEFORE WE START ANIMATING
+	Events.player_took_garbage.emit({
+		"player_id": board_parent._player_index,
+		"instructions": batch_to_send
+	})
+	
+	# 3. NOW PLAY THE LOCAL ANIMATIONS
+	for instruction in batch_to_send:
 		match garbage_type:
 			garbage_types.GRADUAL:
-				await apply_garbage_gradual(amount_to_take, current_attack["gap_index"], current_attack["sender"])
+				await apply_garbage_gradual(instruction["amount"], instruction["gap_index"], instruction["KO_credit"])
 			_:
-				apply_garbage_instant(amount_to_take, current_attack["gap_index"], current_attack["sender"])
-				current_attack["amount"] -= amount_to_take
-				if current_attack["amount"] <= 0: garbage_queue.pop_front()
-		lines_added_this_turn += amount_to_take
-	#update_garbage_meter()
+				apply_garbage_instant(instruction["amount"], instruction["gap_index"], instruction["KO_credit"])
+				# We reference the real garbage_queue here now, not current_attack
+				if not garbage_queue.is_empty():
+					garbage_queue[0]["amount"] -= instruction["amount"]
+					if garbage_queue[0]["amount"] <= 0: garbage_queue.pop_front()
 
 func apply_garbage_instant(amount: int, gap_index: int, KO_credit:int):
 	var grid_end: Vector2i = grid_start + grid_size
@@ -533,3 +596,38 @@ func get_placed_tiles_data() -> Array:
 		})
 		
 	return placed_data
+
+func play_network_clear_animation(payload_value: Dictionary):
+	var cleared_y_coords: Array = payload_value.get("cleared_y_coords", [])
+	var grid_end: Vector2i = grid_start + grid_size
+	
+	# 1. Spawn Particles at the exact cleared rows
+	for line_y in cleared_y_coords:
+		for x in range(grid_start.x, grid_end.x):
+			add_clear_particle(Vector2i(x, int(line_y))) # Cast Y coord just in case
+			
+	# --- THE FIX IS HERE ---
+	# Force it to be an integer so the 'match' statement works!
+	var cleared_count: int = int(payload_value.get("lines_to_clear", 0)) 
+	var any_spin: bool = bool(payload_value.get("is_spin", false)) or bool(payload_value.get("is_all_spin", false))
+	
+	# 2. Play Audio 
+	if any_spin:
+		Audio.play_sound("spin_clear") 
+	else:
+		match cleared_count:
+			1, 2, 3: Audio.play_sound("line_clear")
+			4: Audio.play_sound("quad_clear")
+			
+	if bool(payload_value.get("is_perfect_clear", false)):
+		Audio.play_sound("perfect_clear")
+		
+	if int(payload_value.get("b2b_count", -1)) > 0:
+		Audio.play_sound("b2b")
+		
+	var combo_count: int = int(payload_value.get("combo_count", 0))
+	if combo_count > 0:
+		var combo_sound_index: int = clampi(combo_count, 1, 16)
+		var is_power = bool(payload_value.get("is_power_combo", false))
+		var sound_prefix: String = "power_combo" if is_power else "combo"
+		Audio.play_sound(sound_prefix + str(combo_sound_index))

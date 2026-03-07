@@ -10,6 +10,10 @@ signal player_moved(payload)
 signal player_rotated(payload)
 signal player_cleared(payload)
 signal player_kod(payload)
+signal player_spun(payload)
+signal player_hard_dropped(payload)
+signal player_took_garbage(payload: Dictionary)
+signal garbage_queue_updated(payload: Dictionary)
 #endregion
 
 #region local signals
@@ -25,14 +29,16 @@ signal sent_garbage(payload)
 signal client_joined_lobby(payload)
 signal client_disconnected()
 
-signal client_searching
+signal connection_timeout()
+signal client_searching()
 signal client_connected
 signal server_accepted_join
 signal server_rejected_join
 
 signal sync_interaction(payload)
 signal sync_data(payload)
-signal recieved_board_data(payload)
+signal received_board_data(payload)
+signal round_ended(payload)
 #endregion
 
 func _notification(what: int) -> void:

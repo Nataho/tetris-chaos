@@ -338,14 +338,15 @@ func start_soft_drop(): # moves the piece downward
 		cur_piece_controller.hard_soft_drop()	
 		return
 	soft_drop_timer.start(soft_drop_ms / 1000.0)
-	cur_piece_controller.move_piece(Vector2i.DOWN)
+	cur_piece_controller.move_piece(Vector2i.DOWN,false, false, false, true)
 	
 func stop_soft_drop(): # moves the piece downward
 	soft_drop_timer.stop()
 
 func soft_drop_timeout():
 	if !cur_piece_controller or cur_piece_controller.is_queued_for_deletion(): return
-	cur_piece_controller.move_piece(Vector2i.DOWN)
+	cur_piece_controller.move_piece(Vector2i.DOWN,false, false, false, true)
+	
 	#[TEST]
 	Audio.play_sound("soft_drop")
 

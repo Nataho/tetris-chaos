@@ -76,6 +76,10 @@ func _process_client_messages() -> void:
 			_read_packets(ws)
 			
 		elif state == WebSocketPeer.STATE_CLOSED:
+			for p in range(active_players.size() - 1, -1, -1):
+				if active_players[p].get("socket") == ws:
+					active_players.remove_at(p)
+					
 			connected_clients.remove_at(i)
 			print("Server| Client disconnected and removed.")
 
@@ -88,7 +92,7 @@ func _read_packets(ws: WebSocketPeer) -> void:
 		if typeof(parsed_msg) != TYPE_DICTIONARY or not parsed_msg.has("signal"):
 			continue
 
-		print("hiiii")
+		#print("hiiii")
 		_handle_signal(ws, parsed_msg)
 
 func _handle_signal(ws: WebSocketPeer, data: Dictionary) -> void:
@@ -107,14 +111,14 @@ func _handle_signal(ws: WebSocketPeer, data: Dictionary) -> void:
 			Events.enter_game.emit()
 		
 		"send_board_data":
-			Events.recieved_board_data.emit(data["data"])
+			Events.received_board_data.emit(data["data"])
 			
 		"sync_interaction":
 			Events.sync_interaction.emit(data)
 			# Relay to all other clients if needed
 			broadcast_signal("sync_interaction", data)
 		#"send_board_data":
-			#Events.recieved_board_data.emit(data["data"])
+			#Events.received_board_data.emit(data["data"])
 		#"interact":
 			#Events.server_interaction.emit(data)
 		"testing":
@@ -151,7 +155,7 @@ func sync_interaction(action: String):
 	broadcast_signal(payload["signal"],payload)
 	
 	Events.sync_interaction.emit(payload)
-	print("Serveer| Sync Interaction")
+	print("Server| Sync Interaction")
 
 func sync_data(data:Dictionary):
 	var payload = {
@@ -162,7 +166,7 @@ func sync_data(data:Dictionary):
 	broadcast_signal(payload["signal"], payload)
 	
 	Events.sync_data.emit(payload)
-	print("Client| Sent 'sync_data'")
+	print("Server| Sent 'sync_data'")
 
 #region Outbound Communication
 func broadcast_signal(signal_name: String, extra_data: Dictionary = {}) -> void:

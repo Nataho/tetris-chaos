@@ -59,10 +59,20 @@ var _save_data = {
 
 func _ready() -> void:
 	# Load the game immediately when the manager starts
+	CLA()
 	if not LOAD_GAME():
 		# If no save exists, apply defaults for the first time
 		_apply_controls_to_engine()
 	SAVE_GAME()
+
+func CLA():
+	var args = OS.get_cmdline_args()
+	if "--mute" in args:
+		print("muting")
+		AudioServer.set_bus_mute(0,true)
+	#if "-nosave"
+	#if "--force_mobile" in args:
+		#force_mobile = true
 
 func _apply_controls_to_engine():
 	# Define a map of your shorthand keys to actual InputMap action names

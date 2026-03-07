@@ -2,8 +2,13 @@
 
 [ext_resource type="Script" uid="uid://rpnsmyjsdxsf" path="res://scenes/game/lan_lobby/lan_lobby.gd" id="1_qwmjo"]
 [ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="2_u8wp2"]
+[ext_resource type="FontFile" uid="uid://b4vif8qlndc3e" path="res://assets/fonts/BAHNSCHRIFT.TTF" id="2_vyc6s"]
 [ext_resource type="PackedScene" uid="uid://c2rodumqoa3fe" path="res://classes/boards/LocalBoard/LocalBoard.tscn" id="3_u8wp2"]
 [ext_resource type="PackedScene" uid="uid://d2l8ojou1pilf" path="res://classes/boards/NetworkBoard/NetworkBoard.tscn" id="4_p6f1r"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_vyc6s"]
+font = ExtResource("2_vyc6s")
+font_size = 30
 
 [sub_resource type="Theme" id="Theme_jh0a4"]
 default_font = ExtResource("2_u8wp2")
@@ -19,7 +24,78 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qwmjo")
 
+[node name="Control" type="Control" parent="." unique_id=1556018175]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="side bar" type="VBoxContainer" parent="Control" unique_id=270772186]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -715.0
+offset_top = 81.0
+offset_bottom = 138.0
+grow_horizontal = 0
+
+[node name="Label" type="Label" parent="Control/side bar" unique_id=2036888336]
+custom_minimum_size = Vector2(715, 65)
+layout_mode = 2
+text = "pressing connect without an IP address will look for servers in LAN"
+label_settings = SubResource("LabelSettings_vyc6s")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="IP_bar" type="HBoxContainer" parent="Control/side bar" unique_id=185392013]
+layout_mode = 2
+
+[node name="ip_text_box" type="LineEdit" parent="Control/side bar/IP_bar" unique_id=278900513]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_vyc6s")
+theme_override_font_sizes/font_size = 40
+placeholder_text = "ip address"
+alignment = 1
+max_length = 100
+
+[node name="ip_connect_button" type="Button" parent="Control/side bar/IP_bar" unique_id=2032779596]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_u8wp2")
+theme_override_font_sizes/font_size = 40
+text = "CONNECT"
+
+[node name="name" type="LineEdit" parent="Control/side bar" unique_id=1866100434]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_vyc6s")
+theme_override_font_sizes/font_size = 40
+placeholder_text = "username"
+alignment = 1
+max_length = 15
+
+[node name="host" type="Button" parent="Control" unique_id=1541712131]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -126.5
+offset_top = -26.5
+offset_right = 126.5
+offset_bottom = 26.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_jh0a4")
+text = "HOST SERVER"
+
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2000240318]
+visible = false
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -43,6 +119,7 @@ theme = SubResource("Theme_jh0a4")
 text = "JOIN SERVER"
 
 [node name="local_anchor" type="Control" parent="." unique_id=856645804]
+visible = false
 layout_mode = 1
 anchor_right = 0.5
 anchor_bottom = 1.0
@@ -56,6 +133,7 @@ grow_vertical = 2
 [node name="board" parent="local_anchor" unique_id=987870610 instance=ExtResource("3_u8wp2")]
 
 [node name="network_anchor" type="Control" parent="." unique_id=1006756022]
+visible = false
 layout_mode = 1
 anchor_left = 0.5
 anchor_right = 1.0

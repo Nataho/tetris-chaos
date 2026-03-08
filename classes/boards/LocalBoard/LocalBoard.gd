@@ -15,13 +15,20 @@ static func create(id: int, target: int) -> LocalBoard:
 	var inst:LocalBoard = FILE.instantiate()
 	inst._player_index = id
 	inst.target_player = target
+	#inst.has_initialized = false
 	return inst
+
+func  _ready() -> void:
+	super._ready()
+	_connect_signals()
+	
 
 func initialize(seed_val: int = -1):
 	super.initialize_game_mode("online", seed_val)
 	if NetworkClient.client_active: setup_client()
 	if NetworkServer.server_active: setup_server()
-	_connect_signals()
+	#if !has_initialized:
+		#has_initialized = true
 
 func _connect_signals():
 	# CHEAP: Just the piece moving (High frequency)
@@ -171,6 +178,10 @@ func _dispatch_to_network(data: Dictionary):
 	data["player_id"] = _player_index
 	
 	if NetworkClient.client_active:
+		# If I am a client, send it up to the server
 		NetworkClient.send_signal("send_board_data", data)
-	elif NetworkServer.server_active and NetworkServer.active_players.size() > 0:
-		NetworkServer.send_to_client(NetworkServer.active_players[0]["socket"], "send_board_data", data)
+		
+	elif NetworkServer.server_active:
+		# If I am the host, process it locally AND broadcast it to all clients
+		Events.received_board_data.emit(data) # Process it for myself immediately
+		NetworkServer.broadcast_signal("send_board_data", {"data": data}) # Send it to everyone else

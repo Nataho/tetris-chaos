@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://rpnsmyjsdxsf" path="res://scenes/game/lan_lobby/lan_lobby.gd" id="1_qwmjo"]
 [ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="2_u8wp2"]
 [ext_resource type="FontFile" uid="uid://b4vif8qlndc3e" path="res://assets/fonts/BAHNSCHRIFT.TTF" id="2_vyc6s"]
+[ext_resource type="Script" uid="uid://dj6r8qc4bbwgk" path="res://scripts/rich_text_bounce.gd" id="4_p6f1r"]
 
 [sub_resource type="Theme" id="Theme_jh0a4"]
 default_font = ExtResource("2_u8wp2")
@@ -20,6 +21,14 @@ default_font_size = 40
 [sub_resource type="LabelSettings" id="LabelSettings_1oqdv"]
 font = ExtResource("2_u8wp2")
 font_size = 100
+
+[sub_resource type="Theme" id="Theme_1oqdv"]
+default_font = ExtResource("2_u8wp2")
+default_font_size = 30
+
+[sub_resource type="RichTextEffect" id="RichTextEffect_myqay"]
+script = ExtResource("4_p6f1r")
+metadata/_custom_type_script = "uid://dj6r8qc4bbwgk"
 
 [sub_resource type="Animation" id="Animation_vyc6s"]
 length = 0.001
@@ -46,6 +55,18 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("../../../fg:color")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_1oqdv"]
@@ -77,10 +98,45 @@ tracks/1/keys = {
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 
+[sub_resource type="Animation" id="Animation_p6f1r"]
+resource_name = "next_round_in"
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../../../fg:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_42jex"]
+resource_name = "next_round_out"
+length = 0.5
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../../../fg:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_42jex"]
 _data = {
 &"RESET": SubResource("Animation_vyc6s"),
-&"intro": SubResource("Animation_1oqdv")
+&"intro": SubResource("Animation_1oqdv"),
+&"next_round_in": SubResource("Animation_p6f1r"),
+&"next_round_out": SubResource("Animation_42jex")
 }
 
 [node name="LanLobby" type="Control" unique_id=493069010]
@@ -91,6 +147,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qwmjo")
+first_to = 1
 metadata/_edit_horizontal_guides_ = [79.0]
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1906291870]
@@ -261,7 +318,6 @@ text = "RADIOACTIVE R"
 label_settings = SubResource("LabelSettings_1oqdv")
 
 [node name="player1_anchor" type="Control" parent="versus" unique_id=856645804]
-visible = false
 layout_mode = 1
 anchor_right = 0.5
 anchor_bottom = 1.0
@@ -273,7 +329,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="player2_anchor" type="Control" parent="versus" unique_id=1006756022]
-visible = false
 layout_mode = 1
 anchor_left = 0.5
 anchor_right = 1.0
@@ -284,6 +339,33 @@ offset_right = -510.0
 offset_bottom = -540.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="score" type="RichTextLabel" parent="versus" unique_id=1350313029]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -161.0
+offset_top = 76.0
+offset_right = 161.0
+offset_bottom = 125.0
+grow_horizontal = 2
+theme = SubResource("Theme_1oqdv")
+bbcode_enabled = true
+text = "[color=red](0/0)[/color] FT5 [color=blue](0/0)[/color]"
+horizontal_alignment = 1
+vertical_alignment = 1
+custom_effects = [SubResource("RichTextEffect_myqay")]
+
+[node name="fg" type="ColorRect" parent="versus" unique_id=1585417741]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="versus" unique_id=865883507]
 root_node = NodePath("../HBoxContainer/left_side/Label")

@@ -146,7 +146,11 @@ func _handle_signal(ws: WebSocketPeer, data: Dictionary) -> void:
 			Events.enter_game.emit()
 		
 		"send_board_data":
+			# Process it locally on the Host's machine
 			Events.received_board_data.emit(data["data"])
+			
+			# Relay it to all other connected clients (spectators, etc.)
+			broadcast_signal("send_board_data", data)
 		
 		"sync_data":
 			Events.sync_data.emit(data)

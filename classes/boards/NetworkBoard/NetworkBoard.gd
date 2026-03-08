@@ -3,20 +3,29 @@ class_name NetworkBoard
 const FILE = preload("uid://d2l8ojou1pilf")
 
 var _just_spun: bool = false
+var _is_spectator: bool = false
 
-static func create(id: int, target: int) -> NetworkBoard:
+static func create(id: int, target: int, is_spectator:bool) -> NetworkBoard:
 	var inst:NetworkBoard = FILE.instantiate()
 	inst._player_index = id
 	inst.target_player = target
+	inst._is_spectator = is_spectator
 	return inst
 
 func set_board(playerid: int, target: int):
 	_player_index = playerid
 	target_player = target
 
-func initialize():
-	# Initialize the visual grids
-	super.initialize_game_mode("online")
+func initialize(seed_val: int = -1):
+	super.initialize_game_mode("online", seed_val) # <--- Pass the seed here!
+	
+	# --- NEW FIX: Wipe ghost garbage from the previous round! ---
+	garbage_queue.clear()
+	Events.garbage_queue_updated.emit({
+		"player_id": _player_index,
+		"new_queue": garbage_queue
+	})
+	
 	# Kill the local physics so the opponent's board doesn't play itself!
 	pieces_controller.set_physics_process(false)
 	pieces_controller.set_process(false)
@@ -29,71 +38,60 @@ func _ready() -> void:
 		
 		var type = payload.get("update_type")
 		
-		# --- 1. THE GARBAGE CATCHER (Bypasses the sender check!) ---
-		if type == "garbage":
+		# --- 1. THE GARBAGE CATCHER (Re-activated) ---
+		# This ensures the puppet board actually ADDS the garbage to its queue
+		if type == "garbage" and _is_spectator:
 			var target = payload["value"]["target"]
-			
-			# Is this garbage targeted at the player this NetworkBoard represents?
 			if target == _player_index:
+				# Check if this board is already handling this in the parent.
+				# If your puppet is getting 2x, try commenting out this call
+				# to see if the parent class is already adding it to the queue.
 				receive_garbage(payload)
-			
-			#return # We are done with this packet, stop here!
-			
+				
+				Events.garbage_queue_updated.emit({
+					"player_id": _player_index,
+					"new_queue": garbage_queue.duplicate()
+				})
+			return
 			
 		# --- 2. THE BOUNCER ---
-		# For moves, locks, and spins, ONLY listen if the opponent sent them!
 		if payload.get("player_id") != _player_index: return
 		
 		elif type == "take_garbage":
 			var instructions = payload["instructions"]
+			
+			# We keep the BoardController as the boss here. 
+			# It handles the subtraction logic internally.
 			board_controller.process_garbage_queue(instructions)
+			
+			# We sync the UI meter to match the controller's new state
+			Events.garbage_queue_updated.emit({
+				"player_id": _player_index,
+				"new_queue": garbage_queue.duplicate()
+			})
 		
 		elif type == "sync_garbage_queue":
-			# Overwrite the puppet's queue with the exact state from the local player
 			garbage_queue.clear()
 			garbage_queue.append_array(payload["queue"])
+			
+			Events.garbage_queue_updated.emit({
+				"player_id": _player_index,
+				"new_queue": garbage_queue.duplicate()
+			})
 		
 		# --- 3. NORMAL BOARD UPDATES ---
-		# Route the packet to the right function
 		if type == "piece_update":
-			# 1. Force the exact positions so it can never desync
 			set_piece_tiles(payload["piece_tiles"])
 			set_ghost_tiles(payload["ghost_tiles"])
 			
-			# 2. Read the action to play the right feedback!
-			var action = payload.get("action", "move")
-			var extra_data = payload["extra_data"]
-			
-			if action == "rotate":
-				_handle_rotate_sound()
-				
-			elif action == "move":
-				# Safely get the dict, defaulting to a zero dict if it's somehow missing
-				var dir_dict = extra_data.get("direction", {"x": 0, "y": 0})
-				
-				# Rebuild the Vector2i!
-				var direction = Vector2i(dir_dict["x"], dir_dict["y"])
-				
-				#print("Rebuilt direction: ", direction)
-				#print("extra_data", extra_data)
-				
-				if direction == Vector2i.DOWN and extra_data.get("soft_drop", false):
-					Audio.play_sound("soft_drop")
-					pass
-				else:
-					pass # Audio.play_sound("move")
-			
 		elif type == "lock":
 			set_placed_tiles(payload["placed_tiles"])
-			
 			pieces_controller.clear()
-			pieces_controller.ghost_tiles.clear()
 			
-			# --- NEW: Sync the puppet's garbage queue with the real player's queue! ---
+			# We force a hard-sync on every lock to kill any drift
 			if payload.has("garbage_queue"):
 				garbage_queue.clear()
 				garbage_queue.append_array(payload["garbage_queue"])
-			# --------------------------------------------------------------------------
 			
 			var event_data = payload.get("event_data")
 			if event_data != null and typeof(event_data) == TYPE_DICTIONARY:
@@ -110,15 +108,11 @@ func _ready() -> void:
 					if lines > 0 or is_spin or is_all_spin:
 						event_data["player_index"] = _player_index 
 						display_line_clear_message(event_data)
-			
 		
 		elif type == "spin":
-			var center_x: int = int(payload["center_pos"]["x"])
-			var center_y: int = int(payload["center_pos"]["y"])
-			var center_pos := Vector2i(center_x, center_y)
+			var center_pos := Vector2i(int(payload["center_pos"]["x"]), int(payload["center_pos"]["y"]))
 			var clockwise: bool = bool(payload["clockwise"])
-			
-			_just_spun = true # Flag that a spin happened this exact frame!
+			_just_spun = true
 			board_controller.add_spin_particle(center_pos, clockwise)
 			Audio.play_sound("spin")
 		
@@ -129,7 +123,6 @@ func _ready() -> void:
 			set_queue_tiles(payload["queue"], payload.get("hold_piece"))
 			
 		elif type == "player_kod":
-			# Just pass the internet packet straight into your existing logic!
 			_check_ko(payload)
 	)
 

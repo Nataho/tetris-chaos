@@ -5,7 +5,7 @@ signal countdown_ticked(time_left: int)
 @export var target_player: int = -1
 @export var _player_index = -1 #-1 = keyboard
 
-const MAX_GARBAGE_PER_DROP: int = 100
+const MAX_GARBAGE_PER_DROP: int = 8
 
 @export var board_controller: BoardController
 @export var pieces_controller: PiecesController

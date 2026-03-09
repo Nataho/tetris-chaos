@@ -470,8 +470,12 @@ func calculate_garbage_sent(payload_values: Dictionary) -> int:
 	var combo_count: int = payload_values["combo_count"]
 	var is_perfect_clear: bool = payload_values["is_perfect_clear"]
 	
+	
 	if lines_cleared == 0: return 0
-	if is_perfect_clear: return 10
+	#if is_perfect_clear: 
+		#if board_parent.game_mode != board_parent.game_modes.MARATHON:
+			#Audio.play_sound("garbage_out_large")
+		#return 10
 		
 	var base_damage: int = 0
 	if is_spin:
@@ -503,7 +507,21 @@ func calculate_garbage_sent(payload_values: Dictionary) -> int:
 	else:
 		if combo_count > 0:
 			final_garbage = floori(log(1.0 + (1.25 * float(combo_count))))
-			
+	
+	if is_perfect_clear:
+		final_garbage += 10
+		
+	if board_parent.game_mode != board_parent.game_modes.MARATHON and not final_garbage <= 0:
+		#Events.garbage_attack_triggered.emit(board_parent._player_index, board_parent.target_player, final_garbage)
+		if final_garbage < 4:
+			Audio.play_sound("garbage_out_small")
+		elif final_garbage < 6:
+			Audio.play_sound("garbage_out_medium")
+		else:
+			Audio.play_sound("garbage_out_large")
+		
+		
+	
 	return final_garbage
 
 func update_garbage_meter():
@@ -631,3 +649,12 @@ func play_network_clear_animation(payload_value: Dictionary):
 		var is_power = bool(payload_value.get("is_power_combo", false))
 		var sound_prefix: String = "power_combo" if is_power else "combo"
 		Audio.play_sound(sound_prefix + str(combo_sound_index))
+
+func force_meter_update() -> void:
+	var actual_total: int = 0
+	if board_parent and board_parent.garbage_queue:
+		for attack in board_parent.garbage_queue:
+			actual_total += attack["amount"]
+			
+	visual_garbage_total = float(actual_total)
+	_render_garbage_meter(floori(visual_garbage_total))

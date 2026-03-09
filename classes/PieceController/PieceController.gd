@@ -335,7 +335,7 @@ func move_piece(movement: Vector2i, is_rotate:bool = false, clockwise:bool = fal
 		})
 	#else:
 		#Events.player_placed.emit()
-		
+	
 	if is_on_floor:
 		reset_fall_time()
 		

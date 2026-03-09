@@ -29,7 +29,17 @@ const sound := {
 	"match_intro": [preload("uid://fd5m8skk1rqb"), 0],
 	
 	
+	
+	
 	"garbage_rise":[preload("uid://cu6jrki6jgrqe"),5],
+	
+	"garbage_in_small":[preload("uid://bi0kece2k80tv"), 0],
+	"garbage_in_medium": [preload("uid://dofl44x7833ta"), 0],
+	"garbage_in_large": [preload("uid://b2i2lwife3fk8"), 0],
+	
+	"garbage_out_small":[preload("uid://db4jxvmdwlui8"),0],
+	"garbage_out_medium":[preload("uid://divymxfmc8akh"),0],
+	"garbage_out_large":[preload("uid://b3e7v7mixat56"),0],
 	
 	"countdown_3": [preload("uid://du20tbalvyobt"),0],
 	"countdown_2": [preload("uid://du20tbalvyobt"),0],

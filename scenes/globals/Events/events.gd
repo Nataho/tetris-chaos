@@ -23,6 +23,7 @@ signal android_back_pressed
 
 #region multiplayer signals
 signal sent_garbage(payload)
+#signal garbage_attack_triggered(from_player_index: int, to_player_index: int, amount: int)
 #endregion
 
 #region server-client signals

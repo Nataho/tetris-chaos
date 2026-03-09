@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://dq7nufvkc8vxl"]
 
 [ext_resource type="Script" uid="uid://d3k6f13xh0kk8" path="res://scenes/game/local_multiplayer/local_multiplayer.gd" id="1_hj88h"]
-[ext_resource type="PackedScene" uid="uid://c2rodumqoa3fe" path="res://classes/boards/LocalBoard/LocalBoard.tscn" id="2_ylsce"]
 [ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="3_buvxm"]
 [ext_resource type="PackedScene" uid="uid://v32g77jnvn6k" path="res://classes/extras/ui_classes/PlayerSettings/player_settings.tscn" id="3_myqay"]
 [ext_resource type="Script" uid="uid://dj6r8qc4bbwgk" path="res://scripts/rich_text_bounce.gd" id="4_m40d3"]
+[ext_resource type="PackedScene" uid="uid://cxe4qml4rsqvo" path="res://classes/boards/MultiplayerBoard/MultiplayerBoard.tscn" id="4_myqay"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_buvxm"]
 font = ExtResource("3_buvxm")
@@ -262,10 +262,9 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="board" parent="p1_anchor" unique_id=987870610 instance=ExtResource("2_ylsce")]
+[node name="board" parent="p1_anchor" unique_id=987870610 instance=ExtResource("4_myqay")]
 target_player = 2
 _player_index = 1
-handicap = 0.25
 
 [node name="name" type="RichTextLabel" parent="p1_anchor" unique_id=1582774485]
 layout_mode = 1
@@ -296,7 +295,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="board" parent="p2_anchor" unique_id=1591048522 instance=ExtResource("2_ylsce")]
+[node name="board" parent="p2_anchor" unique_id=465168380 instance=ExtResource("4_myqay")]
 target_player = 1
 _player_index = 2
 

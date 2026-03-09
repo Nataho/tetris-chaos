@@ -13,7 +13,7 @@ dest_files=["res://.godot/imported/Tetris Chaos - Epic Battle.mp3-bdcee059161c39
 [params]
 
 loop=true
-loop_offset=767.0
-bpm=120.03
-beat_count=1710
+loop_offset=767.27
+bpm=120.06
+beat_count=1711
 bar_beats=4

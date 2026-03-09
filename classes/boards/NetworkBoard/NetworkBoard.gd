@@ -93,6 +93,8 @@ func _ready() -> void:
 				garbage_queue.clear()
 				garbage_queue.append_array(payload["garbage_queue"])
 			
+			board_controller.force_meter_update()
+			
 			var event_data = payload.get("event_data")
 			if event_data != null and typeof(event_data) == TYPE_DICTIONARY:
 				var clear_info: Dictionary = event_data.get("value", event_data)

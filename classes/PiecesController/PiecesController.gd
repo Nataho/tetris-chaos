@@ -85,6 +85,8 @@ func start():
 	spawn_piece()
 
 func _process(delta: float) -> void:
+	if get_viewport().gui_get_focus_owner() is LineEdit:
+		return
 	#print("boardcontroller.current_level = ",board_controller.current_level)
 	if !started: return
 	gamepad_handler.handle_controller_input()
@@ -249,6 +251,8 @@ func gamepad_button_released(button:ButtonData):
 		"D": stop_soft_drop()
 
 func _input(event: InputEvent) -> void:
+	if get_viewport().gui_get_focus_owner() is LineEdit:
+		return
 	#if board_parent._player_index != -1: return #keyboard
 	var is_keyboard: bool = GamepadHandler.controllers.get(-1, -100) == board_parent._player_index
 	if board_parent.game_mode == board_parent.game_modes.VERSUS and not is_keyboard: return
@@ -298,9 +302,11 @@ func _handle_release_input(dir_key: String):
 ################################################################
 	
 func start_move_left(): # moves the piece to the left
-	
 	if "L" not in held_move_keys:
 		held_move_keys.append("L")
+		
+	arr_timer.stop()
+	
 	das_timer.start(das_ms / 1000.0)
 	cur_piece_controller.move_piece(Vector2i.LEFT)
 	move_direction = Vector2i.LEFT
@@ -313,6 +319,9 @@ func stop_move():
 func start_move_right(): # moves the piece to the right
 	if "R" not in held_move_keys:
 		held_move_keys.append("R")
+	
+	arr_timer.stop()
+	
 	das_timer.start(das_ms / 1000.0)
 	cur_piece_controller.move_piece(Vector2i.RIGHT)
 	move_direction = Vector2i.RIGHT
@@ -347,8 +356,8 @@ func soft_drop_timeout():
 	if !cur_piece_controller or cur_piece_controller.is_queued_for_deletion(): return
 	cur_piece_controller.move_piece(Vector2i.DOWN,false, false, false, true)
 	
-	#[TEST]
-	Audio.play_sound("soft_drop")
+	if !cur_piece_controller.is_on_floor:
+		Audio.play_sound("soft_drop")
 
 func hard_drop():
 	if cur_piece_controller == null or cur_piece_controller.is_queued_for_deletion(): return

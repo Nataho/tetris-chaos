@@ -20,6 +20,10 @@ extends Control
 
 @onready var scoreboard: RichTextLabel = $versus/score
 
+@onready var chat_box: LineEdit = $chat/chat_box
+@onready var chat: RichTextLabel = $chat/Panel/chat
+
+
 var game_started:bool = false
 var game_finished: bool = false
 
@@ -60,7 +64,7 @@ var p1_match_score: int = 0
 var p2_match_score: int = 0
 
 func _ready() -> void:
-	GameManager.change_resolution(1280, 720)
+	#GameManager.change_resolution(1280, 720)
 	Audio.play_music("lobby",Audio.SOUND_END_EFFECTS.FADE)
 	
 	_setup_ui()
@@ -107,9 +111,13 @@ func _connect_ui_signals() -> void:
 	ip_text_box.text_changed.connect(_on_ip_box_edited)
 	plyr_tgl_btn.pressed.connect(_on_player_toggled)
 	username_text_box.text_changed.connect(_on_username_changed)
+	chat_box.text_submitted.connect(_on_send_chat)
 	Events.android_back_pressed.connect(back)
+	
 
 func _connect_network_signals() -> void:
+	Events.sent_garbage.connect(_on_garbage_sent)
+	
 	Events.sync_interaction.connect(_on_sync_interaction)
 	Events.sync_data.connect(_on_sync_data)
 	Events.client_connected.connect(_on_client_connected)
@@ -196,7 +204,18 @@ func _on_player_toggled():
 	
 	if NetworkServer.server_active:
 		_check_start_requirements()
-		
+
+func _on_send_chat(text:String):
+	chat_box.text = ""
+	chat_box.release_focus()
+	if text == "": return
+	var payload = {
+		"action": "chat",
+		"message": text,
+		"sender": GameManager.player_data["name"]
+	}
+	NetworkSync.sync_data(payload)
+
 # ------------------------------------------------------------------------------
 # Network Event Handlers
 # ------------------------------------------------------------------------------
@@ -294,6 +313,42 @@ func _on_sync_data(payload: Dictionary) -> void:
 		update_scoreboard(p1_score, p2_score)
 		
 		_perform_match_over_sequence(p1_won)
+	
+	elif action == "spawn_garbage":
+		var attacker_id = data.get("attacker_id", -1)
+		var target_id = data.get("target_id", -1)
+		var amount = data.get("amount", 1)
+		
+		var attacker_node = null
+		var target_node = null
+		
+		# Match the networked IDs to the local active boards
+		if attacker_id == current_p1_id:
+			attacker_node = active_p1_board
+		elif attacker_id == current_p2_id:
+			attacker_node = active_p2_board
+			
+		if target_id == current_p1_id:
+			target_node = active_p1_board
+		elif target_id == current_p2_id:
+			target_node = active_p2_board
+			
+		# Safety check: ensure both boards are active and found
+		if attacker_node == null or target_node == null:
+			return
+			
+		# Start at the attacker's anchor, aim for the target's anchor
+		var start_pos = attacker_node.get_parent().global_position
+		var target_anchor = target_node.get_parent()
+		
+		_spawn_attack_visual(start_pos, target_anchor, amount)
+	
+	elif action == "chat":
+		var sender:String = data.get("sender", "player")
+		var message:String = data.get("message", "sent a message..")
+		
+		chat.text += "\n"
+		chat.text += "<%s> %s" % [sender, message]
 	
 	elif action == "timer_sync":
 		is_countdown_active = data.get("active", false)
@@ -475,7 +530,10 @@ func _on_master_timer_timeout() -> void:
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):
 		back()
-	#elif event.is_action_pressed("ready"):
+	elif event.is_action_pressed("ready"):
+		if !chat_box.has_focus():
+			chat_box.grab_focus()
+			get_viewport().set_input_as_handled()
 		#if NetworkServer.server_active:
 			## Host can force start instantly if they want
 			#_on_master_timer_timeout()
@@ -521,7 +579,9 @@ func initiate_start_sequence(p1_name: String, p2_name: String, seed: int, p1_id:
 	
 	# You successfully give it the names right here!
 	$versus/HBoxContainer/left_side/Label.text = p1_name.to_upper()
+	$versus/player1_anchor/Label.text = p1_name.to_upper()
 	$versus/HBoxContainer/right_side/Label.text = p2_name.to_upper()
+	$versus/player2_anchor/Label.text = p2_name.to_upper()
 	$versus/HBoxContainer/left_side/Label.show()
 	$versus/HBoxContainer/right_side/Label.show()
 
@@ -777,3 +837,49 @@ func start_battle():
 	if active_p2_board:
 		if active_p2_board is LocalBoard:
 			active_p2_board.start(3)
+
+# ------------------------------------------------------------------------------
+# Visual Effects / Garbage Spawning
+# ------------------------------------------------------------------------------
+func _on_garbage_sent(payload: Dictionary) -> void:
+	# 1. Grab the raw data from the local signal
+	var attacker_id = payload.get("player_id")
+	var target_id = payload["value"]["target"]
+	var amount = payload["value"]["amount"]
+	
+	# 2. Package it into a network-friendly dictionary
+	var sync_payload = {
+		"action": "spawn_garbage",
+		"attacker_id": attacker_id,
+		"target_id": target_id,
+		"amount": amount
+	}
+	
+	# 3. Fire it off to the server/clients!
+	NetworkSync.sync_data(sync_payload)
+
+func _spawn_attack_visual(start_pos: Vector2, target_node: Node, amount: int) -> void:
+	# Loop through the amount of garbage to spawn a "swarm" of particles
+	# If they sent 4 lines, 4 particles will burst out!
+	
+	for i in range(amount):
+		# Use your custom static create function!
+		var particle = AttackParticles.create(target_node)
+		if amount < 4:
+			particle.modulate = Color.RED
+		elif amount < 6:
+			particle.modulate = Color.TURQUOISE
+		elif amount < 10:
+			particle.modulate = Color.VIOLET
+		else:
+			
+			var r = randf_range(0.5,0.8)
+			var g = randf_range(0.5,0.8)
+			var b = randf_range(0.5,0.8)
+			particle.modulate = Color(r,g,b)
+		# Set its starting position BEFORE adding to the tree
+		# so its _enter_tree random scatter math works perfectly
+		particle.global_position = start_pos
+		
+		# Add it to the $versus node so it renders safely above the game boards
+		$versus.add_child(particle)

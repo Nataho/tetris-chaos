@@ -290,6 +290,15 @@ func receive_garbage(payload):
 	# All lines in this specific attack get the same gap (Clean Garbage!)
 	var random_gap = randi() % board_controller.grid_size.x 
 	
+	if game_mode == game_modes.ONLINE and not self is NetworkBoard: #run sfx only when online to not stack
+		if amount < 4:
+			Audio.play_sound("garbage_in_small")
+		elif amount < 6:
+			Audio.play_sound("garbage_in_medium")
+		else: 
+			Audio.play_sound("garbage_in_large")
+	await get_tree().create_timer(0.5).timeout #timer used to delay garbage intentionally
+	
 	garbage_queue.append({
 		"sender":attacker,
 		"amount": amount,

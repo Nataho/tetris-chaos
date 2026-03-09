@@ -265,6 +265,7 @@ func _connect_signals() -> void:
 	gamepad_handler.gamepad_button_press.connect(_button_input)
 	gamepad_handler.controller_connected.connect(_controller_connected)
 	gamepad_handler.player_disconnected.connect(_player_disconnected)
+	Events.sent_garbage.connect(_on_garbage_sent)
 	
 	$halves/left_half/match/VBoxContainer/rematch.pressed.connect(func(): _hard_reset())
 	$halves/right_half/match/VBoxContainer/rematch.pressed.connect(func(): _hard_reset())
@@ -318,6 +319,76 @@ func trigger_pause() -> void:
 	# Spawn the Pause Menu
 	var pause_menu = PauseMenu.create(gamepad_handler,["no_restart"])
 	add_child(pause_menu)
+
+func _on_garbage_sent(payload: Dictionary) -> void:
+	# 1. Grab the raw data from the local signal
+	var attacker_id = payload.get("player_id")
+	var target_id = payload["value"]["target"]
+	var amount = payload["value"]["amount"]
+	
+	#var attacker_id = data.get("attacker_id", -1)
+	#var target_id = data.get("target_id", -1)
+	#var amount = data.get("amount", 1)
+	
+	var attacker_node = null
+	var target_node = null
+	
+	# Match the networked IDs to the local active boards
+	if attacker_id == p1_board._player_index:
+		attacker_node = p1_board
+	elif attacker_id == p2_board._player_index:
+		attacker_node = p2_board
+		
+	if target_id == p1_board._player_index:
+		target_node = p1_board
+	elif target_id == p2_board._player_index:
+		target_node = p2_board
+		
+	# Safety check: ensure both boards are active and found
+	if attacker_node == null or target_node == null:
+		return
+		
+	# Start at the attacker's anchor, aim for the target's anchor
+	var start_pos = attacker_node.get_parent().global_position
+	var target_anchor = target_node.get_parent()
+	
+	_spawn_attack_visual(start_pos, target_anchor, amount)
+	# 2. Package it into a network-friendly dictionary
+	#var sync_payload = {
+		#"action": "spawn_garbage",
+		#"attacker_id": attacker_id,
+		#"target_id": target_id,
+		#"amount": amount
+	#}
+	
+	# 3. Fire it off to the server/clients!
+	#NetworkSync.sync_data(sync_payload)
+
+func _spawn_attack_visual(start_pos: Vector2, target_node: Node, amount: int) -> void:
+	# Loop through the amount of garbage to spawn a "swarm" of particles
+	# If they sent 4 lines, 4 particles will burst out!
+	
+	for i in range(amount):
+		# Use your custom static create function!
+		var particle = AttackParticles.create(target_node)
+		if amount < 4:
+			particle.modulate = Color.RED
+		elif amount < 6:
+			particle.modulate = Color.TURQUOISE
+		elif amount < 10:
+			particle.modulate = Color.VIOLET
+		else:
+			
+			var r = randf_range(0.5,0.8)
+			var g = randf_range(0.5,0.8)
+			var b = randf_range(0.5,0.8)
+			particle.modulate = Color(r,g,b)
+		# Set its starting position BEFORE adding to the tree
+		# so its _enter_tree random scatter math works perfectly
+		particle.global_position = start_pos
+		
+		# Add it to the $versus node so it renders safely above the game boards
+		add_child(particle)
 
 func _controller_connected(device_id: int) -> void: print("Connected: ", device_id)
 func _player_disconnected(_player_id: int, _device_id: int) -> void: pass

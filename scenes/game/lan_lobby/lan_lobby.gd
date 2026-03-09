@@ -260,7 +260,7 @@ func _on_sync_data(payload: Dictionary) -> void:
 		
 		if NetworkServer.server_active:
 			var broadcast_payload = {
-				"action": "player_joined", 
+				"action": "list_updated", 
 				"players": active_players
 			}
 			NetworkSync.sync_data(broadcast_payload)

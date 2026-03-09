@@ -23,7 +23,7 @@ extends Control
 @onready var chat_box: LineEdit = $chat/chat_box
 @onready var chat: RichTextLabel = $chat/Panel/chat
 
-
+var starting:bool = false
 var game_started:bool = false
 var game_finished: bool = false
 
@@ -221,16 +221,31 @@ func _on_send_chat(text:String):
 # ------------------------------------------------------------------------------
 func _on_sync_interaction(payload: Dictionary) -> void:
 	print("payload", payload)
-	if payload.get("action") == "start_game":
-		start_battle()
+	var action = payload.get("action")
+	match action:
+		"start_game":
+			start_battle()
+		"return_to_lobby":
+			_return_to_lobby()
 
 func _on_sync_data(payload: Dictionary) -> void:
 	var data = payload.get("data", payload)
 	var action = data.get("action", "")
 		
 	if action == "player_joined":
+		var new_player = data.get("new_player", "player")
+		#print("data: ", data)
 		active_players = data.get("players", [])
 		_update_player_list(active_players)
+		chat.text += "\n" + "[color=yellow]%s has entered the lobby [/color]" % new_player.get("name","player")
+	
+	if action == "player_left":
+		print("player left?")
+		var player_left = data.get("player_left", "player")
+		print("data: ", data)
+		active_players = data.get("players", [])
+		_update_player_list(active_players)
+		chat.text += "\n" + "[color=yellow]%s has left the lobby [/color]" % player_left
 		
 	elif action == "role_changed":
 		var target_name = data.get("name", "")
@@ -370,7 +385,20 @@ func _on_client_connected() -> void:
 
 func _on_server_accepted(extra_data: Dictionary) -> void:
 	my_lobby_id = extra_data.get("player_id", -1)
-	$"Control/side bar/guide".text = "Connected. ID: " + str(my_lobby_id)
+	
+	# NEW: Ensure client captures the player list immediately on join
+	if extra_data.has("players"):
+		active_players = extra_data["players"]
+		_update_player_list(active_players)
+
+	if extra_data.get("is_mid_game", false):
+		var snap = extra_data["snapshot"]
+		# ... (your existing mid-game snapshot logic) ...
+		game_started = true # This prevents the timer from starting on the client too
+		$"Control/side bar/guide".text = "game in progress " + str(my_lobby_id)
+	else:
+		$"Control/side bar/guide".text = "Connected. ID: " + str(my_lobby_id)
+		
 	plyr_tgl_btn.disabled = false
 
 func _on_server_rejected() -> void:
@@ -383,10 +411,12 @@ func _on_client_joined(payload: Dictionary) -> void:
 	
 	var sync_payload = {
 		"action": "player_joined", 
-		"players": active_players
+		"players": active_players,
+		"new_player": payload
 	}
 	NetworkSync.sync_data(sync_payload)
-	_check_start_requirements() # Add this!
+	
+	_check_start_requirements()
 
 func _update_player_list(players_array: Array) -> void:
 	for child in $Control/Players.get_children():
@@ -412,9 +442,9 @@ func _update_player_list(players_array: Array) -> void:
 
 func _on_client_left(leaving_player: Dictionary) -> void:
 	var p_name = str(leaving_player.get("name", "Unknown"))
-	var leaving_id = leaving_player.get("player_id", -1) # Grab their ID
+	var leaving_id = leaving_player.get("player_id", -1)
 	
-	# 1. Remove them from the lobby list (happens whether in-game or not)
+	# 1. Update local list
 	for i in range(active_players.size() - 1, -1, -1):
 		if str(active_players[i].get("name", "")) == p_name:
 			active_players.remove_at(i)
@@ -422,28 +452,31 @@ func _on_client_left(leaving_player: Dictionary) -> void:
 			
 	_update_player_list(active_players)
 	
-	# 2. Check if a match is currently running
+	# 2. BROADCAST TO EVERYONE (Moved this up so it always fires)
+	if NetworkServer.server_active:
+		var sync_payload = {
+			"action": "player_left", 
+			"players": active_players,
+			"player_left": p_name
+		}
+		NetworkSync.sync_data(sync_payload)
+
+	# 3. Handle Mid-Game Logic
 	if game_started:
-		# Was the person who left actually fighting?
+		# Was the person who left one of the two combatants?
 		if leaving_id == current_p1_id or leaving_id == current_p2_id:
 			print("Lobby| ACTIVE PLAYER DISCONNECTED! Aborting match...")
-			_return_to_lobby()
+			NetworkSync.sync_interaction("return_to_lobby")
 			$"Control/side bar/guide".text = p_name + " disconnected!"
 		else:
 			print("Lobby| Spectator " + p_name + " left. The match continues.")
-			
-		# We return early here so we don't accidentally trigger lobby timers mid-game
+		
+		# We still return here to prevent the lobby timer from starting mid-match
 		return 
 
-	# 3. Normal Lobby Behavior (Only runs if game_started is false)
+	# 4. Normal Lobby Behavior (Only if game hasn't started)
 	$"Control/side bar/guide".text = "Waiting for opponent..."
-	
 	if NetworkServer.server_active:
-		var sync_payload = {
-			"action": "player_joined", # (Reusing this action to sync the updated list)
-			"players": active_players
-		}
-		NetworkSync.sync_data(sync_payload)
 		_check_start_requirements()
 
 func _on_disconnected_from_host() -> void:
@@ -465,24 +498,26 @@ func _on_connection_timeout() -> void:
 
 func _check_start_requirements() -> void:
 	if not NetworkServer.server_active: return
+	if starting: return
+	
+	# NEW: If a game is already in progress, don't start/stop the lobby timer
+	if game_started: return
 	
 	var ready_count = 0
 	for p in active_players:
-		# Counting everyone who is NOT a spectator
 		if not p.get("is_spectator", false):
 			ready_count += 1
 			
 	if ready_count >= 2:
 		if not is_countdown_active:
 			is_countdown_active = true
-			master_timer.start(countdown) # <--- Changed here
+			master_timer.start(countdown)
 			NetworkSync.sync_data({"action": "timer_sync", "active": true})
 	else:
 		if is_countdown_active:
 			is_countdown_active = false
 			master_timer.stop()
 			NetworkSync.sync_data({"action": "timer_sync", "active": false})
-			# Reset guide text manually here
 			$"Control/side bar/guide".text = "Waiting for players..."
 
 func _on_master_timer_timeout() -> void:
@@ -572,6 +607,7 @@ func handle_ui_animations(delta: float) -> void:
 	player_2_anchor.modulate = player_2_anchor.modulate.lerp(network_mod, lerp_weight)
 
 func initiate_start_sequence(p1_name: String, p2_name: String, seed: int, p1_id: int, p2_id: int):
+	starting = true
 	# Make sure your "intro" animation actually changes this modulate back to visible!
 	$versus.modulate = Color.TRANSPARENT 
 	$Control.hide()
@@ -829,6 +865,7 @@ func apply_status_effects(text: String, score: int, opp_score: int, mp: int) -> 
 
 func start_battle():
 	game_started = true
+	starting = false
 	
 	# Trigger the 3-2-1-GO sequence for whatever boards exist
 	if active_p1_board:

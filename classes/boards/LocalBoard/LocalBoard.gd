@@ -25,10 +25,13 @@ func  _ready() -> void:
 
 func initialize(seed_val: int = -1):
 	super.initialize_game_mode("online", seed_val)
-	#if NetworkClient.client_active: setup_client()
-	#if NetworkServer.server_active: setup_server()
-	#if !has_initialized:
-		#has_initialized = true
+	
+	# --- FIX: Wipe ghost garbage from the previous round for the LocalBoard too! ---
+	garbage_queue.clear()
+	Events.garbage_queue_updated.emit({
+		"player_id": _player_index,
+		"new_queue": garbage_queue
+	})
 
 func _connect_signals():
 	# CHEAP: Just the piece moving (High frequency)

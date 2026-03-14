@@ -193,25 +193,18 @@ func _on_sync_data(payload:Dictionary):
 				NetworkSync.sync_data(broadcast_payload)
 				_check_start_requirements()
 		
-		"players_selected":
-			var p1_name = data.get("p1_name", "Player 1")
-			var p2_name = data.get("p2_name", "Player 2")
-			var p1_id = int(data.get("p1_id", -1)) 
-			var p2_id = int(data.get("p2_id", -1)) 
+		"match_starting":
+			var match_title = data.get("title", "Battle")
 			var match_seed = data.get("seed", -1)
+			var settings = data.get("settings", {})
 			
-			# Save these so the Host knows whose "ready" signals to wait for
-			current_p1_id = p1_id
-			current_p2_id = p2_id
-			
-			# Clear the ready list from any previous matches
 			match_ready_players.clear()
 			
-			print("Lobby| MATCHUP: ", p1_name, " VS ", p2_name)
-			$"Control/side bar/guide".text = p1_name + " VS " + p2_name
+			print("Lobby| PREPARING MATCH: ", match_title)
+			$"Control/side bar/guide".text = match_title
 			
-			# Fire the function that hides the lobby and spawns BattleManager!
-			initiate_start_sequence(p1_name, p2_name, match_seed, p1_id, p2_id)
+			# Pass the generic dictionary directly into the start sequence
+			initiate_start_sequence(match_seed, settings)
 		
 		#checks if both selected players are ready for battle
 		"match_client_ready":
@@ -366,30 +359,24 @@ func _on_connection_timeout() -> void:
 #endregion
 
 #region battle logic
-func initiate_start_sequence(p1_name: String, p2_name: String, match_seed: int, p1_id: int, p2_id: int) -> void:
-	print("Lobby| MATCH STARTING: %s vs %s" % [p1_name, p2_name])
+func initiate_start_sequence(match_seed: int, settings: Dictionary) -> void:
+	print("Lobby| LAUNCHING BATTLE SCENE...")
 	game_started = true
 	
-	# 1. Hide the Lobby UI so the battle can take over
 	$Control.visible = false
 	$ColorRect.visible = false
-	#$chat.visible = false
 	
-	# 2. Spawn the BattleManager using your static function!
+	# Create the BattleManager using the new generic signature
 	battle_manager = BattleManager.create(
 		players_in_lobby,
 		lobby_id,
 		game_mode,
 		is_spectator,
-		p1_id,
-		p2_id,
-		match_seed
+		match_seed,
+		settings
 	)
 	
-	# 3. Connect your custom signal to clean up after the match
 	battle_manager.game_concluded.connect(_on_game_concluded)
-	
-	# 4. Add it to the tree
 	add_child(battle_manager)
 
 func _on_game_concluded():
@@ -416,46 +403,52 @@ func _on_master_timer_timeout() -> void:
 	if not NetworkServer.server_active: return
 	
 	is_countdown_active = false
-	
 	var eligible_players = []
-	# FIX: Changed 'active_players' to 'players_in_lobby'
 	for p in players_in_lobby:
 		if not p.get("is_spectator", false):
 			eligible_players.append(p)
 			
-	if eligible_players.size() >= 2:
+	var current_seed = randi()
+	var match_settings = {}
+	var match_title = ""
+	
+	if game_mode == BattleManager.VERSUS:
 		eligible_players.shuffle()
-		
 		var p1 = eligible_players[0]
 		var p2 = eligible_players[1]
 		
-		var p1_name = p1.get("name", "Unknown")
-		var p2_name = p2.get("name", "Unknown")
-		var p1_id = p1.get("player_id", -1)
-		var p2_id = p2.get("player_id", -1)
+		match_settings["p1_id"] = p1.get("player_id", -1)
+		match_settings["p2_id"] = p2.get("player_id", -1)
+		match_settings["first_to"] = 3 # You can change this later if you want a UI toggle
 		
-		# Note: Either declare 'var current_seed = 0' at the top of your script, 
-		# or use 'var' here if it's only needed locally!
-		var current_seed = randi()
+		match_title = "%s VS %s" % [p1.get("name", "P1"), p2.get("name", "P2")]
 		
-		print("Lobby| MATCHUP: ", p1_name, " VS ", p2_name)
-		$"Control/side bar/guide".text = p1_name + " VS " + p2_name
+	elif game_mode == BattleManager.VERSUS_PLUS:
+		var red_team_ids = []
+		var blue_team_ids = []
 		
-		# Broadcast to Clients
-		NetworkSync.sync_data({
-			"action": "players_selected",
-			"p1_name": p1_name,
-			"p2_name": p2_name,
-			"p1_id": p1_id,
-			"p2_id": p2_id,
-			"seed": current_seed
-		})
+		for p in eligible_players:
+			if p.get("team", "red") == "red":
+				red_team_ids.append(p.get("player_id", -1))
+			else:
+				blue_team_ids.append(p.get("player_id", -1))
+				
+		match_settings["red_team"] = red_team_ids
+		match_settings["blue_team"] = blue_team_ids
+		match_settings["first_to"] = 3
 		
-		# Host triggers their own start sequence!
-		# initiate_start_sequence(p1_name, p2_name, current_seed, p1_id, p2_id)
-	else:
-		$"Control/side bar/guide".text = "Not enough players!"
-		_check_start_requirements()
+		match_title = "TEAM RED (%d) VS TEAM BLUE (%d)" % [red_team_ids.size(), blue_team_ids.size()]
+
+	print("Lobby| MATCHUP: ", match_title)
+	$"Control/side bar/guide".text = match_title
+	
+	# Broadcast the generic dictionary to all clients!
+	NetworkSync.sync_data({
+		"action": "match_starting",
+		"title": match_title,
+		"seed": current_seed,
+		"settings": match_settings
+	})
 
 func _check_start_requirements() -> void:
 	if not NetworkServer.server_active: return
@@ -469,7 +462,7 @@ func _check_start_requirements() -> void:
 	
 	# Determine logic based on Gamemode
 	if game_mode == BattleManager.VERSUS:
-		can_start = (eligible_players.size() == 2)
+		can_start = (eligible_players.size() >= 2)
 	elif game_mode == BattleManager.VERSUS_PLUS:
 		var red_count = 0
 		var blue_count = 0

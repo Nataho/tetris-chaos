@@ -21,6 +21,10 @@ var active_anchors: Dictionary = {}
 var _player_id: int = -1
 var p1_id: int = -1
 var p2_id: int = -1
+
+var p1_match_score: int = 0
+var p2_match_score: int = 0
+
 var _is_spectator: bool = false
 var current_seed: int = -1
 
@@ -37,71 +41,45 @@ var game_finished: bool = false
 var is_resetting: bool = false
 var first_to: int = 1
 
-static func create(players: Dictionary, local_id: int, p1: int, p2: int, spectator: bool, seed: int, ft: int) -> BattleVersus:
-	var scene = FILE.instantiate()
-	
-	if scene == null:
-		push_error("CRITICAL: Failed to instantiate the BattleVersus scene. Check your UID!")
-		return null
-		
-	var obj = scene as BattleVersus
-	
-	if obj == null:
-		push_error("CRITICAL: The BattleVersus.tscn scene does NOT have BattleVersus.gd attached to its root node!")
-		return null
-		
-	obj.setup(players, local_id, p1, p2, spectator, seed, ft)
-	return obj
+func _ready():
+	print("BATTLE VERSUS SPAWNED: ", get_instance_id())
 
-func setup(players: Dictionary, local_id: int, p1: int, p2: int, spectator: bool, seed: int, ft: int) -> void:
+func setup(players: Dictionary, local_id: int, spectator: bool, seed: int, settings: Dictionary) -> void:
 	active_players = players
 	_player_id = local_id
-	p1_id = p1
-	p2_id = p2
 	_is_spectator = spectator
 	current_seed = seed
-	first_to = ft
+	
+	p1_id = settings.get("p1_id", -1)
+	p2_id = settings.get("p2_id", -1)
+	first_to = settings.get("first_to", 1)
 	
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	
 	_spawn_player(p1_id, p1_id == _player_id)
 	_spawn_player(p2_id, p2_id == _player_id)
 	
-	# Strict rule: P1 is ALWAYS on the left, P2 is ALWAYS on the right.
 	left_id = p1_id
 	right_id = p2_id
 	
+	# FIX 1: Link the anchors so they become visible and move to the sides
 	p1_anchor = active_anchors[left_id]
 	p2_anchor = active_anchors[right_id]
-	
-	var p1_board = active_boards[p1_id]
-	var p2_board = active_boards[p2_id]
-	
-	if p1_board is LocalBoard:
-		p1_board.initialize(current_seed)
-	else:
-		p1_board.initialize()
-		
-	if p2_board is LocalBoard:
-		p2_board.initialize(current_seed)
-	else:
-		p2_board.initialize()
 
 func _spawn_player(id: int, is_local: bool) -> void:
 	var anchor: Control = Control.new()
 	var board: MultiplayerBoard
 	anchor.position = Vector2.ZERO
 	
-	var target = -1
-	for key in active_players.keys():
-		if key != id:
-			target = key
-			break
+	# THE FIX: Explicitly target the opponent!
+	var target = p2_id if id == p1_id else p1_id
 	
 	if is_local:
 		board = LocalBoard.create(id, target)
 	else:
 		board = NetworkBoard.create(id, target, _is_spectator)
+	
+	print("board created as spectator: ", _is_spectator)
 	
 	anchor.set_anchors_preset(Control.PRESET_CENTER)
 	board.knocked_out.connect(_on_board_knocked_out)
@@ -112,6 +90,12 @@ func _spawn_player(id: int, is_local: bool) -> void:
 	
 	active_boards[id] = board
 	active_anchors[id] = anchor
+
+	# FIX 2: Initialize the board immediately after spawning!
+	if board is LocalBoard:
+		board.initialize(current_seed)
+	else:
+		board.initialize()
 
 func _process(delta: float) -> void:
 	var screen_size := get_viewport_rect().size
@@ -150,19 +134,16 @@ func process_action(action: String, data: Dictionary) -> void:
 			var value_dict = data.get("value", {})
 			var target_id = int(value_dict.get("target", -1))
 			var amount = int(value_dict.get("amount", 1))
-			
-			# We removed the 'if' check so the sender sees their own attack!
+			# Visuals for garbage attacks
 			spawn_garbage_visual(attacker_id, target_id, amount)
 				
 		"next_round":
 			var next_seed = int(data.get("seed", -1))
 			var scores = data.get("scores", {})
 			
-			# Apply exact scores by explicit ID
-			for id_str in scores.keys():
-				var id = int(id_str)
-				if active_boards.has(id): 
-					active_boards[id].kos = int(scores[id_str])
+			# Apply exact scores to our variables!
+			p1_match_score = int(scores.get(str(p1_id), p1_match_score))
+			p2_match_score = int(scores.get(str(p2_id), p2_match_score))
 					
 			_perform_next_round_transition(next_seed)
 			
@@ -170,34 +151,35 @@ func process_action(action: String, data: Dictionary) -> void:
 			var winner_id = int(data.get("winner_id", -1))
 			var scores = data.get("scores", {})
 			
-			# Apply exact scores by explicit ID
-			for id_str in scores.keys():
-				var id = int(id_str)
-				if active_boards.has(id): 
-					active_boards[id].kos = int(scores[id_str])
+			p1_match_score = int(scores.get(str(p1_id), p1_match_score))
+			p2_match_score = int(scores.get(str(p2_id), p2_match_score))
 					
 			_perform_match_over_sequence(winner_id)
 
 # --- STATE LOGIC ---
 func _on_board_knocked_out(node: MultiplayerBoard) -> void:
-	var loser_id = node._player_index
-	if loser_id == -1: return
-	if game_finished or is_resetting: return
+	if is_resetting or game_finished: return
 	if not NetworkServer.server_active: return 
 	
 	is_resetting = true
+	var loser_id = node._player_index
+	if loser_id == -1: return
+	
+	stop_boards()
 	await get_tree().create_timer(1.0).timeout
 	
 	var winner_id = p1_id if loser_id == p2_id else p2_id
-	active_boards[winner_id].kos += 1
 	
-	# Send the dictionary mapping actual IDs to actual scores!
+	# CALCULATE using our independent variables, ignoring the board's internal 'kos'
+	var new_p1_score = p1_match_score + (1 if winner_id == p1_id else 0)
+	var new_p2_score = p2_match_score + (1 if winner_id == p2_id else 0)
+	
 	var scores_payload = {
-		str(p1_id): active_boards[p1_id].kos,
-		str(p2_id): active_boards[p2_id].kos
+		str(p1_id): new_p1_score,
+		str(p2_id): new_p2_score
 	}
 	
-	if active_boards[p1_id].kos >= first_to or active_boards[p2_id].kos >= first_to:
+	if new_p1_score >= first_to or new_p2_score >= first_to:
 		request_network_sync.emit({
 			"action": "match_over",
 			"winner_id": winner_id,
@@ -280,9 +262,9 @@ func play_intro() -> void:
 		Audio.play_music("epic_battle")
 
 func update_scoreboard(discrete: bool = false) -> void:
-	# Scores now directly read from the explicit visual Left/Right IDs!
-	var s1 = active_boards[left_id].kos if active_boards.has(left_id) else 0
-	var s2 = active_boards[right_id].kos if active_boards.has(right_id) else 0
+	# Read from our independent match scores!
+	var s1 = p1_match_score if left_id == p1_id else p2_match_score
+	var s2 = p2_match_score if right_id == p2_id else p1_match_score
 	
 	var match_point = first_to - 1
 	if (s1 >= first_to or s2 >= first_to) and not game_finished:
@@ -339,6 +321,7 @@ func spawn_garbage_visual(attacker_id: int, target_id: int, amount: int) -> void
 		add_child(particle) 
 
 func start_boards() -> void:
+	print("starting")
 	game_started = true
 	game_finished = false
 	for board in active_boards.values():

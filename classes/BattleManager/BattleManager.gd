@@ -16,23 +16,22 @@ var active_players:Dictionary = {}
 var match_ready_players = []
 
 var current_seed:int = -1
-var first_to: int = 1 
-var p1_id:int = -1
-var p2_id:int = -1
+
+# NEW: We store everything mode-specific in this generic dictionary
+var match_settings: Dictionary = {}
 
 var mode_manager = null
-var active_boards:Dictionary = {} 
 
-static func create(player_data: Array, lobby_id: int, game_mode: int, is_spectator: bool, p1: int, p2: int, seed: int) -> BattleManager:
+# p1, p2, and ft are replaced by the settings dictionary
+static func create(player_data: Array, lobby_id: int, game_mode: int, is_spectator: bool, seed: int, settings: Dictionary) -> BattleManager:
 	var obj: BattleManager = FILE.instantiate()
 	obj.active_players = _convert_players(player_data)
 	obj._player_id = lobby_id
 	obj._is_spectator = is_spectator
 	obj._game_mode = game_mode
 	
-	obj.p1_id = p1
-	obj.p2_id = p2
 	obj.current_seed = seed
+	obj.match_settings = settings
 	return obj
 
 static func _convert_players(player_data:Array) -> Dictionary:
@@ -58,40 +57,41 @@ func _connect_signals():
 	Events.sync_data.connect(_on_sync_data)
 
 func initialize_versus():
-	mode_manager = BattleVersus.create(active_players, _player_id, p1_id, p2_id, _is_spectator, current_seed, first_to)
+	# 1. Instantiate the scene directly from the preloaded FILE
+	mode_manager = BattleVersus.FILE.instantiate()
 	
 	if mode_manager == null:
 		push_error("CRITICAL: BattleManager failed to spawn mode_manager!")
 		return
 		
+	# 2. ADD TO TREE FIRST! (This wakes up all @onready variables inside the boards)
 	add_child(mode_manager)
 	
-	# Hook up signals so the mode can communicate outward
+	# 3. NOW run setup safely since the nodes actually exist!
+	mode_manager.setup(active_players, _player_id, _is_spectator, current_seed, match_settings)
+	
+	# 4. Connect signals
 	mode_manager.request_network_sync.connect(_on_mode_sync_request)
 	mode_manager.game_concluded.connect(func(): game_concluded.emit())
 	
-	# Wait one frame to guarantee all UI nodes are loaded before the intro fires
 	await get_tree().process_frame
 
 func _run_intro_sequence() -> void:
 	if mode_manager.has_method("play_intro"):
 		await mode_manager.play_intro()
 		
-	var ready_payload = {
-		"action": "client_ready",
-		"player_id": _player_id
-	}
+	var ready_payload = {"action": "client_ready", "player_id": _player_id}
 	
 	if NetworkServer.server_active:
 		NetworkSync.sync_data(ready_payload)
-		_on_sync_data(ready_payload)
+		_on_sync_data(ready_payload) 
 	elif NetworkClient.client_active:
 		NetworkClient.sync_data(ready_payload)
 
 func _on_mode_sync_request(payload: Dictionary) -> void:
 	if NetworkServer.server_active:
 		NetworkSync.sync_data(payload)
-		_on_sync_data(payload)
+		# REMOVED: _on_sync_data(payload) <-- Let the network echo handle it
 	elif NetworkClient.client_active:
 		NetworkClient.sync_data(payload)
 
@@ -99,7 +99,6 @@ func _on_sync_data(payload: Dictionary) -> void:
 	var data = payload.get("data", payload)
 	var action = data.get("action", "")
 	
-	# ONLY execute native logic for client_ready checks
 	if action == "client_ready":
 		var client_id = int(data.get("player_id", -1))
 		if client_id != -1 and not match_ready_players.has(client_id):
@@ -109,9 +108,13 @@ func _on_sync_data(payload: Dictionary) -> void:
 			if match_ready_players.size() >= active_players.size() or active_players.size() == 1:
 				match_ready_players.clear() 
 				var start_payload = {"action": "start_match"}
+				
+				# 1. Send to others
 				NetworkSync.sync_data(start_payload)
-				_on_sync_data(start_payload)
-		return # <-- STOPS double execution right here!
+				# 2. FIX: Execute locally for the server. 
+				# BattleVersus._match_started_flag will prevent double-firing!
+				_on_sync_data(start_payload) 
+		return
 	
 	# EVERYTHING else gets completely handed off to the mode!
 	if mode_manager and mode_manager.has_method("process_action"):

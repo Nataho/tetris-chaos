@@ -17,7 +17,7 @@ func set_board(playerid: int, target: int):
 	target_player = target
 
 func initialize(seed_val: int = -1):
-	super.initialize_game_mode("online", seed_val) # <--- Pass the seed here!
+	super.initialize_game_mode("online", seed_val) 
 	
 	# --- NEW FIX: Wipe ghost garbage from the previous round! ---
 	garbage_queue.clear()

@@ -84,7 +84,7 @@ func start():
 	
 	spawn_piece()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if get_viewport().gui_get_focus_owner() is LineEdit:
 		return
 	#print("boardcontroller.current_level = ",board_controller.current_level)
@@ -123,14 +123,16 @@ func _process(delta: float) -> void:
 		held_move_keys.erase("L")
 		if held_move_keys.is_empty():
 			stop_move()
-		elif "R" in held_move_keys:
+		# FIX: Only start moving right if we aren't already moving right
+		elif "R" in held_move_keys and move_direction != Vector2i.RIGHT:
 			start_move_right()
 	
 	if not right_held and "R" in held_move_keys:
 		held_move_keys.erase("R")
 		if held_move_keys.is_empty():
 			stop_move()
-		elif "L" in held_move_keys:
+		# FIX: Only start moving left if we aren't already moving left
+		elif "L" in held_move_keys and move_direction != Vector2i.LEFT:
 			start_move_left()
 	
 	# Handle movement key presses
@@ -296,8 +298,12 @@ func _handle_release_input(dir_key: String):
 	else:
 		# If the other key is still held, immediately switch to it
 		var remaining = held_move_keys.back()
-		if remaining == "L": start_move_left()
-		else: start_move_right()
+		
+		# FIX: Only trigger the move if it's not the current active direction
+		if remaining == "L" and move_direction != Vector2i.LEFT:
+			start_move_left()
+		elif remaining == "R" and move_direction != Vector2i.RIGHT:
+			start_move_right()
 		
 ################################################################
 	

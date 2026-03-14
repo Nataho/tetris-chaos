@@ -112,10 +112,10 @@ func _ready() -> void:
 						display_line_clear_message(event_data)
 		
 		elif type == "spin":
-			var center_pos := Vector2i(int(payload["center_pos"]["x"]), int(payload["center_pos"]["y"]))
+			var piece_center_pos := Vector2i(int(payload["center_pos"]["x"]), int(payload["center_pos"]["y"]))
 			var clockwise: bool = bool(payload["clockwise"])
 			_just_spun = true
-			board_controller.add_spin_particle(center_pos, clockwise)
+			board_controller.add_spin_particle(piece_center_pos, clockwise)
 			Audio.play_sound("spin")
 		
 		elif type == "hard_drop":

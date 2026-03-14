@@ -120,7 +120,7 @@ func _connect_network_signals() -> void:
 	
 	Events.sync_interaction.connect(_on_sync_interaction)
 	Events.sync_data.connect(_on_sync_data)
-	Events.client_connected.connect(_on_client_connected)
+	Events.client_connected_to_server.connect(_on_client_connected)
 	Events.server_accepted_join.connect(_on_server_accepted)
 	Events.server_rejected_join.connect(_on_server_rejected)
 	Events.client_disconnected.connect(_on_disconnected_from_host)
@@ -285,6 +285,7 @@ func _on_sync_data(payload: Dictionary) -> void:
 		
 		initiate_start_sequence(p1_name, p2_name, match_seed, p1_id, p2_id)
 	
+	#checks if both selected players are ready for battle
 	elif action == "match_client_ready":
 		var p_id = int(data.get("player_id", -1))
 		
@@ -303,6 +304,7 @@ func _on_sync_data(payload: Dictionary) -> void:
 				
 				# Fire the universal start command
 				NetworkSync.sync_interaction("start_game")
+	
 	
 	elif action == "next_round":
 		var next_seed = data.get("seed", -1)
@@ -402,11 +404,13 @@ func _on_server_accepted(extra_data: Dictionary) -> void:
 	plyr_tgl_btn.disabled = false
 
 func _on_server_rejected() -> void:
-	get_tree().change_scene_to_file("res://scenes/main/main_menu.tscn")
+	back()
+	#get_tree().change_scene_to_file("res://scenes/main/main_menu.tscn")
 
 func _on_client_joined(payload: Dictionary) -> void:
 	if not NetworkServer.server_active: return
 	active_players.append(payload)
+	print("active_players", active_players)
 	_update_player_list(active_players)
 	
 	var sync_payload = {
@@ -909,11 +913,8 @@ func _spawn_attack_visual(start_pos: Vector2, target_node: Node, amount: int) ->
 		elif amount < 10:
 			particle.modulate = Color.VIOLET
 		else:
-			
-			var r = randf_range(0.5,0.8)
-			var g = randf_range(0.5,0.8)
-			var b = randf_range(0.5,0.8)
-			particle.modulate = Color(r,g,b)
+			var colors = [Color.RED, Color.GREEN, Color.ORANGE, Color.BLUE, Color.TURQUOISE, Color.MAGENTA, Color.YELLOW]
+			particle.modulate = colors.pick_random()
 		# Set its starting position BEFORE adding to the tree
 		# so its _enter_tree random scatter math works perfectly
 		particle.global_position = start_pos

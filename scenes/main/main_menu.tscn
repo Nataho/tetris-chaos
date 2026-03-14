@@ -6,10 +6,15 @@
 [ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="4_hiibk"]
 [ext_resource type="Script" uid="uid://dvsmkslvd8o1g" path="res://classes/extras/RebindButton/RebindButton.gd" id="4_w6ykx"]
 [ext_resource type="Script" uid="uid://vqed8lsulgg7" path="res://classes/extras/HandlingEditor/handling_editor.gd" id="6_swlpu"]
+[ext_resource type="FontFile" uid="uid://b4vif8qlndc3e" path="res://assets/fonts/BAHNSCHRIFT.TTF" id="7_nm0l4"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_swlpu"]
 font = ExtResource("4_hiibk")
 font_size = 80
+
+[sub_resource type="LabelSettings" id="LabelSettings_bxtry"]
+font = ExtResource("7_nm0l4")
+font_size = 30
 
 [node name="MainMenu" type="Control" unique_id=463708987 node_paths=PackedStringArray("marathon", "zen", "multiplayer_button", "settings", "local_versus", "lan", "ranked", "classic", "controls", "handling")]
 layout_mode = 3
@@ -462,3 +467,14 @@ autowrap_mode = 2
 custom_minimum_size = Vector2(1258, 1080)
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="." unique_id=1258235029]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 40.0
+grow_vertical = 0
+text = "version: 0.0.0"
+label_settings = SubResource("LabelSettings_bxtry")

@@ -136,7 +136,7 @@ func _handle_signal(ws: WebSocketPeer, data: Dictionary) -> void:
 				"socket": ws,
 				"name": joining_name,
 				"player_id": active_players.size() + 1,      # Session ID
-				"wants_to_play": true                        # Default to wanting to play
+				"is_spectator": false                        # Default to wanting to play
 			}
 			
 			active_players.append(session_player)

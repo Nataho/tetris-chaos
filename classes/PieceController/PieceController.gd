@@ -130,7 +130,7 @@ func initialize_piece(piece_form, lock_delay = 5.0):
 	if typeof(piece_form) == TYPE_STRING:
 		var index := random_7_bag.find(piece_form)
 		tiles = spawn_tiles(index)
-		self.piece_type = index
+		self.piece_type = index as PIECE_TYPE
 		
 	if typeof(piece_form) == TYPE_INT:
 		tiles = spawn_tiles(piece_form)
@@ -437,6 +437,7 @@ func get_spawn_pos() -> Vector2i:
 	# 1. Get the dynamic left-shifted center
 	# For a 10-wide board: (10 / 2) - 2 = 3
 	# For a 12-wide board: (12 / 2) - 2 = 4
+	@warning_ignore("integer_division")
 	var relative_x: int = (board_controller.grid_size.x / 2) - 2
 	
 	# 2. Set your Y spawn height 

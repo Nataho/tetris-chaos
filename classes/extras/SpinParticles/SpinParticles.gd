@@ -24,7 +24,7 @@ func _ready() -> void:
 	if emitting == false:
 		queue_free()
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if !has_entered_scene: return
 	
 	orbit_velocity_min = lerpf(orbit_velocity_min,0,0.01)

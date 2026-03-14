@@ -1,0 +1,215 @@
+[gd_scene format=3 uid="uid://xpvoxgxklfih"]
+
+[ext_resource type="Script" uid="uid://cbivm88frmi6x" path="res://scenes/game/new_lan_lobby/lan_lobby.gd" id="1_7ls06"]
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="2_tvy30"]
+[ext_resource type="FontFile" uid="uid://b4vif8qlndc3e" path="res://assets/fonts/BAHNSCHRIFT.TTF" id="3_cn7tw"]
+
+[sub_resource type="Theme" id="Theme_c57ps"]
+default_font = ExtResource("2_tvy30")
+default_font_size = 37
+Button/fonts/font = ExtResource("2_tvy30")
+
+[sub_resource type="LabelSettings" id="LabelSettings_usnt0"]
+font = ExtResource("3_cn7tw")
+font_size = 30
+
+[sub_resource type="Theme" id="Theme_knmy4"]
+default_font = ExtResource("2_tvy30")
+default_font_size = 40
+
+[node name="LanLobby" type="Control" unique_id=2036537160]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7ls06")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=526294261]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.4, 0.2, 0.6, 1)
+
+[node name="Control" type="Control" parent="." unique_id=1755524445]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="side bar" type="VBoxContainer" parent="Control" unique_id=1249481820]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -512.0
+offset_top = 80.0
+offset_right = -12.0
+offset_bottom = 343.0
+grow_horizontal = 0
+
+[node name="host" type="Button" parent="Control/side bar" unique_id=2037405183]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme = SubResource("Theme_c57ps")
+text = "HOST SERVER"
+
+[node name="guide" type="Label" parent="Control/side bar" unique_id=675560072]
+custom_minimum_size = Vector2(500, 65)
+layout_mode = 2
+text = "pressing connect without an IP address will look for servers in LAN"
+label_settings = SubResource("LabelSettings_usnt0")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="IP_bar" type="HBoxContainer" parent="Control/side bar" unique_id=72182409]
+layout_mode = 2
+
+[node name="ip_text_box" type="LineEdit" parent="Control/side bar/IP_bar" unique_id=2086732374]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_cn7tw")
+theme_override_font_sizes/font_size = 40
+placeholder_text = "ip address"
+alignment = 1
+max_length = 100
+
+[node name="join" type="Button" parent="Control/side bar/IP_bar" unique_id=664132970]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_tvy30")
+theme_override_font_sizes/font_size = 40
+text = "CONNECT"
+
+[node name="name" type="LineEdit" parent="Control/side bar" unique_id=1813770635]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_cn7tw")
+theme_override_font_sizes/font_size = 40
+placeholder_text = "username"
+alignment = 1
+max_length = 15
+
+[node name="HSeparator" type="HSeparator" parent="Control/side bar" unique_id=750604489]
+custom_minimum_size = Vector2(2.19, 30)
+layout_mode = 2
+
+[node name="player_toggle" type="Button" parent="Control/side bar" unique_id=932198172]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_tvy30")
+theme_override_font_sizes/font_size = 40
+disabled = true
+text = "PLAYER"
+
+[node name="HSeparator2" type="HSeparator" parent="Control/side bar" unique_id=1731849742]
+custom_minimum_size = Vector2(2.19, 30)
+layout_mode = 2
+theme_override_constants/separation = 213
+
+[node name="gamemode_selector" type="OptionButton" parent="Control/side bar" unique_id=500343082]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_tvy30")
+theme_override_font_sizes/font_size = 40
+alignment = 1
+selected = 0
+item_count = 2
+popup/item_0/text = "VERSUS"
+popup/item_0/id = 0
+popup/item_1/text = "VERSUS PLUS"
+popup/item_1/id = 1
+
+[node name="versus_plus" type="VBoxContainer" parent="Control/side bar" unique_id=1960544893]
+visible = false
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/side bar/versus_plus" unique_id=298633180]
+layout_mode = 2
+
+[node name="team_toggle" type="Button" parent="Control/side bar/versus_plus/HBoxContainer" unique_id=550093114]
+custom_minimum_size = Vector2(0, 57)
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+
+[node name="ColorRect" type="ColorRect" parent="Control/side bar/versus_plus/HBoxContainer/team_toggle" unique_id=745086094]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 8.0
+offset_right = -14.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.79607844, 0, 0, 1)
+
+[node name="Players" type="VBoxContainer" parent="Control" unique_id=494766176]
+layout_mode = 1
+offset_top = 80.0
+offset_right = 336.0
+offset_bottom = 129.0
+
+[node name="Player" type="RichTextLabel" parent="Control/Players" unique_id=1054552608]
+custom_minimum_size = Vector2(336, 49)
+layout_mode = 2
+theme = SubResource("Theme_knmy4")
+bbcode_enabled = true
+text = "you"
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="Control/Players/Player" unique_id=763976102]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Control" unique_id=1013277637]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MasterTimer" type="Timer" parent="." unique_id=1096438960]
+
+[node name="chat" type="VBoxContainer" parent="." unique_id=1370459236]
+z_index = 5
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = -255.0
+offset_right = 443.0
+offset_bottom = -15.0
+grow_vertical = 0
+
+[node name="Panel" type="Panel" parent="chat" unique_id=1959804948]
+custom_minimum_size = Vector2(428, 205)
+layout_mode = 2
+
+[node name="chat" type="RichTextLabel" parent="chat/Panel" unique_id=743612733]
+z_index = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+text = "Welcome to the Lobby!"
+scroll_following = true
+
+[node name="chat_box" type="LineEdit" parent="chat" unique_id=2012603019]
+layout_mode = 2

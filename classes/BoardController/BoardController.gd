@@ -4,6 +4,7 @@ const grid_offset := Vector2i(1,1)
 
 enum garbage_types{INSTANT, GRADUAL}
 @export var grid_size: Vector2i = Vector2i(10,20)
+@warning_ignore("integer_division")
 @export var grid_start: Vector2i = Vector2i((grid_size.x /2)*-1,-10) 
 @export var lerp_weight: float = 10.0 # Speed of the visual meter update
 @export var pieces_controller : PiecesController
@@ -95,6 +96,7 @@ func _render_garbage_meter(amount_to_draw: int) -> void:
 
 	# Calculate wraps and colors
 	var visual_lines = amount_to_draw % grid_size.y
+	@warning_ignore("integer_division")
 	var full_wraps = amount_to_draw / grid_size.y
 	
 	if visual_lines == 0 and amount_to_draw > 0:
@@ -313,6 +315,7 @@ func get_gravity_time(level:int) -> float:
 
 func _add_cleared_lines(amount:int):
 	total_lines_cleared += amount
+	@warning_ignore("integer_division")
 	var new_level = 1 + (total_lines_cleared/10)
 	if new_level > current_level:
 		current_level = new_level
@@ -535,6 +538,7 @@ func update_garbage_meter():
 	if total_garbage == 0: return 
 
 	var visual_lines = total_garbage % grid_size.y
+	@warning_ignore("integer_division")
 	var full_wraps = total_garbage / grid_size.y
 	if visual_lines == 0 and total_garbage > 0:
 		visual_lines = grid_size.y

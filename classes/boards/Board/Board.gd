@@ -13,6 +13,7 @@ const MAX_GARBAGE_PER_DROP: int = 8
 @export var board_id:int = -1 # -1: offline; 1/4: local; 100+: online; used for targeting players
 
 @export var random_seed:bool = true
+@warning_ignore("shadowed_global_identifier")
 @export var seed:int = -1
 @export var handicap:float = 1 ##the amount of lines mutiplied or devided from 
 
@@ -51,6 +52,12 @@ func _ready() -> void:
 	pieces_controller.spawned_piece.connect(func(is_hold):
 		Events.player_spawned_piece.emit(is_hold)
 		)
+
+##a function to be used in online multiplayer
+func hide_queue():
+	queue_controller.hide()
+func show_queue():
+	queue_controller.show()
 
 func initialize_game_mode(gamemode:String, randomization_seed = -1):
 	if randomization_seed != -1:
@@ -154,11 +161,13 @@ func display_line_clear_message(payload):
 	var message:String = ""
 	
 	print(payload)
+	@warning_ignore("unused_variable", "shadowed_variable_base_class")
 	var name = payload["name"]
 	var values = payload["value"]
 	var is_spin:bool = values["is_spin"]
 	var b2b_count:int = values["b2b_count"]
 	var is_mini:bool = values["is_mini"]
+	@warning_ignore("unused_variable")
 	var is_all_spin:bool = values["is_all_spin"]
 	#var piece_type = values["piece_type"] #for all spin
 	var lines_to_clear:int = values["lines_to_clear"]
@@ -212,7 +221,7 @@ func display_line_clear_message(payload):
 		lines_for_next_level = current_level*10
 	else:
 		lines_cleared  = total_lines_cleared % 10
-	var level = (1 + (total_lines_cleared / 10))
+	#var level = (1 + (total_lines_cleared / 10))
 	
 	lines_levels.text = "Lines:\n%d/%d\n\nlvl:\n%d" % [lines_cleared, lines_for_next_level, current_level]
 	score.text = str(current_score)
@@ -277,6 +286,7 @@ func reset():
 
 # Call this when the OPPONENT clears lines and sends an attack to this board
 func receive_garbage(payload):
+	print("payload: ", payload)
 	if game_mode == game_modes.MARATHON: return
 	
 	var attacker = payload["player_id"]

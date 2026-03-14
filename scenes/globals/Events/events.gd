@@ -33,7 +33,7 @@ signal client_disconnected()
 
 signal connection_timeout()
 signal client_searching()
-signal client_connected
+signal client_connected_to_server
 signal server_accepted_join(payload)
 signal server_rejected_join
 

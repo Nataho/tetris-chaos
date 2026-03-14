@@ -27,12 +27,12 @@ var is_center:bool = false:
 
 func _init(coordinates:Vector2i, piece_type:int, pieces_controller: PiecesController, piece_controller: PieceController) -> void:
 	self.coordinates = coordinates
-	self.piece_type = piece_type
+	self.piece_type = piece_type as PIECE_TYPE
 	self.pieces_controller = pieces_controller
 	self.piece_controller = piece_controller
 #	
 func update_position(new_pos:Vector2i):
-	var old_pos:Vector2i = coordinates
+	#var old_pos:Vector2i = coordinates
 	coordinates = new_pos
 	#pieces_controller.set_cell(old_pos)
 	pieces_controller.set_cell(new_pos, 0, Vector2i(piece_type,0)) # set new tile

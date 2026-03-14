@@ -68,7 +68,7 @@ func _on_timeout() -> void:
 		stop()
 		Events.connection_timeout.emit() # Remember to add this to Events.gd!
 	
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if not client_active: return
 
 	# TIMEOUT LOGIC
@@ -140,7 +140,7 @@ func _process_server_signal(data: Dictionary) -> void:
 	match signal_name:
 		"server_connected":
 			print("Client| Handshake complete.")
-			Events.client_connected.emit()
+			Events.client_connected_to_server.emit()
 		
 		"join_accepted":
 			print("Client| Server accepted join.")

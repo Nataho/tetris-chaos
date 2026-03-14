@@ -2,6 +2,8 @@ extends Node
 #const default_server_ip = "10.147.17.203"
 const default_server_ip = "127.0.0.1"
 const default_port = 69671
+const game_version = "0.0.5"
+const dev_build = true
 
 var server_info := {
 	"ip": default_server_ip,
@@ -43,6 +45,8 @@ var player_data = {
 	"name": "guest",
 	"high_score": 0,
 	"marathon_level": 1,
+	#"game_version": game_version,
+	#"dev_build": dev_build
 }
 var controls = default_keyboard_controls.duplicate()
 var handling = default_handling.duplicate()
@@ -162,6 +166,7 @@ func change_resolution(width: int, height: int):
 	# Optional: Center the window on the screen after resizing
 	var screen_size = DisplayServer.screen_get_size()
 	var window_size = DisplayServer.window_get_size()
+	@warning_ignore("integer_division")
 	DisplayServer.window_set_position(screen_size / 2 - window_size / 2)
 
 func get_port_and_ip() -> String:

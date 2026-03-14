@@ -379,10 +379,8 @@ func _spawn_attack_visual(start_pos: Vector2, target_node: Node, amount: int) ->
 			particle.modulate = Color.VIOLET
 		else:
 			
-			var r = randf_range(0.5,0.8)
-			var g = randf_range(0.5,0.8)
-			var b = randf_range(0.5,0.8)
-			particle.modulate = Color(r,g,b)
+			var colors = [Color.RED, Color.GREEN, Color.ORANGE, Color.BLUE, Color.TURQUOISE, Color.MAGENTA, Color.YELLOW]
+			particle.modulate = colors.pick_random()
 		# Set its starting position BEFORE adding to the tree
 		# so its _enter_tree random scatter math works perfectly
 		particle.global_position = start_pos

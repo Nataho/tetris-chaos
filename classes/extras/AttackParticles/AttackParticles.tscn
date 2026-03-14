@@ -3,11 +3,17 @@
 [ext_resource type="Script" uid="uid://cd8tyt3icrkl" path="res://classes/extras/AttackParticles/AttackParticles.gd" id="1_hbi0w"]
 
 [node name="AttackParticles" type="CPUParticles2D" unique_id=1089447684]
-amount = 30
-lifetime = 0.25
+amount = 50
+lifetime = 0.2
+randomness = 0.1
+emission_shape = 1
+emission_sphere_radius = 2.0
 gravity = Vector2(0, 0)
-angular_velocity_min = -97.63
-angular_velocity_max = 73.22
-scale_amount_min = 26.42
-scale_amount_max = 26.42
+initial_velocity_max = 310.17
+angular_velocity_min = -610.17
+angular_velocity_max = 536.95
+tangential_accel_min = -100.0
+tangential_accel_max = 134.4
+scale_amount_min = 15.0
+scale_amount_max = 25.0
 script = ExtResource("1_hbi0w")

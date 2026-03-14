@@ -7,6 +7,7 @@ var _wait_time: float = 0.12
 var _target_pos: Vector2
 var _spawn_pos: Vector2 
 var _target_offset: Vector2 = Vector2(30* -6, 30*10)
+#var _target_offset: Vector2 = Vector2.ZERO
 
 # Arc Math Variables
 var _is_homing: bool = false 
@@ -15,9 +16,11 @@ var _t_speed: float = 0.5
 var _p0: Vector2
 var _p1: Vector2
 
-static func create(target: Node) -> AttackParticles:
+static func create(target: Node, custom_offset = Vector2.ZERO) -> AttackParticles:
 	var obj: AttackParticles = _FILE.instantiate()
 	obj._target = target
+	if custom_offset != Vector2.ZERO: obj._target_offset = custom_offset
+	
 	return obj
 
 func _ready() -> void: 
@@ -43,7 +46,11 @@ func _physics_process(delta: float) -> void:
 		_wait_time -= delta
 		global_position = global_position.lerp(_target_pos, 15.0 * delta) 
 	else:
-		# Calculate the exact spot we want to hit
+		_lock_on_target.call_deferred(delta)
+
+func _lock_on_target(delta:float):
+	# Calculate the exact spot we want to hit
+		#await get_tree().physics_frame
 		var actual_target_pos = _target.global_position + _target_offset
 		
 		# --- TRANSITION LOGIC ---
@@ -78,3 +85,7 @@ func _physics_process(delta: float) -> void:
 		# --- DISTANCE-BASED FADE ---
 		var ease_late_progress = _t * _t 
 		modulate.a = lerp(0.10, 1.0, ease_late_progress)
+
+func _get_target_global_position() -> Vector2:
+	var target_global_position = _target.global_position
+	return target_global_position

@@ -49,6 +49,7 @@ func _ready() -> void:
 	if OS.get_name() == "Android":
 		$Multiplayer/empty_space/VBoxContainer/local_versus.hide()
 	
+	
 	for i in range(get_children().size()):
 		if i <2: continue
 		
@@ -61,6 +62,14 @@ func _ready() -> void:
 	#Audio.music_player_node.play()
 	change_background(Color("a000f0"))
 	connect_buttons()
+	setup_version_label()
+	
+func setup_version_label():
+	var version = str(GameManager.game_version)
+	var dev_build = "dev " if GameManager.dev_build else ""
+	
+	$Label.text = "version: %s%s" % [dev_build, version]
+	$Label.show()
 
 func change_background(color:Color):
 	target_color = color
@@ -91,7 +100,7 @@ func connect_buttons():
 		)
 	
 	lan.pressed.connect(func():
-		get_tree().change_scene_to_file("res://scenes/game/lan_lobby/lan_lobby.tscn")
+		get_tree().change_scene_to_file("res://scenes/game/new_lan_lobby/lan_lobby.tscn")
 		)
 	
 	Events.android_back_pressed.connect(_back)

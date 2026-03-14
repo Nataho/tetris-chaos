@@ -48,13 +48,14 @@ texture_filter = 1
 tile_set = ExtResource("2_byeq6")
 script = ExtResource("3_hj61u")
 
-[node name="board_tiles" type="TileMapLayer" parent="." unique_id=1856813065 node_paths=PackedStringArray("pieces_controller", "placed_tiles")]
+[node name="board_tiles" type="TileMapLayer" parent="." unique_id=1856813065 node_paths=PackedStringArray("pieces_controller", "placed_tiles", "board_parent")]
 texture_filter = 1
 tile_map_data = PackedByteArray("AAD7//X/AAAIAAAAAAD6//b/AAAIAAAAAAAEAPX/AAAIAAAAAAAFAPb/AAAIAAAAAAAFAAkAAAAIAAAAAAAEAAoAAAAIAAAAAAD6/wkAAAAIAAAAAAD7/woAAAAIAAAAAAAPAP3/AQAAAAAAAAAQAP3/AQAAAAAAAAAQAP7/AQAAAAAAAAARAP7/AQAAAAAAAAA=")
 tile_set = ExtResource("2_byeq6")
 script = ExtResource("4_1ekxy")
 pieces_controller = NodePath("../pieces")
 placed_tiles = NodePath("../placed_tiles")
+board_parent = NodePath("..")
 
 [node name="ghost_tiles" type="TileMapLayer" parent="." unique_id=702294583]
 modulate = Color(1, 1, 1, 0.20784314)
@@ -66,7 +67,7 @@ texture_filter = 1
 tile_map_data = PackedByteArray("AAADAAkAAAAIAAAAAAADAAgAAAAIAAAAAAADAAcAAAAIAAAAAAADAAYAAAAIAAAAAAADAAUAAAAIAAAAAAADAAQAAAAIAAAAAAADAAMAAAACAAAAAAADAAIAAAACAAAAAAADAAEAAAAFAAAAAAACAAEAAAAFAAAAAAADAAAAAAAFAAAAAAADAP//AAAFAAAAAAABAAEAAAAGAAAAAAABAAIAAAAGAAAAAAABAAMAAAAGAAAAAAAAAAIAAAAGAAAAAAACAAIAAAACAAAAAAACAAMAAAACAAAAAAACAAQAAAAIAAAAAAABAAQAAAAIAAAAAAAAAAQAAAAIAAAAAAD//wQAAAAIAAAAAAD+/wMAAAAAAAAAAAD9/wMAAAAIAAAAAAD8/wMAAAAIAAAAAAD7/wMAAAABAAAAAAD7/wQAAAAIAAAAAAD8/wQAAAAIAAAAAAD9/wQAAAAIAAAAAAD//wMAAAAIAAAAAAAAAAMAAAAIAAAAAAD7/wUAAAAIAAAAAAD8/wUAAAAIAAAAAAD9/wUAAAAIAAAAAAD+/wUAAAAIAAAAAAD//wUAAAAIAAAAAAAAAAUAAAAIAAAAAAABAAUAAAAIAAAAAAACAAUAAAAIAAAAAAD+/wQAAAAIAAAAAAD7/wYAAAAIAAAAAAD7/wcAAAAIAAAAAAD8/wgAAAAIAAAAAAD8/wkAAAAIAAAAAAD9/wkAAAAIAAAAAAD+/wkAAAAIAAAAAAD//wkAAAAIAAAAAAAAAAkAAAAIAAAAAAABAAkAAAAIAAAAAAACAAkAAAAIAAAAAAACAAgAAAAIAAAAAAACAAcAAAAIAAAAAAACAAYAAAAIAAAAAAABAAYAAAAIAAAAAAAAAAYAAAAIAAAAAAD//wYAAAAIAAAAAAD+/wYAAAAIAAAAAAD8/wYAAAAIAAAAAAD9/wYAAAAIAAAAAAD//wcAAAAIAAAAAAAAAAcAAAAIAAAAAAABAAcAAAAIAAAAAAAAAAgAAAAIAAAAAAABAAgAAAAIAAAAAAD//wgAAAAIAAAAAAD+/wgAAAAIAAAAAAD9/wgAAAAIAAAAAAD9/wcAAAAIAAAAAAD8/wcAAAAIAAAAAAD7/wgAAAAIAAAAAAD7/wkAAAAIAAAAAAD+/wcAAAAIAAAAAAD//wIAAAAAAAAAAAD+/wIAAAAAAAAAAAD9/wIAAAABAAAAAAD8/wIAAAABAAAAAAD7/wIAAAABAAAAAAD7////AAABAAAAAAD7/wAAAAABAAAAAAD7/wEAAAABAAAAAAD8/wEAAAABAAAAAAD//wEAAAAAAAAAAAA=")
 tile_set = ExtResource("2_byeq6")
 
-[node name="pieces" type="TileMapLayer" parent="." unique_id=912887612 node_paths=PackedStringArray("board_controller", "queue_controller", "ghost_tiles", "soft_drop_timer", "das_timer", "arr_timer")]
+[node name="pieces" type="TileMapLayer" parent="." unique_id=912887612 node_paths=PackedStringArray("board_controller", "queue_controller", "ghost_tiles", "board_parent", "soft_drop_timer", "das_timer", "arr_timer")]
 texture_filter = 1
 tile_set = ExtResource("2_byeq6")
 script = ExtResource("5_j4pvl")
@@ -74,6 +75,7 @@ board_controller = NodePath("../board_tiles")
 queue_controller = NodePath("../queue_tiles")
 ghost_tiles = NodePath("../ghost_tiles")
 randomization_seed = 519
+board_parent = NodePath("..")
 soft_drop_ms = 50
 das_ms = 100
 arr_ms = 20

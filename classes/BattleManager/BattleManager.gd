@@ -200,3 +200,7 @@ func _on_garbage_sent(payload: Dictionary) -> void:
 		# REMOVED: _on_sync_data(sync_payload) -> The network echo handles this now!
 	elif NetworkClient.client_active:
 		NetworkClient.sync_data(sync_payload)
+
+func _on_peer_disconnected(id: int) -> void:
+	if mode_manager != null and mode_manager.has_method("handle_player_disconnect"):
+		mode_manager.handle_player_disconnect(id)

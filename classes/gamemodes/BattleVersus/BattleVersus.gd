@@ -330,3 +330,17 @@ func stop_boards() -> void:
 	for board in active_boards.values():
 		if board.has_method("stop"):
 			board.stop()
+
+func handle_player_disconnect(id: int) -> void:
+	if not active_players.has(id): return
+	
+	var is_spectator = active_players[id].get("is_spectator", false)
+	
+	if is_spectator:
+		active_players.erase(id)
+		print("BattleVersus| Spectator %d left." % id)
+	else:
+		print("BattleVersus| Active player %d disconnected! Aborting match..." % id)
+		# Only the server needs to issue the abort command to prevent double-firing
+		if NetworkServer.server_active:
+			NetworkSync.sync_interaction("return_to_lobby")

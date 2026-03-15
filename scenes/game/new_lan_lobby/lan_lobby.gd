@@ -64,6 +64,8 @@ func _input(event: InputEvent) -> void:
 		if !chat_box.has_focus():
 			chat_box.grab_focus()
 			get_viewport().set_input_as_handled()
+	if event.is_action_pressed("pause"):
+		back()
 
 func _process(delta: float) -> void:
 	const hidden_chat = Color(1,1,1,0.2)
@@ -127,7 +129,7 @@ func _on_sync_interaction(payload:Dictionary):
 		"start_game":
 			pass
 		"return_to_lobby":
-			pass
+			_on_game_concluded()
 
 func _on_sync_data(payload:Dictionary):
 	var data = payload.get("data", payload)
@@ -135,16 +137,46 @@ func _on_sync_data(payload:Dictionary):
 	
 	match action:
 		"player_joined":
-			print("what?")
-			var new_player = data.get("new_player", "player")
+			# Safely extract just the name, whether it's a Dictionary or a String
+			var joined_data = data.get("new_player", "Unknown")
+			var new_name = ""
+			if typeof(joined_data) == TYPE_DICTIONARY:
+				new_name = str(joined_data.get("name", "Unknown"))
+			else:
+				new_name = str(joined_data)
+				
+			chat.text += "\n" + "[color=green]%s has joined the lobby[/color]" % new_name
+			
 			players_in_lobby = data.get("players", [])
 			_update_player_list(players_in_lobby)
-			chat.text += "\n" + "[color=yellow]%s has entered the lobby [/color]" % new_player.get("name","player")
+			
+			# --- LATE JOINER SYNC LOGIC ---
+			if data.has("game_mode"):
+				var gm = int(data.get("game_mode", 0))
+				if game_mode != gm:
+					_on_gamemode_selected(gm)
+					
+			if data.get("game_started", false):
+				game_started = true 
+				$"Control/side bar/guide".text = "Match in progress... Please wait."
+			else:
+				$"Control/side bar/guide".text = "Waiting for opponent..."
+				_check_start_requirements()
 		"player_left":
-			var player_left = data.get("player_left", "player")
+			var left_name = data.get("player_left", "")
+			chat.text += "\n" + "[color=yellow]%s has left the lobby [/color]" % left_name
+			
 			players_in_lobby = data.get("players", [])
 			_update_player_list(players_in_lobby)
-			chat.text += "\n" + "[color=yellow]%s has left the lobby [/color]" % player_left
+			
+			if is_instance_valid(battle_manager):
+				# Changed payload.get to data.get!
+				var dropped_id = int(data.get("leaving_id", -1))
+				print("Lobby Client| Received disconnect for ID: ", dropped_id)
+				
+				if dropped_id != -1 and battle_manager.has_method("_on_peer_disconnected"):
+					battle_manager._on_peer_disconnected(dropped_id)
+					
 		"role_changed":
 			var target_name = data.get("name", "")
 			var new_spectator_state = data.get("is_spectator", false)
@@ -293,7 +325,9 @@ func _on_client_joined(payload: Dictionary) -> void:
 	var sync_payload = {
 		"action": "player_joined", 
 		"players": players_in_lobby,
-		"new_player": safe_player
+		"new_player": safe_player,
+		"game_mode": game_mode, 
+		"game_started": game_started
 	}
 	NetworkSync.sync_data(sync_payload)
 	
@@ -301,7 +335,11 @@ func _on_client_joined(payload: Dictionary) -> void:
 
 func _on_client_left(leaving_player: Dictionary) -> void:
 	var p_name = str(leaving_player.get("name", "Unknown"))
-	var leaving_id = leaving_player.get("player_id", -1)
+	
+	# Check for both common keys just in case!
+	var leaving_id = leaving_player.get("player_id", leaving_player.get("id", -1))
+	
+	print("Lobby Server| Player Left! Name: ", p_name, " ID: ", leaving_id)
 	
 	# 1. Update local list
 	for i in range(players_in_lobby.size() - 1, -1, -1):
@@ -311,34 +349,25 @@ func _on_client_left(leaving_player: Dictionary) -> void:
 			
 	_update_player_list(players_in_lobby)
 	
-	# 2. BROADCAST TO EVERYONE (Moved this up so it always fires)
+	# 2. BROADCAST TO EVERYONE
 	if NetworkServer.server_active:
 		var sync_payload = {
 			"action": "player_left", 
 			"players": players_in_lobby,
-			"player_left": p_name
+			"player_left": p_name,
+			"leaving_id": leaving_id
 		}
 		NetworkSync.sync_data(sync_payload)
 	
 		# 3. Handle Mid-Game Logic
-		if game_started:
-			## Was the person who left one of the two combatants?
-			#if leaving_id == current_p1_id or leaving_id == current_p2_id:
-			if leaving_id in [battle_manager.p1_id, battle_manager.p2_id]:
-				
-				print("Lobby| ACTIVE PLAYER DISCONNECTED! Aborting match...")
-				NetworkSync.sync_interaction("return_to_lobby")
-				$"Control/side bar/guide".text = p_name + " disconnected!"
-			else:
-				print("Lobby| Spectator " + p_name + " left. The match continues.")
-			#
-			## We still return here to prevent the lobby timer from starting mid-match
+		if game_started and is_instance_valid(battle_manager):
+			if battle_manager.has_method("_on_peer_disconnected"):
+				battle_manager._on_peer_disconnected(leaving_id)
 			return 
-	#
-		## 4. Normal Lobby Behavior (Only if game hasn't started)
+	
+		# 4. Normal Lobby Behavior
 		$"Control/side bar/guide".text = "Waiting for opponent..."
-		if NetworkServer.server_active:
-			_check_start_requirements()
+		_check_start_requirements()
 
 func _on_connection_timeout() -> void:
 	print("Lobby| Connection timed out.")
@@ -414,7 +443,7 @@ func _on_master_timer_timeout() -> void:
 		
 		match_settings["p1_id"] = p1.get("player_id", -1)
 		match_settings["p2_id"] = p2.get("player_id", -1)
-		match_settings["first_to"] = 3 # You can change this later if you want a UI toggle
+		match_settings["first_to"] = 5 # You can change this later if you want a UI toggle
 		
 		match_title = "%s VS %s" % [p1.get("name", "P1"), p2.get("name", "P2")]
 		
@@ -447,6 +476,8 @@ func _on_master_timer_timeout() -> void:
 
 func _check_start_requirements() -> void:
 	if not NetworkServer.server_active: return
+	if game_started:
+		return
 
 	var eligible_players = []
 	for p in players_in_lobby:

@@ -3,7 +3,7 @@ extends Node
 const default_server_ip = "127.0.0.1"
 const default_port = 69671
 const game_version = "0.0.5"
-const dev_build = true
+const dev_build = false
 
 var server_info := {
 	"ip": default_server_ip,

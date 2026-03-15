@@ -9,6 +9,9 @@ signal game_concluded
 const SLIDE_SPEED: float = 10.0
 const DISTANCE: float = 0.25
 
+var red_grid_scale: float = 0.25
+var blue_grid_scale: float = 0.25
+
 @onready var anim: AnimationPlayer = $anim
 @onready var scoreboard: RichTextLabel = $versus/score
 @onready var p1_name: Label = $versus/HBoxContainer/left_side/Label
@@ -158,43 +161,42 @@ func _process(delta: float) -> void:
 	
 	var grid_offset_y = 350.0 
 	
+	# Helper to check if a grid should be centered (1 player left) or offset (teammates/multiple)
+	var is_red_solo = alive_red.size() == 1
+	var is_blue_solo = alive_blue.size() == 1
+	
+	red_grid.size = Vector2.ZERO
+	blue_grid.size = Vector2.ZERO
+	
 	# 1. LERP THE GRIDS & MAIN ANCHOR
 	if _is_spectator:
-		var red_t = left_pos
-		red_t.x -= red_grid.size.x / 2.0
-		red_t.y -= red_grid.size.y / 2.0
-		red_grid.position = red_grid.position.lerp(red_t, lerp_weight)
-		
-		var blue_t = right_pos
-		blue_t.x -= blue_grid.size.x / 2.0
-		blue_t.y -= blue_grid.size.y / 2.0
-		blue_grid.position = blue_grid.position.lerp(blue_t, lerp_weight)
+		# Spectators see both teams centered
+		red_grid.position = red_grid.position.lerp(left_pos - (red_grid.size / 2.0), lerp_weight)
+		blue_grid.position = blue_grid.position.lerp(right_pos - (blue_grid.size / 2.0), lerp_weight)
 	else:
 		if my_team == "red":
 			my_anchor.position = my_anchor.position.lerp(left_pos, lerp_weight)
 			
-			var red_t = left_pos + Vector2(0, grid_offset_y)
-			red_t.x -= red_grid.size.x / 2.0
+			# Red Grid (Teammates): If solo (just me), this grid is empty/hidden, 
+			# but if teammates exist, they stay offset.
+			var red_t = left_pos + Vector2(-red_grid.size.x / 2.0, grid_offset_y)
 			red_grid.position = red_grid.position.lerp(red_t, lerp_weight)
 			
-			var blue_t = right_pos
-			blue_t.x -= blue_grid.size.x / 2.0
-			blue_t.y -= blue_grid.size.y / 2.0
+			# Blue Grid (Enemies): Center if solo, center if many (enemies always center)
+			var blue_t = right_pos - (blue_grid.size / 2.0)
 			blue_grid.position = blue_grid.position.lerp(blue_t, lerp_weight)
-			
-		elif my_team == "blue":
+		else:
 			my_anchor.position = my_anchor.position.lerp(right_pos, lerp_weight)
 			
-			var blue_t = right_pos + Vector2(0, grid_offset_y)
-			blue_t.x -= blue_grid.size.x / 2.0
+			# Blue Grid (Teammates): Offset
+			var blue_t = right_pos + Vector2(-blue_grid.size.x / 2.0, grid_offset_y)
 			blue_grid.position = blue_grid.position.lerp(blue_t, lerp_weight)
 			
-			var red_t = left_pos
-			red_t.x -= red_grid.size.x / 2.0
-			red_t.y -= red_grid.size.y / 2.0
+			# Red Grid (Enemies): Center
+			var red_t = left_pos - (red_grid.size / 2.0)
 			red_grid.position = red_grid.position.lerp(red_t, lerp_weight)
 
-	# 2. LERP BOARDS TO TARGETS (IGNORE DEAD PLAYERS!)
+	# 2. LERP BOARDS TO TARGETS
 	for id in board_targets.keys():
 		if active_anchors.has(id) and not dead_ids.has(id):
 			var anchor = active_anchors[id]
@@ -203,10 +205,11 @@ func _process(delta: float) -> void:
 			anchor.global_position = anchor.global_position.lerp(target.global_position, lerp_weight)
 			
 			var team = active_players[id].get("team", "red")
-			var is_solo = (team == "red" and alive_red.size() == 1) or (team == "blue" and alive_blue.size() == 1)
+			var grid_scale = red_grid_scale if team == "red" else blue_grid_scale
 			
-			var target_scale = Vector2(1.0, 1.0) if (target == my_anchor or is_solo) else Vector2(0.25, 0.25)
-			anchor.scale = anchor.scale.lerp(target_scale, lerp_weight)
+			# Final logic: 1.0 scale if it's my main anchor OR if it's the last opponent
+			var target_scale_val = 1.0 if (target == my_anchor or grid_scale == 1.0) else grid_scale
+			anchor.scale = anchor.scale.lerp(Vector2(target_scale_val, target_scale_val), lerp_weight)
 
 func get_alive_team(target_team_id: int) -> Array:
 	if target_team_id == -2: return alive_blue.duplicate()
@@ -261,7 +264,6 @@ func process_action(action: String, data: Dictionary) -> void:
 					
 			_perform_match_over_sequence(data.get("winner_team", ""))
 
-# --- STATE LOGIC ---
 func _on_board_knocked_out(node: MultiplayerBoard) -> void:
 	if is_resetting or game_finished: return
 	
@@ -305,20 +307,29 @@ func _on_board_knocked_out(node: MultiplayerBoard) -> void:
 	_update_grid_layouts()
 	
 	# --- 2. LET THE DEAD BOARD ANIMATE IN PLACE ---
-	dead_ids.append(loser_id) # Stops _process from moving it to shifting grid spots!
+	dead_ids.append(loser_id)
 		
 	# --- 3. CHECK WIN CONDITION ---
+	_check_win_condition()
+
+func _check_win_condition() -> void:
 	if alive_red.size() > 0 and alive_blue.size() > 0:
 		return 
 		
 	if not NetworkServer.server_active: return 
 	
-	is_resetting = true
+	# Server-only logic follows
+	is_resetting = true # Set immediately to prevent simultaneous death bugs
 	stop_boards()
-	await get_tree().create_timer(1.0).timeout
 	
-	var winning_team = "blue" if alive_red.size() == 0 else "red"
+	var winning_team = ""
+	if alive_red.size() == 0:
+		winning_team = "blue"
+	elif alive_blue.size() == 0:
+		winning_team = "red"
 	
+	if winning_team == "": return
+
 	var new_red_score = red_match_score + (1 if winning_team == "red" else 0)
 	var new_blue_score = blue_match_score + (1 if winning_team == "blue" else 0)
 	
@@ -327,22 +338,27 @@ func _on_board_knocked_out(node: MultiplayerBoard) -> void:
 		"blue_score": new_blue_score
 	}
 	
+	var action_data = {
+		"action": "next_round",
+		"seed": randi(),
+		"scores": scores_payload
+	}
+	
 	if new_red_score >= first_to or new_blue_score >= first_to:
-		request_network_sync.emit({
-			"action": "match_over",
-			"winner_team": winning_team,
-			"scores": scores_payload
-		})
-	else:
-		request_network_sync.emit({
-			"action": "next_round",
-			"seed": randi(),
-			"scores": scores_payload
-		})
+		action_data["action"] = "match_over"
+		action_data["winner_team"] = winning_team
+
+	# Send to clients
+	request_network_sync.emit(action_data)
+	
+	# Unlock the state temporarily so the host can process its own action!
+	is_resetting = false 
+	process_action(action_data["action"], action_data)
 
 func _perform_next_round_transition(next_seed: int) -> void:
 	update_scoreboard()
 	
+	# Make sure the UI is ready
 	anim.play("next_round_in")
 	await anim.animation_finished
 	
@@ -359,7 +375,9 @@ func _perform_next_round_transition(next_seed: int) -> void:
 	anim.play("next_round_out")
 	await anim.animation_finished
 	
-	is_resetting = false
+	# RESET FLAGS BEFORE STARTING
+	is_resetting = false 
+	game_started = false # Allow start_boards to set it to true
 	start_boards()
 			
 func _perform_match_over_sequence(winner_team: String) -> void:
@@ -375,8 +393,8 @@ func _perform_match_over_sequence(winner_team: String) -> void:
 	game_concluded.emit()
 
 func update_scoreboard(discrete: bool = false) -> void:
-	var s1 = red_match_score if my_team == "red" or _is_spectator else blue_match_score
-	var s2 = blue_match_score if my_team == "blue" else red_match_score
+	var s1 = red_match_score
+	var s2 = blue_match_score
 	
 	var p1_text = "[color=red](%d/%d)[/color]" % [s1, first_to]
 	var p2_text = "[color=blue](%d/%d)[/color]" % [s2, first_to]
@@ -388,11 +406,25 @@ func spawn_garbage_visual(attacker_id: int, target_id: int, amount: int) -> void
 	var target_node = active_boards[target_id]
 	var start_pos = active_boards[attacker_id].global_position
 	
+	# Find out if the target board is scaled up (1v1 / main board) or small (grid)
+	var c_offset = Vector2.ZERO
+	
+	if board_targets.has(target_id):
+		var team = active_players[target_id].get("team", "red")
+		var grid_scale = red_grid_scale if team == "red" else blue_grid_scale
+		
+		# If it's my main board, or if it's the last opponent (scale 1.0), it's full size. 
+		# Otherwise, it's tucked in a grid, so use the (1, 1) offset.
+		var is_full_size = (board_targets[target_id] == my_anchor or grid_scale == 1.0)
+		
+		if not is_full_size:
+			c_offset = Vector2(1, 1)
+			
 	for i in range(amount): 
-		var particle = AttackParticles.create(target_node) 
+		var particle = AttackParticles.create(target_node, c_offset) 
 		particle.modulate = Color.RED if amount < 4 else (Color.TURQUOISE if amount < 6 else Color.VIOLET)
 		particle.global_position = start_pos 
-		add_child(particle) 
+		add_child(particle)
 
 func start_boards() -> void:
 	game_started = true
@@ -406,7 +438,8 @@ func start_boards() -> void:
 	board_targets = original_targets.duplicate()
 	
 	for id in board_targets.keys():
-		if board_targets[id] != my_anchor:
+		# Add the is_instance_valid check here to prevent crashes from freed nodes!
+		if is_instance_valid(board_targets[id]) and board_targets[id] != my_anchor:
 			board_targets[id].get_parent().show()
 	
 	_update_grid_layouts()
@@ -449,14 +482,122 @@ func play_intro() -> void:
 		Audio.play_music("epic_battle")
 
 func _update_grid_layouts() -> void:
-	for grid in [red_grid, blue_grid]:
-		var visible_count = 0
-		for child in grid.get_children():
-			if child.visible:
-				visible_count += 1
-		
-		if visible_count > 0:
-			# This math makes 1-2 players = 1 col, 3-4 = 2 cols, 5-6 = 3 cols, maxing at 5!
-			grid.columns = clampi(int(ceil(visible_count / 2.0)), 1, 5)
+	_apply_grid_logic(red_grid, "red")
+	_apply_grid_logic(blue_grid, "blue")
+
+func _apply_grid_logic(grid: GridContainer, team_name: String) -> void:
+	var visible_count = 0
+	for child in grid.get_children():
+		if child.visible:
+			visible_count += 1
+	
+	if visible_count == 0: return
+
+	var cols: int = 1
+	var wrap_size: Vector2 = Vector2(96, 160)
+	var t_scale: float = 0.25
+
+	var is_my_team = (team_name == my_team)
+	
+	if is_my_team and not _is_spectator:
+		cols = 1
+		wrap_size = Vector2(96, 160)
+		t_scale = 0.25
+	else:
+		if visible_count == 1:
+			cols = 1
+			wrap_size = Vector2(384, 640) 
+			t_scale = 1.0
+		elif visible_count <= 2:
+			cols = 1
+			wrap_size = Vector2(240, 400) 
+			t_scale = 0.65
+		elif visible_count <= 4:
+			cols = 2
+			wrap_size = Vector2(150, 250) 
+			t_scale = 0.4
 		else:
-			grid.columns = 1
+			cols = 3
+			wrap_size = Vector2(96, 160)
+			t_scale = 0.25
+
+	grid.columns = cols
+	
+	if team_name == "red": red_grid_scale = t_scale
+	else: blue_grid_scale = t_scale
+
+	for wrapper in grid.get_children():
+		wrapper.custom_minimum_size = wrap_size
+		wrapper.pivot_offset = wrap_size / 2.0
+
+func handle_player_disconnect(in_id: int) -> void:
+	push_warning("BattlePlus| Received disconnect request for ID: ", in_id)
+	
+	# Safely find the exact dictionary key, forcing both to integers
+	var id: int = -1
+	for key in active_players.keys():
+		if int(key) == int(in_id):
+			id = key
+			break
+			
+	if id == -1: 
+		print("BattlePlus| Error: Could not find player in active_players! Keys: ", active_players.keys())
+		return
+	
+	var is_spectator = active_players[id].get("is_spectator", false)
+	if is_spectator:
+		active_players.erase(id)
+		print("BattlePlus| Spectator %d left." % id)
+		return
+		
+	push_warning("BattlePlus| Player %d dropped! Cleaning up nodes..." % id)
+	
+	# --- 1. REMOVE FROM ALL TRACKING ARRAYS ---
+	var team = active_players[id].get("team", "red")
+	active_players.erase(id)
+	
+	if team == "red":
+		if alive_red.has(id): alive_red.erase(id)
+		if red_team_ids.has(id): red_team_ids.erase(id)
+	else:
+		if alive_blue.has(id): alive_blue.erase(id)
+		if blue_team_ids.has(id): blue_team_ids.erase(id)
+		
+	if dead_ids.has(id): dead_ids.erase(id)
+		
+	# --- 2. DESTROY THE NODES SAFELY ---
+	if active_boards.has(id):
+		active_boards[id].queue_free()
+		active_boards.erase(id)
+		
+	if active_anchors.has(id):
+		var anchor = active_anchors[id]
+		var target_wrapper = board_targets.get(id)
+		
+		anchor.queue_free()
+		active_anchors.erase(id)
+		
+		# Free the grid cell so the grid automatically shrinks!
+		if target_wrapper and target_wrapper != my_anchor:
+			target_wrapper.get_parent().queue_free()
+			
+	if board_targets.has(id):
+		board_targets.erase(id)
+	
+	if original_targets.has(id):
+		original_targets.erase(id)
+	
+	# Force the UI to recalculate columns and sizes
+	_update_grid_layouts()
+	
+	# --- 3. CHECK MATCH INTEGRITY (Server Only) ---
+	if NetworkServer.server_active:
+		var total_playing = red_team_ids.size() + blue_team_ids.size()
+		
+		if total_playing <= 1:
+			print("BattlePlus| Only 1 or 0 players left total. Aborting match to lobby.")
+			NetworkSync.sync_interaction("return_to_lobby")
+		else:
+			# The match can continue! 
+			# Did this disconnection cause the last person on a team to vanish?
+			_check_win_condition()

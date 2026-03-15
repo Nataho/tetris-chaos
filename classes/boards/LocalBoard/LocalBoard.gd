@@ -92,6 +92,7 @@ func _on_network_data_received(payload: Dictionary) -> void:
 	
 	# We ONLY care about incoming garbage right now
 	if type == "garbage":
+		#print("garbage payload: ", payload)
 		var target = payload["value"]["target"]
 		
 		# Is the internet trying to attack ME?

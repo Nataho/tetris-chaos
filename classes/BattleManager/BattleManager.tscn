@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://3deoyvpw2i7d"]
 
 [ext_resource type="Script" uid="uid://b0o6b4akyoc3a" path="res://classes/BattleManager/BattleManager.gd" id="1_l0kso"]
+[ext_resource type="PackedScene" uid="uid://bi7behrrxvr38" path="res://classes/gamemodes/BattleVersus/BattleVersus.tscn" id="2_uwpvr"]
+[ext_resource type="PackedScene" uid="uid://dgaj6dtavx53s" path="res://classes/gamemodes/BattleVersusPlus/BattleVersusPlus.tscn" id="3_46on2"]
 
 [node name="BattleManager" type="Control" unique_id=743379656]
 layout_mode = 3
@@ -11,3 +13,5 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_l0kso")
+versus_scene = ExtResource("2_uwpvr")
+versus_plus_scene = ExtResource("3_46on2")

@@ -1,10 +1,5 @@
 extends Control
 
-##TEST: this is just a dummy dictionary and is meant to be tested for boards to initialize
-#var dummy = [{ "name": "client", "player_id": 1, "is_spectator": false, "is_host": true }, {"name": "asdf", "player_id": 2, "is_spectator": false }]
-# TODO: make an instance of the battle manager whenever the battle starts
-#		example: BattleManager.create(dummy, 1, BattleManager.VERSUS, false)
-
 const versus_plus_teams = {
 	"red": Color8(203,0,0),
 	"blue": Color8(0,0,203)
@@ -476,8 +471,8 @@ func _check_start_requirements() -> void:
 		if not is_countdown_active:
 			print("Lobby| Requirements met. Starting countdown!")
 			is_countdown_active = true
-			countdown = 15
-			$"Control/side bar/guide".text = "STARTING IN: 15"
+			countdown = 10
+			$"Control/side bar/guide".text = "STARTING IN: 10"
 			NetworkSync.sync_data({"action": "timer_sync", "active": true})
 			master_timer.wait_time = 1.0 
 			master_timer.start()

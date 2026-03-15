@@ -41,9 +41,6 @@ var game_finished: bool = false
 var is_resetting: bool = false
 var first_to: int = 1
 
-func _ready():
-	print("BATTLE VERSUS SPAWNED: ", get_instance_id())
-
 func setup(players: Dictionary, local_id: int, spectator: bool, seed: int, settings: Dictionary) -> void:
 	active_players = players
 	_player_id = local_id

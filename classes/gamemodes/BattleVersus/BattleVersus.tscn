@@ -1,0 +1,234 @@
+[gd_scene format=3 uid="uid://bi7behrrxvr38"]
+
+[ext_resource type="Script" uid="uid://cbfqissm1r2ff" path="res://classes/gamemodes/BattleVersus/BattleVersus.gd" id="1_bttm0"]
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="2_045c1"]
+[ext_resource type="Script" uid="uid://dj6r8qc4bbwgk" path="res://scripts/rich_text_bounce.gd" id="3_764us"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_swr64"]
+font = ExtResource("2_045c1")
+font_size = 100
+
+[sub_resource type="Theme" id="Theme_ldlm4"]
+default_font = ExtResource("2_045c1")
+default_font_size = 30
+
+[sub_resource type="RichTextEffect" id="RichTextEffect_myqay"]
+script = ExtResource("3_764us")
+metadata/_custom_type_script = "uid://dj6r8qc4bbwgk"
+
+[sub_resource type="Animation" id="Animation_46on2"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("versus:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("fg:color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0, 0, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("bg:color")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.4, 0.2, 0.6, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_uwpvr"]
+resource_name = "intro"
+length = 8.0
+step = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("versus:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("bg:color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0.4, 0.2, 0.6, 1), Color(0.4, 0.2, 0.6, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_xq2g2"]
+resource_name = "next_round_in"
+step = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("fg:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_an0cd"]
+resource_name = "next_round_out"
+length = 0.5
+step = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("fg:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_fxj8h"]
+_data = {
+&"RESET": SubResource("Animation_46on2"),
+&"intro": SubResource("Animation_uwpvr"),
+&"next_round_in": SubResource("Animation_xq2g2"),
+&"next_round_out": SubResource("Animation_an0cd")
+}
+
+[node name="BattleVersus" type="Control" unique_id=1863646166]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_bttm0")
+
+[node name="bg" type="ColorRect" parent="." unique_id=1218924126]
+z_index = -1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.4, 0.2, 0.6, 1)
+
+[node name="versus" type="Control" parent="." unique_id=1767759424]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="versus" unique_id=1285106148]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="left_side" type="ColorRect" parent="versus/HBoxContainer" unique_id=685509315]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.64705884, 0, 0, 0.39215687)
+
+[node name="Label" type="Label" parent="versus/HBoxContainer/left_side" unique_id=1748024867]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "RADIOACTIVE R"
+label_settings = SubResource("LabelSettings_swr64")
+
+[node name="right_side" type="ColorRect" parent="versus/HBoxContainer" unique_id=1028035845]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0, 0.64705884, 0.39215687)
+
+[node name="Label" type="Label" parent="versus/HBoxContainer/right_side" unique_id=2144846228]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "RADIOACTIVE R"
+label_settings = SubResource("LabelSettings_swr64")
+
+[node name="score" type="RichTextLabel" parent="versus" unique_id=1282830284]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -161.0
+offset_top = 76.0
+offset_right = 161.0
+offset_bottom = 125.0
+grow_horizontal = 2
+theme = SubResource("Theme_ldlm4")
+bbcode_enabled = true
+text = "[color=red](0/0)[/color] FT5 [color=blue](0/0)[/color]"
+horizontal_alignment = 1
+vertical_alignment = 1
+custom_effects = [SubResource("RichTextEffect_myqay")]
+
+[node name="fg" type="ColorRect" parent="." unique_id=1817570563]
+z_index = 3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="anim" type="AnimationPlayer" parent="." unique_id=1914347882]
+libraries/ = SubResource("AnimationLibrary_fxj8h")

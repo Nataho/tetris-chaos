@@ -2,11 +2,8 @@
 
 [ext_resource type="Script" uid="uid://cbfqissm1r2ff" path="res://classes/gamemodes/BattleVersus/BattleVersus.gd" id="1_bttm0"]
 [ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="2_045c1"]
+[ext_resource type="LabelSettings" uid="uid://c1ahktnxlxg8x" path="res://assets/Labels/NameLabel.tres" id="2_764us"]
 [ext_resource type="Script" uid="uid://dj6r8qc4bbwgk" path="res://scripts/rich_text_bounce.gd" id="3_764us"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_swr64"]
-font = ExtResource("2_045c1")
-font_size = 100
 
 [sub_resource type="Theme" id="Theme_ldlm4"]
 default_font = ExtResource("2_045c1")
@@ -179,7 +176,7 @@ offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
 text = "RADIOACTIVE R"
-label_settings = SubResource("LabelSettings_swr64")
+label_settings = ExtResource("2_764us")
 
 [node name="right_side" type="ColorRect" parent="versus/HBoxContainer" unique_id=1028035845]
 layout_mode = 2
@@ -200,7 +197,7 @@ offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
 text = "RADIOACTIVE R"
-label_settings = SubResource("LabelSettings_swr64")
+label_settings = ExtResource("2_764us")
 
 [node name="score" type="RichTextLabel" parent="versus" unique_id=1282830284]
 layout_mode = 1

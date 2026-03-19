@@ -87,6 +87,9 @@ func start():
 func _process(_delta: float) -> void:
 	if get_viewport().gui_get_focus_owner() is LineEdit:
 		return
+	
+	if GameManager.is_prompt_open: return
+	
 	#print("boardcontroller.current_level = ",board_controller.current_level)
 	if !started: return
 	gamepad_handler.handle_controller_input()
@@ -224,6 +227,7 @@ func _set_gamepad_signals():
 	gamepad_handler.gamepad_button_released.connect(gamepad_button_released)
 
 func gamepad_button_pressed(button:ButtonData):
+	if GameManager.is_prompt_open: return
 	if button.player_index != board_parent._player_index and board_parent.game_mode == board_parent.game_modes.VERSUS: return
 	if !cur_piece_controller or cur_piece_controller.is_queued_for_deletion(): return
 	if !started: return
@@ -240,6 +244,7 @@ func gamepad_button_pressed(button:ButtonData):
 		"B": rotate_right()
 		"LB", "RB": hold()
 func gamepad_button_released(button:ButtonData):
+	if GameManager.is_prompt_open: return
 	if button.player_index != board_parent._player_index and board_parent.game_mode == board_parent.game_modes.VERSUS: return
 	if !cur_piece_controller or cur_piece_controller.is_queued_for_deletion(): return
 	if !started: return
@@ -255,6 +260,9 @@ func gamepad_button_released(button:ButtonData):
 func _input(event: InputEvent) -> void:
 	if get_viewport().gui_get_focus_owner() is LineEdit:
 		return
+	
+	if GameManager.is_prompt_open: return
+	
 	#if board_parent._player_index != -1: return #keyboard
 	var is_keyboard: bool = GamepadHandler.controllers.get(-1, -100) == board_parent._player_index
 	if board_parent.game_mode == board_parent.game_modes.VERSUS and not is_keyboard: return

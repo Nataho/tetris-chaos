@@ -6,7 +6,7 @@ func _ready() -> void:
 	board.initialize_game_mode("marathon")
 	board1.initialize_game_mode("marathon")
 	
-	board1.hide_queue()
+	#board1.hide_queue()
 	
 	board.start(3)
 	board1.start(3)
@@ -31,4 +31,4 @@ func _process(delta: float) -> void:
 		anchors.append(anchor)
 	
 	$test_board.global_position = $test_board.global_position.lerp(anchors[2].global_position, 5*delta)
-	$test_board2.global_position = $test_board2.global_position.lerp(anchors[5].global_position, 5*delta)
+	$test_board2.global_position = $test_board2.global_position.lerp(anchors[3].global_position, 5*delta)

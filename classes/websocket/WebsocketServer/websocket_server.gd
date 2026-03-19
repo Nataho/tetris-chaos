@@ -13,6 +13,8 @@ var connected_clients: Array[WebSocketPeer] = []
 var udp_broadcaster := PacketPeerUDP.new()
 var broadcast_timer := 0.0
 
+
+var client_last_seen: Dictionary = {}
 #endregion
 
 func start() -> void:
@@ -63,9 +65,13 @@ func _check_for_new_connections() -> void:
 		# Set metadata to track if we've handled the initial handshake
 		ws.set_meta("welcomed", false)
 		connected_clients.append(ws)
+		
+		client_last_seen[ws] = Time.get_ticks_msec()
+		
 		print("Server| New connection attempt...")
 
 func _process_client_messages() -> void:
+	var current_time = Time.get_ticks_msec()
 	for i in range(connected_clients.size() - 1, -1, -1):
 		var ws = connected_clients[i]
 		ws.poll()
@@ -80,7 +86,13 @@ func _process_client_messages() -> void:
 			
 			_read_packets(ws)
 			
+			if current_time - client_last_seen.get(ws, current_time) > 15000:
+				print("Server| Client timed out! (No response for 15s)")
+				ws.close()
+			
 		elif state == WebSocketPeer.STATE_CLOSED:
+			client_last_seen.erase(ws)
+			
 			# Scrub them from active_players AND tell the UI they left
 			for p in range(active_players.size() - 1, -1, -1):
 				if active_players[p].get("socket") == ws:
@@ -96,12 +108,19 @@ func _process_client_messages() -> void:
 func _read_packets(ws: WebSocketPeer) -> void:
 	while ws.get_available_packet_count() > 0:
 		var packet = ws.get_packet()
+		
+		client_last_seen[ws] = Time.get_ticks_msec()
+		
 		var msg = packet.get_string_from_utf8()
 		var parsed_msg = JSON.parse_string(msg)
 		
 		if typeof(parsed_msg) != TYPE_DICTIONARY or not parsed_msg.has("signal"):
 			continue
-
+		
+		if parsed_msg["signal"] == "ping":
+			send_to_client(ws, "pong")
+			continue
+		
 		#print("hiiii")
 		_handle_signal(ws, parsed_msg)
 

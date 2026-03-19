@@ -128,14 +128,26 @@ func change_settings_display(tab:settings_tabs):
 	current_settings_tab = tab
 
 func _input(event: InputEvent) -> void:
+	if GameManager.is_prompt_open: return
 	if event.is_action_pressed("ui_cancel"):
 		_back()
+		get_viewport().set_input_as_handled()
 
 func _back():
 	if current_tab > 0:
 		change_tab(tabs.MAIN)
 	else:
-		get_tree().quit()
+		GameManager.is_prompt_open = true
+		
+		var prompt := ConfirmPrompt.create("You don't wanna play anymore??")
+		add_child(prompt)
+		
+		var confirmed = await prompt.result
+		
+		if confirmed:
+			get_tree().quit()
+			
+		GameManager.is_prompt_open = false
 
 #[TEST]
 #func test():

@@ -29,6 +29,13 @@ font_size = 32
 font_color = Color(0.86898494, 0.8689849, 0.8689849, 1)
 outline_color = Color(0, 0, 0, 1)
 
+[sub_resource type="LabelSettings" id="LabelSettings_61skl"]
+font = ExtResource("6_bu5we")
+font_size = 32
+font_color = Color(0.86898494, 0.8689849, 0.8689849, 1)
+outline_size = 15
+outline_color = Color(0, 0, 0, 1)
+
 [sub_resource type="LabelSettings" id="LabelSettings_euthe"]
 font = ExtResource("6_bu5we")
 font_size = 90
@@ -264,42 +271,24 @@ label_settings = SubResource("LabelSettings_e5ijt")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="score2" type="Label" parent="Control" unique_id=925141483]
-visible = false
+[node name="username" type="Label" parent="Control" unique_id=2054282775]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -20.0
-offset_top = 1.0
-offset_right = 20.0
-offset_bottom = 46.0
+offset_left = -56.0
+offset_top = 42.0
+offset_right = 56.0
+offset_bottom = 87.0
 grow_horizontal = 2
 grow_vertical = 0
-text = "0"
-label_settings = SubResource("LabelSettings_8mdgx")
+text = "Player"
+label_settings = SubResource("LabelSettings_61skl")
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="add" type="Label" parent="Control/score2" unique_id=1417753865]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 162.5
-offset_top = -39.0
-offset_right = 202.5
-offset_bottom = 6.0
-grow_horizontal = 2
-grow_vertical = 0
-text = "0"
-label_settings = SubResource("LabelSettings_e5ijt")
-horizontal_alignment = 1
-vertical_alignment = 1
+uppercase = true
 
 [node name="gameover" type="Label" parent="Control" unique_id=1495387268]
 visible = false

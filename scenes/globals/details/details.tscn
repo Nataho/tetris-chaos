@@ -17,11 +17,20 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_b613u")
 
-[node name="Label" type="Label" parent="." unique_id=449053978]
+[node name="fps" type="Label" parent="." unique_id=449053978]
 layout_mode = 1
 offset_left = 29.0
 offset_top = 26.0
 offset_right = 85.0
 offset_bottom = 55.0
 text = "FPS:"
+label_settings = SubResource("LabelSettings_finkb")
+
+[node name="ping" type="Label" parent="." unique_id=441499238]
+layout_mode = 1
+offset_left = 29.0
+offset_top = 53.0
+offset_right = 85.0
+offset_bottom = 82.0
+text = "Ping: "
 label_settings = SubResource("LabelSettings_finkb")

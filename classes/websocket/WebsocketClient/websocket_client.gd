@@ -14,6 +14,9 @@ var client_active: bool = false
 var found_server_ip: String = ""
 var is_connecting: bool = false
 
+var heartbeat_timer: float = 0.0
+var last_ping_time: int = 0
+
 # We'll use 15 seconds as our search window
 const CONNECTION_TIMEOUT: float = 15.0
 #endregion
@@ -68,7 +71,7 @@ func _on_timeout() -> void:
 		stop()
 		Events.connection_timeout.emit() # Remember to add this to Events.gd!
 	
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not client_active: return
 
 	# TIMEOUT LOGIC
@@ -91,6 +94,13 @@ func _process(_delta: float) -> void:
 			is_connecting = false 
 			
 		_handle_server_messages()
+		
+		heartbeat_timer += delta
+		if heartbeat_timer > 1.0:
+			last_ping_time = Time.get_ticks_msec()
+			send_signal("ping") # Send a silent ping every 5 seconds
+			heartbeat_timer = 0.0
+			print("Ping Flow 1: Client sent ping!")
 		
 	elif state == WebSocketPeer.STATE_CLOSED:
 		_handle_disconnection()
@@ -159,7 +169,13 @@ func _process_server_signal(data: Dictionary) -> void:
 			
 		"sync_data":
 			Events.sync_data.emit(data)
+		
+		"pong":
+			var current_ping = Time.get_ticks_msec() - last_ping_time
 			
+			if Details.has_method("show_ping"):
+				Details.show_ping(current_ping)
+		
 		"error":
 			print("Client| Server Error: ", data.get("message", "Unknown"))
 			

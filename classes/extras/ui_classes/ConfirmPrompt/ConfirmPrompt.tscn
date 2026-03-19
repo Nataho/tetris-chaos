@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://cilno8og0akis"]
+
+[ext_resource type="Script" uid="uid://ct5r8h6jpms7g" path="res://classes/extras/ui_classes/ConfirmPrompt/ConfirmPrompt.gd" id="1_5vuof"]
+[ext_resource type="FontFile" uid="uid://b4vif8qlndc3e" path="res://assets/fonts/BAHNSCHRIFT.TTF" id="1_54opm"]
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="1_pe855"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_pe855"]
+font = ExtResource("1_54opm")
+font_size = 40
+
+[node name="ConfirmPrompt" type="Panel" unique_id=1179055282]
+self_modulate = Color(1, 1, 1, 0.2)
+custom_minimum_size = Vector2(760, 368)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5vuof")
+
+[node name="Panel" type="Panel" parent="." unique_id=1621368743]
+self_modulate = Color(1, 1, 1, 0.5529412)
+custom_minimum_size = Vector2(760, 368)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -184.0
+offset_right = 380.0
+offset_bottom = 184.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Panel" unique_id=129678262]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -337.0
+offset_top = -93.0
+offset_right = 345.0
+offset_bottom = 28.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Prompt"
+label_settings = SubResource("LabelSettings_pe855")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel" unique_id=457539139]
+z_index = 1
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -99.5
+offset_top = -91.0
+offset_right = 99.5
+offset_bottom = -34.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 193
+
+[node name="cancel" type="Button" parent="Panel/HBoxContainer" unique_id=290929961]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_pe855")
+theme_override_font_sizes/font_size = 40
+text = "CANCEL"
+
+[node name="confirm" type="Button" parent="Panel/HBoxContainer" unique_id=252442139]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_pe855")
+theme_override_font_sizes/font_size = 40
+text = "CONFIRM"

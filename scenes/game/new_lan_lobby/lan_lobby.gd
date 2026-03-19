@@ -13,7 +13,6 @@ const versus_plus_teams = {
 @onready var ip_text_box: LineEdit = $"Control/side bar/IP_bar/ip_text_box"
 @onready var username_text_box: LineEdit = $"Control/side bar/name"
 
-
 @onready var player_node_snapshot:RichTextLabel = null
 @onready var ui_player_node: RichTextLabel = $Control/Players/Player
 
@@ -25,6 +24,7 @@ const versus_plus_teams = {
 
 @onready var gamemode_selector: OptionButton = $"Control/side bar/gamemode_selector"
 @onready var versus_plus_options: VBoxContainer = $"Control/side bar/versus_plus"
+@onready var team_toggle: Button = $"Control/side bar/versus_plus/HBoxContainer/team_toggle"
 
 var _ip_to_search:String = ""
 
@@ -50,7 +50,7 @@ var current_p2_id: int = -1
 var versus_plus_team = versus_plus_teams["red"]
 
 func _ready() -> void:
-	GameManager.change_resolution(500,500)
+	#if GameManager.dev_build: GameManager.change_resolution(500,500)
 	
 	players_in_lobby = [GameManager.player_data]
 	
@@ -60,12 +60,14 @@ func _ready() -> void:
 	Audio.play_music("lobby",Audio.SOUND_END_EFFECTS.FADE)
 
 func _input(event: InputEvent) -> void:
+	if GameManager.is_prompt_open: return
 	if event.is_action_pressed("ready"):
 		if !chat_box.has_focus():
 			chat_box.grab_focus()
 			get_viewport().set_input_as_handled()
 	if event.is_action_pressed("pause"):
 		back()
+		get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
 	const hidden_chat = Color(1,1,1,0.2)
@@ -120,7 +122,7 @@ func connect_ui_signals():
 	connect_versus_plus_signals()
 
 func connect_versus_plus_signals():
-	$"Control/side bar/versus_plus/HBoxContainer/team_toggle".toggled.connect(_on_versus_team_toggled)
+	team_toggle.toggled.connect(_on_versus_team_toggled)
 
 #region network handlers
 func _on_sync_interaction(payload:Dictionary):
@@ -240,19 +242,6 @@ func _on_sync_data(payload:Dictionary):
 			if not match_ready_players.has(p_id):
 				match_ready_players.append(p_id)
 				print("Lobby| Player ", p_id, " finished intro. Ready list: ", match_ready_players)
-				
-			# ONLY the Host checks to see if it's time to start
-			#TODO:
-					#if NetworkServer.server_active:
-						#print("Lobby| Host waiting for IDs: ", current_p1_id, " and ", current_p2_id)
-						#
-						## Check against our safely saved IDs instead of asking the boards!
-						#if match_ready_players.has(current_p1_id) and match_ready_players.has(current_p2_id):
-							#print("Lobby| ALL CLEAR! Both players ready. Firing start_game.")
-							#match_ready_players.clear()
-							#
-							## Fire the universal start command
-							#NetworkSync.sync_interaction("start_game")
 		
 		"chat":
 			var sender:String = data.get("sender", "player")
@@ -301,10 +290,10 @@ func _on_server_accepted(extra_data:Dictionary) -> void:
 	gamemode_selector.disabled = true
 
 func _on_server_rejected(extra_data:Dictionary) -> void:
-	back()
+	force_back()
 
 func _on_disconnected_from_host() -> void:
-	back()
+	force_back()
 
 # -server network signals-
 func _on_client_joined(payload: Dictionary) -> void:
@@ -390,6 +379,7 @@ func initiate_start_sequence(match_seed: int, settings: Dictionary) -> void:
 	$Control.visible = false
 	$ColorRect.visible = false
 	
+	
 	# Create the BattleManager using the new generic signature
 	battle_manager = BattleManager.create(
 		players_in_lobby,
@@ -415,7 +405,9 @@ func _on_game_concluded():
 	$Control.visible = true
 	$chat.visible = true
 	$ColorRect.visible = true
+	
 	$"Control/side bar/guide".text = "Waiting for players..."
+	toggle_lobby_ui(false)
 	
 	# If host, check if enough people are still here to immediately start a new countdown
 	if NetworkServer.server_active:
@@ -531,7 +523,7 @@ func _on_countdown_timer_timeout() -> void:
 	
 	# Update the Host's local UI
 	if countdown <= locked_in_time:
-		player_toggle.disabled = true
+		toggle_lobby_ui(true)
 	$"Control/side bar/guide".text = "STARTING IN: " + str(countdown)
 	
 	# When we hit zero, stop ticking and start the match!
@@ -663,7 +655,7 @@ func _update_player_list(players_array: Array) -> void:
 
 func _on_gamemode_selected(index:int):
 	gamemode_selector.selected = index
-	game_mode = index # <-- ADD THIS: Track the current game mode!
+	game_mode = index 
 	
 	var nodes_to_refresh = [versus_plus_options]
 	for node:Control in nodes_to_refresh:
@@ -714,7 +706,30 @@ func _on_versus_team_toggled(toggled_on: bool):
 
 #endregion
 
+#region helper functions
+
+func toggle_lobby_ui(is_disabled:bool):
+	player_toggle.disabled = is_disabled
+	gamemode_selector.disabled = is_disabled
+	team_toggle.disabled = is_disabled
+
 func back():
+	GameManager.is_prompt_open = true
+	
+	var prompt := ConfirmPrompt.create("Are you sure you want to exit the lobby?")
+	add_child(prompt)
+	
+	var confirmed = await prompt.result
+	
+	if confirmed:
+		NetworkClient.stop()
+		NetworkServer.stop_server()
+		get_tree().change_scene_to_file("res://scenes/main/main_menu.tscn")
+	
+	GameManager.is_prompt_open = false
+
+func force_back():
 	NetworkClient.stop()
 	NetworkServer.stop_server()
 	get_tree().change_scene_to_file("res://scenes/main/main_menu.tscn")
+#endregion

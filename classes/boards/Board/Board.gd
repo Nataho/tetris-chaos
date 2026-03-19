@@ -41,6 +41,8 @@ var controller_keybinds = {
 	
 }
 
+var queue_hidden = false
+
 func _ready() -> void:
 	#board_controller.start()
 	#pieces_controller.start()
@@ -56,8 +58,10 @@ func _ready() -> void:
 ##a function to be used in online multiplayer
 func hide_queue():
 	queue_controller.hide()
+	queue_hidden = true
 func show_queue():
 	queue_controller.show()
+	queue_hidden = false
 
 func initialize_game_mode(gamemode:String, randomization_seed = -1):
 	if randomization_seed != -1:
@@ -324,6 +328,11 @@ func _check_ko(payload):
 	$Control/gameover.show()
 
 #functions to be used on children
+
+func add_username(username:String):
+	$Control/username.show()
+	$Control/username.text = username
+
 func _super_ready() -> void: pass
 func _super_physics_process(_delta) -> void: pass
 func _super_reset() -> void: pass

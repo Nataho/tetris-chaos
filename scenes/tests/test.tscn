@@ -19,16 +19,17 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -597.0
-offset_top = -408.0
-offset_right = -101.0
-offset_bottom = 408.0
+offset_left = -545.0
+offset_top = -244.0
+offset_right = -153.0
+offset_bottom = 244.0
 grow_horizontal = 0
 grow_vertical = 2
-columns = 5
+columns = 3
 
 [node name="Control" type="Control" parent="GridContainer" unique_id=718223216]
-custom_minimum_size = Vector2(96, 160)
+visible = false
+custom_minimum_size = Vector2(176, 160)
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="GridContainer/Control" unique_id=1758129244]
@@ -50,7 +51,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Control2" type="Control" parent="GridContainer" unique_id=601347858]
-custom_minimum_size = Vector2(96, 160)
+custom_minimum_size = Vector2(176, 160)
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="GridContainer/Control2" unique_id=985823332]
@@ -72,7 +73,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Control3" type="Control" parent="GridContainer" unique_id=1008205819]
-custom_minimum_size = Vector2(96, 160)
+custom_minimum_size = Vector2(176, 160)
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="GridContainer/Control3" unique_id=977677212]
@@ -94,7 +95,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Control4" type="Control" parent="GridContainer" unique_id=1965167842]
-custom_minimum_size = Vector2(96, 160)
+custom_minimum_size = Vector2(176, 160)
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="GridContainer/Control4" unique_id=169923441]
@@ -116,7 +117,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Control5" type="Control" parent="GridContainer" unique_id=37331474]
-custom_minimum_size = Vector2(96, 160)
+custom_minimum_size = Vector2(176, 160)
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="GridContainer/Control5" unique_id=1560635359]
@@ -138,7 +139,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Control6" type="Control" parent="GridContainer" unique_id=993059193]
-custom_minimum_size = Vector2(96, 160)
+custom_minimum_size = Vector2(176, 160)
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="GridContainer/Control6" unique_id=641883888]
@@ -160,7 +161,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Control7" type="Control" parent="GridContainer" unique_id=712552101]
-custom_minimum_size = Vector2(96, 160)
+custom_minimum_size = Vector2(176, 160)
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="GridContainer/Control7" unique_id=771814607]
@@ -172,6 +173,270 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="anchor" type="Control" parent="GridContainer/Control7" unique_id=333743347]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control8" type="Control" parent="GridContainer" unique_id=489027528]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control8" unique_id=1765943147]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control8" unique_id=399875628]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control9" type="Control" parent="GridContainer" unique_id=2074499082]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control9" unique_id=970991386]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control9" unique_id=787114511]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control10" type="Control" parent="GridContainer" unique_id=1397119298]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control10" unique_id=1231977256]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control10" unique_id=1244647473]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control11" type="Control" parent="GridContainer" unique_id=1095684965]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control11" unique_id=45305658]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control11" unique_id=1396799727]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control12" type="Control" parent="GridContainer" unique_id=298331972]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control12" unique_id=1134194383]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control12" unique_id=801158379]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control13" type="Control" parent="GridContainer" unique_id=60534219]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control13" unique_id=405562729]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control13" unique_id=11752598]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control14" type="Control" parent="GridContainer" unique_id=2079074632]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control14" unique_id=610675481]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control14" unique_id=1651902464]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control15" type="Control" parent="GridContainer" unique_id=1471966080]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control15" unique_id=722755695]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control15" unique_id=382106630]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control16" type="Control" parent="GridContainer" unique_id=1401485818]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control16" unique_id=932868476]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control16" unique_id=1959094524]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control17" type="Control" parent="GridContainer" unique_id=948810203]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control17" unique_id=596140202]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control17" unique_id=29739097]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control18" type="Control" parent="GridContainer" unique_id=1223633143]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control18" unique_id=1157983324]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control18" unique_id=1739900257]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control19" type="Control" parent="GridContainer" unique_id=1860716694]
+custom_minimum_size = Vector2(176, 160)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="GridContainer/Control19" unique_id=1288113482]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="anchor" type="Control" parent="GridContainer/Control19" unique_id=1921225164]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

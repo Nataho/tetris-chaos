@@ -18,7 +18,7 @@ var match_ready_players = []
 
 var current_seed:int = -1
 
-# NEW: We store everything mode-specific in this generic dictionary
+#We store everything mode-specific in this generic dictionary
 var match_settings: Dictionary = {}
 
 var mode_manager = null

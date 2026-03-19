@@ -81,6 +81,9 @@ func _spawn_player(id: int, is_local: bool) -> void:
 	anchor.set_anchors_preset(Control.PRESET_CENTER)
 	board.knocked_out.connect(_on_board_knocked_out)
 	
+	#print("active_players: ", active_players[id]["name"])
+	board.add_username(active_players[id]["name"])
+	
 	anchor.add_child(board)
 	board.position = Vector2.ZERO
 	add_child(anchor)

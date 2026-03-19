@@ -36,7 +36,7 @@ func text_updated(new_text: String) -> void:
 	match handling_name:
 		"DAS": if int_val < 60:int_val = 60
 		"ARR": if int_val < 10:int_val = 10
-		"SD": if int_val < 50:int_val = 50
+		"SD": if int_val < 25:int_val = 25
 	
 		
 	# Update GameManager directly
@@ -56,4 +56,4 @@ func display_current_value() -> void:
 	match handling_name:
 		"DAS": placeholder_text = "> 60"
 		"ARR": placeholder_text = "> 10"
-		"SD": placeholder_text = "> 50"
+		"SD": placeholder_text = "> 25"

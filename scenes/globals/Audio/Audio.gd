@@ -8,6 +8,24 @@ enum SOUND_START_EFFECTS {NONE, FADE}
 var stop_tween: Tween
 var start_tween: Tween
 
+#[TEST]
+const testing_ra_ni = {
+	0: [
+		"ballpen",
+		"5"
+	],
+	1: [
+		"eraser",
+		"10"
+	]
+}
+#[index of item][name = 0, price = 1]
+const todee_ari = [
+	["ballpen", "5"],
+	["eraser", "10"]
+]
+#
+const ballpen_nako = [0][0]
 const sound := {
 	#sound name: [sound file, decibles]
 	"hard_drop" : [preload("uid://bly66k1bw7i1w"), 0],
@@ -32,6 +50,11 @@ const sound := {
 	
 	
 	"garbage_rise":[preload("uid://cu6jrki6jgrqe"),5],
+	
+	#[TEST] vine boom
+	#"garbage_in_small":[preload("uid://c430aoh5iay0d"), 0],
+	#"garbage_in_medium": [preload("uid://c430aoh5iay0d"), 0],
+	#"garbage_in_large": [preload("uid://c430aoh5iay0d"), 0],
 	
 	"garbage_in_small":[preload("uid://bi0kece2k80tv"), 0],
 	"garbage_in_medium": [preload("uid://dofl44x7833ta"), 0],

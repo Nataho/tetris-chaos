@@ -109,6 +109,8 @@ func _spawn_player(id: int) -> void:
 		
 	active_boards[id] = board
 	
+	board.add_username(active_players[id]["name"])
+	
 	# UNIFIED ANCHOR LOGIC
 	var anchor = Control.new()
 	anchor.size = Vector2.ZERO
@@ -496,39 +498,76 @@ func _apply_grid_logic(grid: GridContainer, team_name: String) -> void:
 	var cols: int = 1
 	var wrap_size: Vector2 = Vector2(96, 160)
 	var t_scale: float = 0.25
+	var show_q: bool = true
 
 	var is_my_team = (team_name == my_team)
 	
 	if is_my_team and not _is_spectator:
-		cols = 1
-		wrap_size = Vector2(96, 160)
+		# --- TEAMMATE LOGIC ---
+		cols = 5
 		t_scale = 0.25
-	else:
-		if visible_count == 1:
-			cols = 1
-			wrap_size = Vector2(384, 640) 
-			t_scale = 1.0
-		elif visible_count <= 2:
-			cols = 1
-			wrap_size = Vector2(240, 400) 
-			t_scale = 0.65
-		elif visible_count <= 4:
-			cols = 2
-			wrap_size = Vector2(150, 250) 
-			t_scale = 0.4
+		if visible_count <= 5:
+			wrap_size = Vector2(176, 160)
+			show_q = true
 		else:
-			cols = 3
 			wrap_size = Vector2(96, 160)
+			show_q = false
+	else:
+		# --- OPPONENT / SPECTATOR LOGIC ---
+		if visible_count == 1:
+			# 1 Opponent = Boss/1v1 Layout
+			cols = 1
+			wrap_size = Vector2(704, 640) # Full scale width with queue!
+			t_scale = 1.0
+			show_q = true
+		elif visible_count == 2:
+			# 2 Opponents = 1 Column (Stacked vertically)
+			cols = 1
+			wrap_size = Vector2(458, 416) # 704 * 0.65 = 458
+			t_scale = 0.65
+			show_q = true
+		elif visible_count <= 4:
+			# 3 to 4 Opponents = 2 Columns (2x2 style)
+			cols = 2
+			wrap_size = Vector2(282, 256) # 704 * 0.4 = 282
+			t_scale = 0.4
+			show_q = true
+		elif visible_count <= 18:
+			# 5 to 18 Opponents = 3 Columns
+			cols = 3
+			wrap_size = Vector2(176, 160) # Your perfectly tested 0.25 size
 			t_scale = 0.25
+			show_q = true
+		else:
+			# > 18 Opponents = 5 Columns (Queue Hidden)
+			cols = 5
+			wrap_size = Vector2(96, 160) # No queue width (384 * 0.25 = 96)
+			t_scale = 0.25
+			show_q = false
 
 	grid.columns = cols
 	
 	if team_name == "red": red_grid_scale = t_scale
 	else: blue_grid_scale = t_scale
 
+	# 1. Update Grid Cell Sizes
 	for wrapper in grid.get_children():
 		wrapper.custom_minimum_size = wrap_size
 		wrapper.pivot_offset = wrap_size / 2.0
+		
+	# 2. Dynamically Show/Hide the Garbage Queue on the actual Boards
+	for id in active_boards.keys():
+		if active_players.has(id) and active_players[id].get("team", "red") == team_name:
+			var board = active_boards[id]
+			
+			# Ensure your personal main board NEVER hides its queue
+			if id == _player_id:
+				if board.has_method("show_queue"): board.show_queue()
+			else:
+				if show_q:
+					if board.has_method("show_queue"): board.show_queue()
+				else:
+					if board.has_method("hide_queue"): board.hide_queue()
 
 func handle_player_disconnect(in_id: int) -> void:
 	push_warning("BattlePlus| Received disconnect request for ID: ", in_id)

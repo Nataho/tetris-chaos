@@ -16,7 +16,7 @@ font_size = 80
 font = ExtResource("7_nm0l4")
 font_size = 30
 
-[node name="MainMenu" type="Control" unique_id=463708987 node_paths=PackedStringArray("marathon", "zen", "multiplayer_button", "settings", "local_versus", "lan", "ranked", "classic", "controls", "handling")]
+[node name="MainMenu" type="Control" unique_id=463708987 node_paths=PackedStringArray("marathon", "zen", "multiplayer_button", "settings", "local_versus", "lan", "ranked", "classic", "controls", "handling", "graphics")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,6 +34,7 @@ ranked = NodePath("Multiplayer/empty_space/VBoxContainer/ranked")
 classic = NodePath("Multiplayer/empty_space/VBoxContainer/classic")
 controls = NodePath("settings/empty_space/controls/controls")
 handling = NodePath("settings/empty_space/controls/handling")
+graphics = NodePath("settings/empty_space/controls/graphics")
 
 [node name="background" type="ColorRect" parent="." unique_id=1817507213]
 layout_mode = 1

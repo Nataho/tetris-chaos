@@ -16,6 +16,7 @@ extends Control
 @export_group("Settings")
 @export var controls:Button
 @export var handling:Button
+@export var graphics:Button
 @export var change_server:Button
 
 enum tabs {MAIN, MULTIPLAYER, SETTINGS}
@@ -103,6 +104,9 @@ func connect_buttons():
 		)
 	handling.pressed.connect(func():
 		change_settings_display(settings_tabs.HANDLING)
+		)
+	graphics.pressed.connect(func():
+		change_settings_display(settings_tabs.GRAPHICS)
 		)
 	
 	local_versus.pressed.connect(func():

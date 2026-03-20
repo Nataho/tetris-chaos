@@ -9,7 +9,7 @@ const default_server_ip = "127.0.0.1"
 const default_port = 69671
 
 # --- UPDATED VERSIONING ---
-const GAME_VERSION = "v0.5.4" 
+const GAME_VERSION = "v0.5.5" 
 const VERSION_URL = "https://nataho.github.io/tetris-chaos/version.json"
 const dev_build = false
 
@@ -172,6 +172,26 @@ func change_resolution(width: int, height: int):
 	var window_size = DisplayServer.window_get_size()
 	@warning_ignore("integer_division")
 	DisplayServer.window_set_position(screen_size / 2 - window_size / 2)
+
+func cycle_window_mode() -> String:
+	var current_mode = DisplayServer.window_get_mode()
+	
+	# If we are currently in Windowed mode, switch to Fullscreen
+	if current_mode == DisplayServer.WINDOW_MODE_WINDOWED:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		return "fullscreen"
+		
+	# If we are in Fullscreen (or any other mode), switch back to Windowed
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		
+		# Re-center the window so it doesn't get stuck in the corner!
+		var screen_size = DisplayServer.screen_get_size()
+		var window_size = DisplayServer.window_get_size()
+		@warning_ignore("integer_division")
+		DisplayServer.window_set_position(screen_size / 2 - window_size / 2)
+		
+		return "windowed"
 
 func get_port_and_ip() -> String:
 	return server_info["ip"] + ":" + server_info["port"]

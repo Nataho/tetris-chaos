@@ -101,7 +101,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="settings" type="HBoxContainer" parent="." unique_id=1353048682]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -139,7 +138,6 @@ text = "HANDLING"
 [node name="graphics" type="Button" parent="settings/empty_space/controls" unique_id=474056489]
 layout_mode = 2
 theme = ExtResource("3_byqcc")
-disabled = true
 text = "GRAPHICS"
 
 [node name="customize" type="Button" parent="settings/empty_space/controls" unique_id=1741017591]
@@ -414,7 +412,45 @@ script = ExtResource("6_swlpu")
 handling_name = "SD"
 metadata/_custom_type_script = "uid://vqed8lsulgg7"
 
+[node name="graphics" type="VBoxContainer" parent="settings/right_side" unique_id=1950200732]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -528.0
+offset_top = -167.5
+offset_right = 528.0
+offset_bottom = 167.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 22
+alignment = 1
+
+[node name="window_mode" type="Label" parent="settings/right_side/graphics" unique_id=848066476]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Display Mode"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="button" type="Button" parent="settings/right_side/graphics/window_mode" unique_id=1741053050]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 546.0
+offset_top = -53.0
+offset_right = 1020.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("7_nm0l4")
+theme_override_font_sizes/font_size = 70
+text = "Windowed"
+
 [node name="Multiplayer" type="HBoxContainer" parent="." unique_id=524118982]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

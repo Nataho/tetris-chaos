@@ -19,7 +19,7 @@ extends Control
 @export var change_server:Button
 
 enum tabs {MAIN, MULTIPLAYER, SETTINGS}
-enum settings_tabs {CONTROLS,HANDLING}
+enum settings_tabs {CONTROLS,HANDLING,GRAPHICS}
 enum multiplayer_tabs {LOCAL_VERSUS, LAN, RANKED, CLASSIC}
 
 var current_tab = tabs.MAIN
@@ -42,7 +42,11 @@ var target_color:Color
 @onready var settings_nodes := [
 	$settings/right_side/controls,
 	$settings/right_side/handling,
+	$settings/right_side/graphics,
 ]
+
+@onready var window_mode_button: Button = $settings/right_side/graphics/window_mode/button
+
 
 func _ready() -> void:
 	#display_input_Key(%test,"soft_drop")
@@ -86,6 +90,12 @@ func connect_buttons():
 		)
 	settings.pressed.connect(func():
 		change_tab(tabs.SETTINGS)
+		)
+	
+	
+	window_mode_button.pressed.connect(func():
+		var text = GameManager.cycle_window_mode()
+		window_mode_button.text = text
 		)
 	
 	controls.pressed.connect(func():

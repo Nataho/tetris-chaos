@@ -9,7 +9,7 @@ const default_server_ip = "127.0.0.1"
 const default_port = 69671
 
 # --- UPDATED VERSIONING ---
-const GAME_VERSION = "v0.5.1" 
+const GAME_VERSION = "v0.5.2" 
 const VERSION_URL = "https://nataho.github.io/tetris-chaos/version.json"
 const dev_build = false
 

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="tetris-chaos"
-run/main_scene="uid://clret6q5qt138"
+run/main_scene="uid://bfny8duo28u4v"
 config/quit_on_go_back=false
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="uid://d1fomwp0vhkmc"

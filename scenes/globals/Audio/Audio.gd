@@ -8,23 +8,6 @@ enum SOUND_START_EFFECTS {NONE, FADE}
 var stop_tween: Tween
 var start_tween: Tween
 
-#[TEST]
-const testing_ra_ni = {
-	0: [
-		"ballpen",
-		"5"
-	],
-	1: [
-		"eraser",
-		"10"
-	]
-}
-#[index of item][name = 0, price = 1]
-const todee_ari = [
-	["ballpen", "5"],
-	["eraser", "10"]
-]
-#
 const ballpen_nako = [0][0]
 const sound := {
 	#sound name: [sound file, decibles]
@@ -45,6 +28,8 @@ const sound := {
 	"connect": [preload("uid://ckq7v80blwc4n"), 5],
 	"match_point": [preload("uid://bgnw6a7s535qx"),0],
 	"match_intro": [preload("uid://fd5m8skk1rqb"), 0],
+	
+	
 	
 	
 	
@@ -113,6 +98,8 @@ const music := {
 	"victory": [preload("uid://dwlf71kw2aaw1"), 0],
 	"lobby": [preload("uid://bamimtu3mj4k4"), 0],
 	
+	"title_screen": [preload("uid://bduw15ub4eiyo"), 0], # [FIXME: change me into another]
+	
 	"battle": [preload("uid://dan8cx51lryal"), 0],
 	"fb_battle": [preload("uid://gruf7jo6n77n"), 0],
 	"neo_battle": [preload("uid://pa7k62fmcl33"), 0],
@@ -175,6 +162,7 @@ func play_music(music_key: String,
 		
 	print("Now playing: ", music_key)
 	print("is playing?: ", music_player_node.playing)
+	
 # ==========================================
 # AUDIO EFFECTS LOGIC
 # ==========================================

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bduw15ub4eiyo"
+path="res://.godot/imported/Jayfoo - Starfruit [Doodley Soundtrack, Vol. 1] - Jayfoo.mp3-8e97e3f989099855ccf898af4ebb1aaf.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Jayfoo - Starfruit [Doodley Soundtrack, Vol. 1] - Jayfoo.mp3"
+dest_files=["res://.godot/imported/Jayfoo - Starfruit [Doodley Soundtrack, Vol. 1] - Jayfoo.mp3-8e97e3f989099855ccf898af4ebb1aaf.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

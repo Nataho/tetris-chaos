@@ -6,7 +6,7 @@ extends Control
 @onready var status: Label = $ProgressBar/status
 
 func _ready() -> void:
-	Audio.play_music("battle")
+	Audio.play_music("title_screen")
 	
 	# 1. Lock the start button so they can't skip the update check
 	start_button.disabled = true
@@ -14,6 +14,7 @@ func _ready() -> void:
 	# 2. Connect your UI to the GameManager's update signals
 	GameManager.update_status_msg.connect(_on_status_updated)
 	GameManager.update_finished.connect(_on_update_finished)
+	start_button.pressed.connect(_on_start_button_pressed)
 	
 	# 3. Tell the GameManager to start checking GitHub!
 	GameManager.check_for_updates()
@@ -37,4 +38,4 @@ func _on_update_finished() -> void:
 # Don't forget to connect this function to your start_button's "pressed" signal in the editor!
 func _on_start_button_pressed() -> void:
 	print("Entering the game...")
-	# get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	get_tree().change_scene_to_file("res://scenes/main/main_menu.tscn")

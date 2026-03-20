@@ -9,9 +9,12 @@ const default_server_ip = "127.0.0.1"
 const default_port = 69671
 
 # --- UPDATED VERSIONING ---
-const GAME_VERSION = "v0.5.3" 
+const GAME_VERSION = "v0.5.4" 
 const VERSION_URL = "https://nataho.github.io/tetris-chaos/version.json"
 const dev_build = false
+
+var active_version: String = GAME_VERSION
+var target_version: String = ""
 
 #ui state variables
 var is_prompt_open:bool = false
@@ -78,6 +81,9 @@ func _ready() -> void:
 		# If no save exists, apply defaults for the first time
 		_apply_controls_to_engine()
 	SAVE_GAME()
+	
+	# --- 1. LOAD THE EXISTING PATCH SO IT DOESN'T FORGET ---
+	_load_existing_patch()
 	
 	# --- START THE UPDATER ---
 	# We create the HTTP node purely in code so you don't have to mess with your Scene Tree!
@@ -174,6 +180,18 @@ func get_port_and_ip() -> String:
 # AUTO UPDATER ENGINE
 # ==========================================
 
+func _load_existing_patch() -> void:
+	# 1. If we have a downloaded patch, inject it into the game on boot!
+	if FileAccess.file_exists("user://hotfix.pck"):
+		ProjectSettings.load_resource_pack("user://hotfix.pck")
+		
+	# 2. Read what version that patch was so we don't redownload it
+	if FileAccess.file_exists("user://patch_version.txt"):
+		var file = FileAccess.open("user://patch_version.txt", FileAccess.READ)
+		active_version = file.get_as_text().strip_edges()
+	else:
+		active_version = GAME_VERSION
+
 func check_for_updates() -> void:
 	update_status_msg.emit("Checking for updates...")
 	http_request.request_completed.connect(_on_version_check_completed)
@@ -190,7 +208,9 @@ func _on_version_check_completed(_result, response_code, _headers, body) -> void
 			
 		var latest_version = json["latest_version"]
 		
-		if is_version_older(GAME_VERSION, latest_version):
+		# --- 2. COMPARE AGAINST active_version INSTEAD OF GAME_VERSION ---
+		if is_version_older(active_version, latest_version):
+			target_version = latest_version
 			update_status_msg.emit("Downloading patch " + latest_version + "...")
 			download_patch(json["patch_url"])
 		else:
@@ -219,6 +239,11 @@ func _on_patch_downloaded(_result, response_code, _headers, _body) -> void:
 	if response_code == 200 or response_code == 302:
 		var success = ProjectSettings.load_resource_pack("user://hotfix.pck")
 		if success:
+			# --- 3. SAVE THE TEXT FILE SO IT REMEMBERS TOMORROW ---
+			var file = FileAccess.open("user://patch_version.txt", FileAccess.WRITE)
+			file.store_string(target_version)
+			active_version = target_version
+			
 			_finish_update("Update Applied Successfully!")
 		else:
 			_finish_update("Failed to apply patch.")

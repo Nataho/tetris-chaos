@@ -46,6 +46,8 @@ var locked_in_time:int = 3
 var current_p1_id: int = -1
 var current_p2_id: int = -1
 
+var versus_first_to = 5
+
 # versus_plus variables
 var versus_plus_team = versus_plus_teams["red"]
 
@@ -451,7 +453,7 @@ func _on_master_timer_timeout() -> void:
 				
 		match_settings["red_team"] = red_team_ids
 		match_settings["blue_team"] = blue_team_ids
-		match_settings["first_to"] = 3
+		match_settings["first_to"] = 5
 		
 		match_title = "TEAM RED (%d) VS TEAM BLUE (%d)" % [red_team_ids.size(), blue_team_ids.size()]
 

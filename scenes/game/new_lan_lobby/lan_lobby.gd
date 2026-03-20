@@ -437,7 +437,7 @@ func _on_master_timer_timeout() -> void:
 		
 		match_settings["p1_id"] = p1.get("player_id", -1)
 		match_settings["p2_id"] = p2.get("player_id", -1)
-		match_settings["first_to"] = 5 # You can change this later if you want a UI toggle
+		match_settings["first_to"] = versus_first_to #[NOTE] add new ui for changing this
 		
 		match_title = "%s VS %s" % [p1.get("name", "P1"), p2.get("name", "P2")]
 		
@@ -453,7 +453,7 @@ func _on_master_timer_timeout() -> void:
 				
 		match_settings["red_team"] = red_team_ids
 		match_settings["blue_team"] = blue_team_ids
-		match_settings["first_to"] = 5
+		match_settings["first_to"] = versus_first_to #[NOTE] add new ui for changing this
 		
 		match_title = "TEAM RED (%d) VS TEAM BLUE (%d)" % [red_team_ids.size(), blue_team_ids.size()]
 

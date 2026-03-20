@@ -65,7 +65,7 @@ func _ready() -> void:
 	setup_version_label()
 	
 func setup_version_label():
-	var version = str(GameManager.game_version)
+	var version = str(GameManager.GAME_VERSION)
 	var dev_build = "dev " if GameManager.dev_build else ""
 	
 	$Label.text = "version: %s%s" % [dev_build, version]

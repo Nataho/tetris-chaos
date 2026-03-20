@@ -42,10 +42,6 @@ window/size/viewport_height=1080
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 
-[editor]
-
-run/main_run_args="--mute"
-
 [input]
 
 move_left={

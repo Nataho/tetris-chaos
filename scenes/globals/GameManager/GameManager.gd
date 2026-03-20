@@ -1,8 +1,16 @@
 extends Node
+
+# --- NEW SIGNALS FOR YOUR UI ---
+signal update_status_msg(message: String)
+signal update_finished()
+
 #const default_server_ip = "10.147.17.203"
 const default_server_ip = "127.0.0.1"
 const default_port = 69671
-const game_version = "0.0.51"
+
+# --- UPDATED VERSIONING ---
+const GAME_VERSION = "v0.5.1" 
+const VERSION_URL = "https://nataho.github.io/tetris-chaos/version.json"
 const dev_build = false
 
 #ui state variables
@@ -40,16 +48,12 @@ const default_handling = {
 	"ARR": 33,
 }
 
-var achievements = {
-	
-}
+var achievements = {}
 var player_data = {
 	"uid": "",
 	"name": "guest",
 	"high_score": 0,
 	"marathon_level": 1,
-	#"game_version": game_version,
-	#"dev_build": dev_build
 }
 var controls = default_keyboard_controls.duplicate()
 var handling = default_handling.duplicate()
@@ -64,6 +68,9 @@ var _save_data = {
 	"settings": settings
 }
 
+# --- NEW HTTP NODE ---
+var http_request: HTTPRequest
+
 func _ready() -> void:
 	# Load the game immediately when the manager starts
 	CLA()
@@ -71,18 +78,20 @@ func _ready() -> void:
 		# If no save exists, apply defaults for the first time
 		_apply_controls_to_engine()
 	SAVE_GAME()
+	
+	# --- START THE UPDATER ---
+	# We create the HTTP node purely in code so you don't have to mess with your Scene Tree!
+	http_request = HTTPRequest.new()
+	add_child(http_request)
+	#check_for_updates()
 
 func CLA():
 	var args = OS.get_cmdline_args()
 	if "--mute" in args:
 		print("muting")
 		AudioServer.set_bus_mute(0,true)
-	#if "-nosave"
-	#if "--force_mobile" in args:
-		#force_mobile = true
 
 func _apply_controls_to_engine():
-	# Define a map of your shorthand keys to actual InputMap action names
 	var action_map = {
 		"ML": "move_left",
 		"MR": "move_right",
@@ -97,14 +106,12 @@ func _apply_controls_to_engine():
 		var action_name = action_map[shorthand]
 		var key_code = int(controls[shorthand])
 		
-		# Clear existing events and add the new one
 		InputMap.action_erase_events(action_name)
 		var new_event = InputEventKey.new()
 		new_event.physical_keycode = key_code
 		InputMap.action_add_event(action_name, new_event)
 
 func update_save_data():
-	# Explicitly re-map these to ensure _save_data has the LATEST values
 	_save_data = {
 		"achievements": achievements,
 		"player_data": player_data,
@@ -115,15 +122,13 @@ func update_save_data():
 
 func _save() -> Dictionary:
 	update_save_data()
-	var save = _save_data
-	return save
+	return _save_data
 
 func SAVE_GAME():
-	var save_file = FileAccess.open("user://Save.save",FileAccess.WRITE) #get save file and write
-	var json_string = JSON.stringify(_save(),"\t",false,true) #convert to json string
-	save_file.store_line(json_string) #write the info to file as json
+	var save_file = FileAccess.open("user://Save.save",FileAccess.WRITE)
+	var json_string = JSON.stringify(_save(),"\t",false,true)
+	save_file.store_line(json_string)
 	print("sucessfully saved game")
-	#print(json_string)
 
 func LOAD_GAME() -> bool:
 	if not FileAccess.file_exists("user://Save.save"):
@@ -136,13 +141,10 @@ func LOAD_GAME() -> bool:
 	if data == null:
 		return false
 
-	# Use .merge to update the existing dictionaries instead of replacing them
-	# This keeps the reference inside _save_data intact!
 	achievements.merge(data.get("achievements", {}), true)
 	player_data.merge(data.get("player_data", {}), true)
 	settings.merge(data.get("settings", {}), true)
 
-	# Handle Controls specifically because of the Integer cast
 	var loaded_controls = data.get("controls", {})
 	for key in loaded_controls:
 		controls[key] = int(loaded_controls[key])
@@ -152,21 +154,14 @@ func LOAD_GAME() -> bool:
 		handling[key] = int(loaded_handling[key])
 
 	_apply_controls_to_engine()
-	
-	# IMPORTANT: Refresh the save_data container with the loaded values
 	update_save_data()
-	
-	print("Loaded and synced: ", controls)
 	return true
 
 func _exit_tree() -> void:
 	SAVE_GAME()
 
 func change_resolution(width: int, height: int):
-	# Set the window size
 	DisplayServer.window_set_size(Vector2i(width, height))
-	
-	# Optional: Center the window on the screen after resizing
 	var screen_size = DisplayServer.screen_get_size()
 	var window_size = DisplayServer.window_get_size()
 	@warning_ignore("integer_division")
@@ -174,3 +169,63 @@ func change_resolution(width: int, height: int):
 
 func get_port_and_ip() -> String:
 	return server_info["ip"] + ":" + server_info["port"]
+
+# ==========================================
+# AUTO UPDATER ENGINE
+# ==========================================
+
+func check_for_updates() -> void:
+	update_status_msg.emit("Checking for updates...")
+	http_request.request_completed.connect(_on_version_check_completed)
+	http_request.request(VERSION_URL)
+
+func _on_version_check_completed(_result, response_code, _headers, body) -> void:
+	http_request.request_completed.disconnect(_on_version_check_completed)
+	
+	if response_code == 200:
+		var json = JSON.parse_string(body.get_string_from_utf8())
+		if json == null or not json.has("latest_version"):
+			_finish_update("Up to date!")
+			return
+			
+		var latest_version = json["latest_version"]
+		
+		if is_version_older(GAME_VERSION, latest_version):
+			update_status_msg.emit("Downloading patch " + latest_version + "...")
+			download_patch(json["patch_url"])
+		else:
+			_finish_update("Game is up to date!")
+	else:
+		_finish_update("Playing Offline")
+
+func is_version_older(current: String, latest: String) -> bool:
+	var curr_parts = current.replace("v", "").split(".")
+	var late_parts = latest.replace("v", "").split(".")
+	
+	if curr_parts.size() < 3 or late_parts.size() < 3: return false
+	
+	for i in range(3):
+		if int(curr_parts[i]) < int(late_parts[i]): return true
+		elif int(curr_parts[i]) > int(late_parts[i]): return false
+	return false
+
+func download_patch(patch_url: String) -> void:
+	http_request.download_file = "user://hotfix.pck"
+	http_request.request_completed.connect(_on_patch_downloaded)
+	http_request.request(patch_url)
+
+func _on_patch_downloaded(_result, response_code, _headers, _body) -> void:
+	http_request.request_completed.disconnect(_on_patch_downloaded)
+	if response_code == 200 or response_code == 302:
+		var success = ProjectSettings.load_resource_pack("user://hotfix.pck")
+		if success:
+			_finish_update("Update Applied Successfully!")
+		else:
+			_finish_update("Failed to apply patch.")
+	else:
+		_finish_update("Download failed.")
+
+func _finish_update(final_message: String) -> void:
+	print(final_message)
+	update_status_msg.emit(final_message)
+	update_finished.emit()

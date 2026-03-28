@@ -95,7 +95,7 @@ func connect_buttons():
 	
 	
 	window_mode_button.pressed.connect(func():
-		var text = GameManager.cycle_window_mode()
+		var text = Tools.cycle_window_mode()
 		window_mode_button.text = text
 		)
 	

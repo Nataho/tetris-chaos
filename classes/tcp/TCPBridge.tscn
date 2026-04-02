@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://6eoa2o8g6e0a"]
+
+[ext_resource type="Script" uid="uid://bx6do3fsfc40x" path="res://classes/tcp/TCPBridge.gd" id="1_vx674"]
+
+[node name="TCPBridge" type="Node" unique_id=1692674403]
+script = ExtResource("1_vx674")

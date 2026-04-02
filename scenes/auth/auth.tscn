@@ -1,0 +1,258 @@
+[gd_scene format=3 uid="uid://crc6xyroorqna"]
+
+[ext_resource type="Script" uid="uid://b247b0g0t7vfb" path="res://scenes/auth/auth.gd" id="1_7gy5t"]
+[ext_resource type="FontFile" uid="uid://b4vif8qlndc3e" path="res://assets/fonts/BAHNSCHRIFT.TTF" id="2_p2b5a"]
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="3_k8ufd"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1jv7q"]
+font = ExtResource("3_k8ufd")
+font_size = 80
+
+[sub_resource type="LabelSettings" id="LabelSettings_p2b5a"]
+font = ExtResource("2_p2b5a")
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_k8ufd"]
+font = ExtResource("3_k8ufd")
+font_size = 24
+font_color = Color(1, 0, 0.029831886, 1)
+outline_size = 8
+outline_color = Color(0.1953125, 0.1953125, 0.1953125, 1)
+
+[node name="auth" type="Control" unique_id=147662643]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7gy5t")
+
+[node name="login_panel" type="Panel" parent="." unique_id=1909021698]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -720.0
+offset_top = -399.0
+offset_right = 720.0
+offset_bottom = 399.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="title" type="Label" parent="login_panel" unique_id=1107110985]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -21.0
+offset_top = 36.0
+offset_right = 21.0
+offset_bottom = 59.0
+grow_horizontal = 2
+text = "LOGIN"
+label_settings = SubResource("LabelSettings_1jv7q")
+
+[node name="vbox" type="VBoxContainer" parent="login_panel" unique_id=859646741]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -314.0
+offset_top = -89.0
+offset_right = 314.0
+offset_bottom = 89.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 60
+
+[node name="username" type="LineEdit" parent="login_panel/vbox" unique_id=1608875130]
+custom_minimum_size = Vector2(0, 87)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_p2b5a")
+theme_override_font_sizes/font_size = 40
+placeholder_text = "GUEST"
+alignment = 1
+max_length = 20
+
+[node name="Label" type="Label" parent="login_panel/vbox/username" unique_id=2021097307]
+layout_mode = 1
+offset_top = -45.0
+offset_right = 210.0
+offset_bottom = -4.0
+text = "USERNAME"
+label_settings = SubResource("LabelSettings_p2b5a")
+vertical_alignment = 1
+
+[node name="password" type="LineEdit" parent="login_panel/vbox" unique_id=1216134849]
+custom_minimum_size = Vector2(0, 87)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_p2b5a")
+theme_override_font_sizes/font_size = 40
+placeholder_text = "A_STRONG_PASSWORD"
+alignment = 1
+secret = true
+
+[node name="Label" type="Label" parent="login_panel/vbox/password" unique_id=535810375]
+layout_mode = 0
+offset_top = -45.0
+offset_right = 209.0
+offset_bottom = -4.0
+text = "PASSWORD"
+label_settings = SubResource("LabelSettings_p2b5a")
+vertical_alignment = 1
+
+[node name="confirm" type="Button" parent="login_panel" unique_id=974647025]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -209.0
+offset_top = 178.0
+offset_right = 209.0
+offset_bottom = 235.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("3_k8ufd")
+theme_override_font_sizes/font_size = 40
+text = "Login"
+
+[node name="message" type="Label" parent="login_panel" unique_id=750121484]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -298.0
+offset_top = 127.0
+offset_right = 299.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "server message"
+label_settings = SubResource("LabelSettings_k8ufd")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="signup_panel" type="Panel" parent="." unique_id=1904227905]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -720.0
+offset_top = -399.0
+offset_right = 720.0
+offset_bottom = 399.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="title" type="Label" parent="signup_panel" unique_id=1819364354]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -131.0
+offset_top = 36.0
+offset_right = 131.0
+offset_bottom = 133.0
+grow_horizontal = 2
+text = "SIGNUP"
+label_settings = SubResource("LabelSettings_1jv7q")
+
+[node name="vbox" type="VBoxContainer" parent="signup_panel" unique_id=1079318781]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -314.0
+offset_top = -89.0
+offset_right = 314.0
+offset_bottom = 89.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 60
+
+[node name="username" type="LineEdit" parent="signup_panel/vbox" unique_id=1390098445]
+custom_minimum_size = Vector2(0, 87)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_p2b5a")
+theme_override_font_sizes/font_size = 40
+placeholder_text = "GUEST"
+alignment = 1
+max_length = 20
+
+[node name="Label" type="Label" parent="signup_panel/vbox/username" unique_id=1421810637]
+layout_mode = 1
+offset_top = -45.0
+offset_right = 210.0
+offset_bottom = -4.0
+text = "USERNAME"
+label_settings = SubResource("LabelSettings_p2b5a")
+vertical_alignment = 1
+
+[node name="password" type="LineEdit" parent="signup_panel/vbox" unique_id=1571527603]
+custom_minimum_size = Vector2(0, 87)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_p2b5a")
+theme_override_font_sizes/font_size = 40
+placeholder_text = "A_STRONG_PASSWORD"
+alignment = 1
+secret = true
+
+[node name="Label" type="Label" parent="signup_panel/vbox/password" unique_id=918767208]
+layout_mode = 0
+offset_top = -45.0
+offset_right = 209.0
+offset_bottom = -4.0
+text = "PASSWORD"
+label_settings = SubResource("LabelSettings_p2b5a")
+vertical_alignment = 1
+
+[node name="confirm" type="Button" parent="signup_panel" unique_id=1469149645]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -209.0
+offset_top = 178.0
+offset_right = 209.0
+offset_bottom = 235.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("3_k8ufd")
+theme_override_font_sizes/font_size = 40
+text = "Login"
+
+[node name="message" type="Label" parent="signup_panel" unique_id=300522897]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -298.0
+offset_top = 127.0
+offset_right = 299.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "server message"
+label_settings = SubResource("LabelSettings_k8ufd")
+horizontal_alignment = 2
+vertical_alignment = 1

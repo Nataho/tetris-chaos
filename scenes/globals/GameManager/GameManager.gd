@@ -3,13 +3,15 @@ extends Node
 # --- NEW SIGNALS FOR YOUR UI ---
 signal update_status_msg(message: String)
 signal update_finished()
+signal update_progress(current_bytes: int, total_bytes: int)
 
-#const default_server_ip = "10.147.17.203"
+#const default_server_ip = "10.147.17.203" #zerotierIP
+#const default_server_ip = "hashinata.tadpolecliff.ts.net"
 const default_server_ip = "127.0.0.1"
-const default_port = 69671
+const default_port = 10100
 
 # --- UPDATED VERSIONING ---
-const GAME_VERSION = "v0.5.7" 
+const GAME_VERSION = "v0.5.8" 
 const VERSION_URL = "https://nataho.github.io/tetris-chaos/version.json"
 const dev_build = false
 
@@ -73,6 +75,10 @@ var _save_data = {
 
 # --- NEW HTTP NODE ---
 var http_request: HTTPRequest
+var is_downloading_patch: bool = false
+
+# --- TCP for server ---
+var server_tcp:TCPBridge
 
 func _ready() -> void:
 	# Load the game immediately when the manager starts
@@ -89,7 +95,20 @@ func _ready() -> void:
 	# We create the HTTP node purely in code so you don't have to mess with your Scene Tree!
 	http_request = HTTPRequest.new()
 	add_child(http_request)
-	#check_for_updates()
+	
+	http_request = HTTPRequest.new()
+	add_child(http_request)
+	
+	server_tcp = TCPBridge.create() #try to connect to server
+	add_child(server_tcp)
+	#print("adsf")
+
+func _process(_delta: float) -> void:
+	# <-- NEW LOGIC: Constantly check download size while downloading
+	if is_downloading_patch and http_request.get_http_client_status() == HTTPClient.STATUS_BODY:
+		var current = http_request.get_downloaded_bytes()
+		var total = http_request.get_body_size()
+		update_progress.emit(current, total)
 
 func CLA():
 	var args = OS.get_cmdline_args()
@@ -231,10 +250,12 @@ func is_version_older(current: String, latest: String) -> bool:
 
 func download_patch(patch_url: String) -> void:
 	http_request.download_file = "user://hotfix.pck"
+	is_downloading_patch = true
 	http_request.request_completed.connect(_on_patch_downloaded)
 	http_request.request(patch_url)
 
 func _on_patch_downloaded(_result, response_code, _headers, _body) -> void:
+	is_downloading_patch = false
 	http_request.request_completed.disconnect(_on_patch_downloaded)
 	if response_code == 200 or response_code == 302:
 		var success = ProjectSettings.load_resource_pack("user://hotfix.pck")

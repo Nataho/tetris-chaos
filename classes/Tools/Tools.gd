@@ -20,3 +20,6 @@ static func cycle_window_mode() -> String:
 		DisplayServer.window_set_position(screen_size / 2 - window_size / 2)
 		
 		return "windowed"
+
+static func has_space(text:String) -> bool:
+	return true if " " in text else false

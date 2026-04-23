@@ -30,7 +30,7 @@ func text_updated(new_text: String) -> void:
 		int_val = int(new_text)
 	
 	if int_val == 0:
-		int_val = GameManager.default_handling[handling_name]
+		int_val = LoadNSave.default_handling[handling_name]
 		print("int val: ", int_val)
 		
 	match handling_name:

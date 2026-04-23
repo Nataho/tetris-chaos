@@ -23,3 +23,9 @@ static func cycle_window_mode() -> String:
 
 static func has_space(text:String) -> bool:
 	return true if " " in text else false
+
+static func CLA(): ## Specifically used by game manager when game first starts
+	var args = OS.get_cmdline_args()
+	if "--mute" in args:
+		print("muting")
+		AudioServer.set_bus_mute(0,true)

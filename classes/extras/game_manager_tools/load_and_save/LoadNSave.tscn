@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bex13507csq33"]
+
+[ext_resource type="Script" uid="uid://dpv7jxqv45ks7" path="res://classes/extras/game_manager_tools/load_and_save/LoadNSave.gd" id="1_kejvd"]
+
+[node name="LoadNSave" type="Node" unique_id=2037536891]
+script = ExtResource("1_kejvd")

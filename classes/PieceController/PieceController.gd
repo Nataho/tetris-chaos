@@ -97,7 +97,7 @@ func _physics_process(delta: float) -> void:
 		# Reset modulate to normal just in case the piece slid off a ledge
 		pieces_controller.modulate = Color.WHITE 
 		
-		if fall_time <= 0:
+		if fall_time <= 0: #move piece down
 			if can_move_piece(Vector2i.DOWN):
 				move_piece(Vector2i.DOWN)
 			reset_fall_time() # Restarts the timer based on the level formula

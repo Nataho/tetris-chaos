@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://nawrcya6mqht"]
+
+[ext_resource type="Script" uid="uid://c7l1w8y6ypm3u" path="res://classes/extras/game_manager_tools/patch_manager/PatchManager.gd" id="1_0gfrs"]
+
+[node name="PatchManager" type="Node" unique_id=2108744774]
+script = ExtResource("1_0gfrs")

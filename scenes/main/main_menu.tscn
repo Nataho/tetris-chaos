@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://clret6q5qt138"]
 
 [ext_resource type="Script" uid="uid://cbsdyountkqrd" path="res://scenes/main/main_menu.gd" id="1_sd5it"]
-[ext_resource type="AudioStream" uid="uid://cxkfkkchh6ne3" path="res://assets/audio/music/Tetris Chaos - Main Menu ost.mp3" id="2_5vafy"]
 [ext_resource type="Theme" uid="uid://dup756tvm3sht" path="res://assets/themes/main.tres" id="3_byqcc"]
 [ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="4_hiibk"]
 [ext_resource type="Script" uid="uid://dvsmkslvd8o1g" path="res://classes/extras/RebindButton/RebindButton.gd" id="4_w6ykx"]
@@ -44,9 +43,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.627451, 0, 0.9411765, 1)
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1254638202]
-stream = ExtResource("2_5vafy")
 
 [node name="main" type="HBoxContainer" parent="." unique_id=1709053038]
 visible = false

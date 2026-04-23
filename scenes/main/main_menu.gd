@@ -62,7 +62,7 @@ func _ready() -> void:
 	
 	$main.show()
 	
-	Audio.play_music("main_menu")
+	Audio.play_music("title_screen")
 	#Audio.music_player_node.stream = Audio.music["main_menu"][0]
 	#Audio.music_player_node.play()
 	change_background(Color("a000f0"))

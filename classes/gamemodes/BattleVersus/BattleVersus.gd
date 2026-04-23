@@ -228,7 +228,7 @@ func _perform_match_over_sequence(winner_id: int) -> void:
 	scoreboard.text = "[center][wave amp=50.0 freq=5.0 connected=1]%s WINS![/wave][/center]" % winner_name.to_upper()
 	
 	Audio.play_music("victory", Audio.SOUND_END_EFFECTS.VINYL)
-	await Audio.music_player_node.finished
+	await Audio.active_node.music_player_node.finished
 	game_concluded.emit()
 
 
@@ -249,17 +249,16 @@ func play_intro() -> void:
 	update_scoreboard()
 	
 	anim.play("intro")
-	if has_node("/root/Audio"):
-		Audio.trigger_fade_out(2)
-		Audio.play_sound("match_intro", 0.56)
+	
+	Audio.active_node._trigger_fade_out(2)
+	Audio.play_sound("match_intro", 0.56)
 		
 	await anim.animation_finished
 	
 	p1_name.hide()
 	p2_name.hide()
 	
-	if has_node("/root/Audio"):
-		Audio.play_music("epic_battle")
+	Audio.play_music("epic_battle")
 
 func update_scoreboard(discrete: bool = false) -> void:
 	# Read from our independent match scores!

@@ -249,7 +249,7 @@ func _handle_match_end(p1_won: bool) -> void:
 	_play_victory_sequence()
 	Audio.play_music("victory", Audio.SOUND_END_EFFECTS.VINYL)
 	
-	await Audio.music_player_node.finished
+	await Audio.active_node.music_player_node.finished
 	Audio.play_music("main_menu")
 	
 	if game_finished:

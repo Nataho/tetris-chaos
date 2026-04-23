@@ -12,10 +12,13 @@ var is_connected_to_server := false
 var server_ip := "100.120.66.37"
 var server_port := 10100
 
-static func create() -> TCPBridge:
-	var inst = _FILE.instantiate()
-	active_bridge = inst
-	return inst
+#static func create() -> TCPBridge:
+	#var inst = _FILE.instantiate()
+	#active_bridge = inst
+	#return inst
+
+func _enter_tree() -> void:
+	active_bridge = self
 
 func _exit_tree() -> void:
 	if tcp:

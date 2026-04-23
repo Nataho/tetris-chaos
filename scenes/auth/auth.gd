@@ -104,6 +104,5 @@ func show_message(node: Label, text: String, color: Color) -> void:
 		
 	node.text = text
 	
-	# OVERRIDE the theme color, do not modify LabelSettings!
 	node.label_settings.font_color = color
 	node.show()

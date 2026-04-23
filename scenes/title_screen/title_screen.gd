@@ -6,9 +6,12 @@ extends Control
 @onready var status: Label = $ProgressBar/status
 
 var target_progress: float = 0.0
+var patch_manager: PatchManager
 
 func _ready() -> void:
 	Audio.play_music("title_screen")
+	patch_manager = PatchManager.new()
+	add_child(patch_manager)
 	
 	# 1. Lock the start button so they can't skip the update check
 	start_button.disabled = true
@@ -18,13 +21,13 @@ func _ready() -> void:
 	target_progress = 0.0
 	
 	# 2. Connect your UI to the GameManager's update signals
-	GameManager.update_status_msg.connect(_on_status_updated)
-	GameManager.update_progress.connect(_on_progress_updated) # <-- CONNECT NEW SIGNAL
-	GameManager.update_finished.connect(_on_update_finished)
+	patch_manager.update_status_msg.connect(_on_status_updated)
+	patch_manager.update_progress.connect(_on_progress_updated) # <-- CONNECT NEW SIGNAL
+	patch_manager.update_finished.connect(_on_update_finished)
 	start_button.pressed.connect(_on_start_button_pressed)
 	
 	# 3. Tell the GameManager to start checking GitHub!
-	GameManager.check_for_updates()
+	patch_manager.check_for_updates(GameManager.active_version)
 
 func _process(delta: float) -> void:
 	# Smoothly interpolate the visual progress bar to match the target percentage.
@@ -61,9 +64,9 @@ func _on_update_finished() -> void:
 	target_progress = 100.0 
 	
 	# Clean up the signals
-	GameManager.update_status_msg.disconnect(_on_status_updated)
-	GameManager.update_progress.disconnect(_on_progress_updated)
-	GameManager.update_finished.disconnect(_on_update_finished)
+	patch_manager.update_status_msg.disconnect(_on_status_updated)
+	patch_manager.update_progress.disconnect(_on_progress_updated)
+	patch_manager.update_finished.disconnect(_on_update_finished)
 
 # Don't forget to connect this function to your start_button's "pressed" signal in the editor!
 func _on_start_button_pressed() -> void:

@@ -640,7 +640,7 @@ func initiate_start_sequence(p1_name: String, p2_name: String, seed: int, p1_id:
 	
 	initialize_boards(seed, p1_id, p2_id)
 	
-	Audio.trigger_fade_out(2)
+	Audio.active_node.trigger_fade_out(2)
 	Audio.play_sound("match_intro", 0.56)
 	
 	# ---> ADD THIS LINE: Wait for the intro animation to finish! <---
@@ -786,7 +786,7 @@ func _perform_match_over_sequence(p1_won: bool) -> void:
 	
 	# 2. Play the victory audio (ported from your local script)
 	Audio.play_music("victory", Audio.SOUND_END_EFFECTS.VINYL)
-	await Audio.music_player_node.finished
+	await Audio.active_node.music_player_node.finished
 	
 	# 3. Wait for the music/sound to finish, or just wait a fixed amount of time
 	# If you want to use the audio signal: await Audio.music_player_node.finished

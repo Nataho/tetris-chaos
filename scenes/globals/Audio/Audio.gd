@@ -1,16 +1,21 @@
+class_name Audio
 extends Node
+
+# The acting autoload instance
+static var active_node: Audio
 
 enum SOUND_END_EFFECTS {NONE, FADE, VINYL}
 enum SOUND_START_EFFECTS {NONE, FADE}
 
-@export var music_player_node: AudioStreamPlayer
+var music_player_node: AudioStreamPlayer
 
 var stop_tween: Tween
 var start_tween: Tween
 
 const ballpen_nako = [0][0]
+
 const sound := {
-	#sound name: [sound file, decibles]
+	#sound name: [sound file, decibels]
 	"hard_drop" : [preload("uid://bly66k1bw7i1w"), 0],
 	"hold": [preload("uid://doi6o733o8ydj"), 10],
 	"rotate": [preload("uid://civksgwgabla4"), -5],
@@ -29,17 +34,7 @@ const sound := {
 	"match_point": [preload("uid://bgnw6a7s535qx"),0],
 	"match_intro": [preload("uid://fd5m8skk1rqb"), 0],
 	
-	
-	
-	
-	
-	
 	"garbage_rise":[preload("uid://cu6jrki6jgrqe"),5],
-	
-	#[TEST] vine boom
-	#"garbage_in_small":[preload("uid://c430aoh5iay0d"), 0],
-	#"garbage_in_medium": [preload("uid://c430aoh5iay0d"), 0],
-	#"garbage_in_large": [preload("uid://c430aoh5iay0d"), 0],
 	
 	"garbage_in_small":[preload("uid://bi0kece2k80tv"), 0],
 	"garbage_in_medium": [preload("uid://dofl44x7833ta"), 0],
@@ -87,7 +82,6 @@ const sound := {
 	"power_combo14": [preload("uid://dq768naost2fu"), 5],
 	"power_combo15": [preload("uid://cur5gty33icuo"), 5],
 	"power_combo16": [preload("uid://cg4wfprouu7my"), 5],
-	
 }
 
 const music := {
@@ -98,7 +92,7 @@ const music := {
 	"victory": [preload("uid://dwlf71kw2aaw1"), 0],
 	"lobby": [preload("uid://bamimtu3mj4k4"), 0],
 	
-	"title_screen": [preload("uid://bduw15ub4eiyo"), 0], # [FIXME: change me into another]
+	"title_screen": [preload("uid://c1hsx4s22yct8"), 0], 
 	
 	"battle": [preload("uid://dan8cx51lryal"), 0],
 	"fb_battle": [preload("uid://gruf7jo6n77n"), 0],
@@ -108,10 +102,34 @@ const music := {
 	"epic_battle": [preload("uid://33hhwbkttud0"), 0]
 }
 
-func play_sound(sound_key:String, offset:float = 0.0):
+func _enter_tree() -> void:
+	# Set the static reference to THIS node when it enters the scene
+	active_node = self
+	music_player_node = AudioStreamPlayer.new()
+	add_child(music_player_node)
+
+# ==========================================
+# STATIC WRAPPERS (Call these from anywhere!)
+# ==========================================
+
+static func play_sound(sound_key: String, offset: float = 0.0) -> void:
+	if is_instance_valid(active_node):
+		active_node._play_sound(sound_key, offset)
+
+static func play_music(music_key: String, end_effect: SOUND_END_EFFECTS = SOUND_END_EFFECTS.NONE, start_effect: SOUND_START_EFFECTS = SOUND_START_EFFECTS.NONE) -> void:
+	if is_instance_valid(active_node):
+		active_node._play_music(music_key, end_effect, start_effect)
+
+
+# ==========================================
+# INSTANCE METHODS (The actual logic)
+# ==========================================
+
+func _play_sound(sound_key: String, offset: float) -> void:
 	if sound_key not in sound.keys(): 
-		push_error("sound not found:", sound_key)
+		push_error("sound not found: ", sound_key)
 		return
+		
 	var sfx := AudioStreamPlayer.new()
 	sfx.stream = sound[sound_key][0]
 	sfx.volume_db = sound[sound_key][1]
@@ -122,10 +140,7 @@ func play_sound(sound_key:String, offset:float = 0.0):
 	await sfx.finished
 	sfx.queue_free()
 
-func play_music(music_key: String,
-	end_effect: SOUND_END_EFFECTS = SOUND_END_EFFECTS.NONE, 
-	start_effect: SOUND_START_EFFECTS = SOUND_START_EFFECTS.NONE) -> void:
-	
+func _play_music(music_key: String, end_effect: SOUND_END_EFFECTS, start_effect: SOUND_START_EFFECTS) -> void:
 	if not music.has(music_key):
 		push_error("The sound key is not found in the dictionary: ", music_key)
 		return
@@ -140,11 +155,10 @@ func play_music(music_key: String,
 	# 1. Handle the END effect
 	if music_player_node.playing:
 		if end_effect == SOUND_END_EFFECTS.VINYL:
-			await trigger_vinyl_stop(2.0)
+			await _trigger_vinyl_stop(2.0)
 		elif end_effect == SOUND_END_EFFECTS.FADE:
-			await trigger_fade_out(1.5)
+			await _trigger_fade_out(1.5)
 		else:
-			# For NONE, we stop instantly and do NOT await
 			music_player_node.stop()
 				
 	# 2. Setup the NEW track
@@ -155,19 +169,15 @@ func play_music(music_key: String,
 	if start_effect == SOUND_START_EFFECTS.FADE:
 		music_player_node.volume_db = -80.0 
 		music_player_node.play()
-		trigger_fade_in(target_volume, 1.5)
+		_trigger_fade_in(target_volume, 1.5)
 	else:
 		music_player_node.volume_db = target_volume
 		music_player_node.play()
 		
 	print("Now playing: ", music_key)
 	print("is playing?: ", music_player_node.playing)
-	
-# ==========================================
-# AUDIO EFFECTS LOGIC
-# ==========================================
 
-func trigger_fade_out(duration: float = 1.5) -> void:
+func _trigger_fade_out(duration: float = 1.5) -> void:
 	if stop_tween and stop_tween.is_running():
 		stop_tween.kill()
 		
@@ -178,30 +188,26 @@ func trigger_fade_out(duration: float = 1.5) -> void:
 		music_player_node.stop()
 	)
 	
-	# We await this so the next song doesn't start until the fade is done
 	await stop_tween.finished
 
-func trigger_fade_in(target_volume: float, duration: float = 1.5) -> void:
+func _trigger_fade_in(target_volume: float, duration: float = 1.5) -> void:
 	if start_tween and start_tween.is_running():
 		start_tween.kill()
 		
 	start_tween = create_tween()
 	start_tween.tween_property(music_player_node, "volume_db", target_volume, duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
-func trigger_vinyl_stop(duration: float =20.0) -> void:
+func _trigger_vinyl_stop(duration: float = 20.0) -> void:
 	if stop_tween and stop_tween.is_running():
 		stop_tween.kill()
 		
-	# set_parallel(true) lets us tween both pitch and volume at the same time
 	stop_tween = create_tween().set_parallel(true)
 	
 	# Slide pitch down to 0.01 (Godot crashes at exactly 0.0)
 	stop_tween.tween_property(music_player_node, "pitch_scale", 0.01, duration).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
-	
 	# Slide volume down to silence (-80.0 db)
 	stop_tween.tween_property(music_player_node, "volume_db", -80.0, duration).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
 	
-	# chain() tells the tween to wait until the parallel movements are done before firing the callback
 	stop_tween.chain().tween_callback(func():
 		music_player_node.stop()
 		music_player_node.pitch_scale = 1.0 # Reset pitch for the next track
@@ -214,5 +220,4 @@ func _apply_wavy_pitch(player: AudioStreamPlayer, progress: float) -> void:
 	var wobble: float = sin(time * 30.0) * 0.15 * progress
 	
 	player.pitch_scale = max(0.01, progress + wobble)
-	# Fades the volume out slightly alongside the pitch drop
 	player.volume_db = linear_to_db(progress)

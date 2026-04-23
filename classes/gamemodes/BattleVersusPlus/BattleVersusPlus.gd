@@ -391,7 +391,7 @@ func _perform_match_over_sequence(winner_team: String) -> void:
 	scoreboard.text = "[center][wave amp=50.0 freq=5.0 connected=1][color=%s]%s TEAM WINS![/color][/wave][/center]" % [color_tag, winner_team.to_upper()]
 	
 	Audio.play_music("victory", Audio.SOUND_END_EFFECTS.VINYL)
-	await Audio.music_player_node.finished
+	await Audio.active_node.music_player_node.finished
 	game_concluded.emit()
 
 func update_scoreboard(discrete: bool = false) -> void:
@@ -471,17 +471,15 @@ func play_intro() -> void:
 	update_scoreboard()
 	
 	anim.play("intro")
-	if has_node("/root/Audio"):
-		Audio.trigger_fade_out(2)
-		Audio.play_sound("match_intro", 0.56)
+	Audio.active_node._trigger_fade_out(2)
+	Audio.play_sound("match_intro", 0.56)
 		
 	await anim.animation_finished
 	
 	p1_name.hide()
 	p2_name.hide()
 	
-	if has_node("/root/Audio"):
-		Audio.play_music("epic_battle")
+	Audio.play_music("epic_battle")
 
 func _update_grid_layouts() -> void:
 	_apply_grid_logic(red_grid, "red")
@@ -637,6 +635,4 @@ func handle_player_disconnect(in_id: int) -> void:
 			print("BattlePlus| Only 1 or 0 players left total. Aborting match to lobby.")
 			NetworkSync.sync_interaction("return_to_lobby")
 		else:
-			# The match can continue! 
-			# Did this disconnection cause the last person on a team to vanish?
 			_check_win_condition()

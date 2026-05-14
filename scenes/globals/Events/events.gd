@@ -35,13 +35,16 @@ signal connection_timeout()
 signal client_searching()
 signal client_connected_to_server
 signal server_accepted_join(payload)
-signal server_rejected_join
+signal server_rejected_join(payload)
 
 
 signal sync_interaction(payload)
 signal sync_data(payload)
 signal received_board_data(payload)
 signal round_ended(payload)
+
+#signal server_accepted_join(payload)
+#signal
 #endregion
 
 func _notification(what: int) -> void:

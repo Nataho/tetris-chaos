@@ -120,6 +120,7 @@ func start(countdown: float):
 		
 	# 4. Hit 0! (Your display function turns this into "GO!")
 	display_countdown(0)
+	if self is NetworkBoard: return 
 	pieces_controller.start()
 	
 func _physics_process(delta: float) -> void:

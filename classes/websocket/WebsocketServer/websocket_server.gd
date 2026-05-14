@@ -19,7 +19,7 @@ var client_last_seen: Dictionary = {}
 
 func start() -> void:
 	if server_active: return
-	NetworkSync.is_client = false
+	NetworkSync.current_mode = NetworkSync.NetMode.LAN_HOST
 	
 	active_players.clear()
 	active_players.append(GameManager.player_data)

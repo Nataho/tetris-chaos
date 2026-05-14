@@ -14,6 +14,7 @@ const DISTANCE: float = 0.25
 @onready var p1_name: Label = $versus/HBoxContainer/left_side/Label
 @onready var p2_name: Label = $versus/HBoxContainer/right_side/Label
 
+var ready_players: Array = []
 var active_players: Dictionary = {}
 var active_boards: Dictionary = {}
 var active_anchors: Dictionary = {}
@@ -41,27 +42,72 @@ var game_finished: bool = false
 var is_resetting: bool = false
 var first_to: int = 1
 
-func setup(players: Dictionary, local_id: int, spectator: bool, seed: int, settings: Dictionary) -> void:
-	active_players = players
+func _ready() -> void:
+	# 1. Listen for match state data coming from the Python Server
+	Events.sync_data.connect(_on_sync_data_received)
+	
+	# 2. NEW: Listen for direct Board Data to catch incoming network attacks
+	Events.received_board_data.connect(_on_received_board_data)
+	
+	# 3. NEW: Listen for local garbage generation so we see our own attacks fire!
+	Events.sent_garbage.connect(_on_local_garbage_generated)
+	
+# Helper to route global sync data into your existing process_action logic
+func _on_sync_data_received(payload: Dictionary) -> void:
+	var action = payload.get("action", "")
+	
+	var am_i_host: bool = false
+	if NetworkSync.current_mode == NetworkSync.NetMode.ONLINE:
+		am_i_host = TCPBridge.get_host_info()
+	else:
+		am_i_host = NetworkServer.server_active
+	
+	if action == "player_ready" and am_i_host:
+		_handle_host_ready_check(int(payload.get("player_id", -1)))
+		return
+		
+	process_action(action, payload)
+	
+func _handle_host_ready_check(id: int) -> void:
+	if not ready_players.has(id):
+		ready_players.append(id)
+	
+	# Once P1 and P2 are both loaded, fire the start signal
+	if ready_players.size() >= 2:
+		NetworkSync.sync_data({"action": "start_match"})
+	
+
+func setup(players: Array, local_id: int, mode: int, spectator: bool, seed_val: int, settings: Dictionary) -> void:
 	_player_id = local_id
 	_is_spectator = spectator
-	current_seed = seed
-	
-	p1_id = settings.get("p1_id", -1)
-	p2_id = settings.get("p2_id", -1)
+	current_seed = seed_val
 	first_to = settings.get("first_to", 1)
 	
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	# 1. Map players by UID
+	for p in players:
+		var p_uid = int(p.get("uid", -1))
+		active_players[p_uid] = p
 	
-	_spawn_player(p1_id, p1_id == _player_id)
-	_spawn_player(p2_id, p2_id == _player_id)
+	# 2. Get P1 and P2 UIDs from settings
+	p1_id = int(settings.get("p1_id", -1))
+	p2_id = int(settings.get("p2_id", -1))
 	
+	# --- NEW FIX: ABSOLUTE SIDES ---
+	# P1 is ALWAYS on the left, P2 is ALWAYS on the right for everyone!
+	# The game will just give you control of the board that matches your _player_id.
 	left_id = p1_id
 	right_id = p2_id
+	# --------------------------------
 	
-	# FIX 1: Link the anchors so they become visible and move to the sides
-	p1_anchor = active_anchors[left_id]
-	p2_anchor = active_anchors[right_id]
+	# 3. Assign screen sides
+	p1_name.text = active_players[left_id].get("name", "P1").to_upper()
+	p2_name.text = active_players[right_id].get("name", "P2").to_upper()
+	
+	# 4. Spawn the boards
+	_spawn_player(p1_id, (p1_id == _player_id))
+	_spawn_player(p2_id, (p2_id == _player_id))
+	
+	print("Battle| Setup complete. Local ID: ", _player_id)
 
 func _spawn_player(id: int, is_local: bool) -> void:
 	var anchor: Control = Control.new()
@@ -81,7 +127,6 @@ func _spawn_player(id: int, is_local: bool) -> void:
 	anchor.set_anchors_preset(Control.PRESET_CENTER)
 	board.knocked_out.connect(_on_board_knocked_out)
 	
-	#print("active_players: ", active_players[id]["name"])
 	board.add_username(active_players[id]["name"])
 	
 	anchor.add_child(board)
@@ -91,7 +136,14 @@ func _spawn_player(id: int, is_local: bool) -> void:
 	active_boards[id] = board
 	active_anchors[id] = anchor
 
-	# FIX 2: Initialize the board immediately after spawning!
+	# --- NEW FIX: ASSIGN THE ANCHORS FOR MOVEMENT ---
+	if id == left_id:
+		p1_anchor = anchor  # The _process function will now slide this left
+	elif id == right_id:
+		p2_anchor = anchor  # The _process function will now slide this right
+	# ------------------------------------------------
+
+	# Initialize the board immediately after spawning!
 	if board is LocalBoard:
 		board.initialize(current_seed)
 	else:
@@ -124,6 +176,17 @@ func _process(delta: float) -> void:
 # --- NETWORK DATA FEED ---
 func process_action(action: String, data: Dictionary) -> void:
 	match action:
+		#"player_ready":
+			#if not NetworkServer.server_active: return
+			#
+			#var rid = int(data.get("player_id", -1))
+			#if not ready_players.has(rid):
+				#ready_players.append(rid)
+			#
+			## Check against the total number of players in this match
+			#if ready_players.size() >= active_players.size():
+				#NetworkSync.sync_data({"action": "start_match"})
+				
 		"start_match":
 			if _match_started_flag: return
 			_match_started_flag = true
@@ -140,26 +203,31 @@ func process_action(action: String, data: Dictionary) -> void:
 		"next_round":
 			var next_seed = int(data.get("seed", -1))
 			var scores = data.get("scores", {})
-			
-			# Apply exact scores to our variables!
 			p1_match_score = int(scores.get(str(p1_id), p1_match_score))
 			p2_match_score = int(scores.get(str(p2_id), p2_match_score))
-					
 			_perform_next_round_transition(next_seed)
 			
 		"match_over":
 			var winner_id = int(data.get("winner_id", -1))
 			var scores = data.get("scores", {})
-			
 			p1_match_score = int(scores.get(str(p1_id), p1_match_score))
 			p2_match_score = int(scores.get(str(p2_id), p2_match_score))
-					
 			_perform_match_over_sequence(winner_id)
 
 # --- STATE LOGIC ---
 func _on_board_knocked_out(node: MultiplayerBoard) -> void:
 	if is_resetting or game_finished: return
-	if not NetworkServer.server_active: return 
+	
+	# --- FIX: PROPER HOST CHECK ---
+	var am_i_host: bool = false
+	if NetworkSync.current_mode == NetworkSync.NetMode.ONLINE:
+		am_i_host = TCPBridge.get_host_info()
+	else:
+		am_i_host = NetworkServer.server_active
+		
+	# Only the Host is allowed to advance the round or end the match!
+	if not am_i_host: return 
+	# ------------------------------
 	
 	is_resetting = true
 	var loser_id = node._player_index
@@ -169,24 +237,19 @@ func _on_board_knocked_out(node: MultiplayerBoard) -> void:
 	await get_tree().create_timer(1.0).timeout
 	
 	var winner_id = p1_id if loser_id == p2_id else p2_id
-	
-	# CALCULATE using our independent variables, ignoring the board's internal 'kos'
-	var new_p1_score = p1_match_score + (1 if winner_id == p1_id else 0)
-	var new_p2_score = p2_match_score + (1 if winner_id == p2_id else 0)
-	
 	var scores_payload = {
-		str(p1_id): new_p1_score,
-		str(p2_id): new_p2_score
+		str(p1_id): p1_match_score + (1 if winner_id == p1_id else 0),
+		str(p2_id): p2_match_score + (1 if winner_id == p2_id else 0)
 	}
 	
-	if new_p1_score >= first_to or new_p2_score >= first_to:
-		request_network_sync.emit({
+	if scores_payload[str(winner_id)] >= first_to:
+		NetworkSync.sync_data({
 			"action": "match_over",
 			"winner_id": winner_id,
 			"scores": scores_payload
 		})
 	else:
-		request_network_sync.emit({
+		NetworkSync.sync_data({
 			"action": "next_round",
 			"seed": randi(),
 			"scores": scores_payload
@@ -320,18 +383,71 @@ func spawn_garbage_visual(attacker_id: int, target_id: int, amount: int) -> void
 		add_child(particle) 
 
 func start_boards() -> void:
-	print("starting")
+	print("Battle| Starting Boards")
 	game_started = true
 	game_finished = false
 	for board in active_boards.values():
-		#board.start(3)
-		if board is LocalBoard:
-			board.start(3)
+		# FIX 3: REMOVE THE "if board is LocalBoard" CHECK
+		# Both the LocalBoard AND the NetworkBoard need to call .start(3)
+		# so that the countdown animation plays on both sides of the screen.
+		board.start(3)
 
 func stop_boards() -> void:
 	for board in active_boards.values():
 		if board.has_method("stop"):
 			board.stop()
+
+func _on_received_board_data(payload: Dictionary) -> void:
+	# 1. Catch garbage data coming from the opponent
+	if payload.get("update_type") == "garbage":
+		var attacker_id = int(payload.get("player_id", -1))
+		var value_dict = payload.get("value", {})
+		var target_id = int(value_dict.get("target", -1))
+		var amount = int(value_dict.get("amount", 1))
+		
+		spawn_garbage_visual(attacker_id, target_id, amount)
+		
+	# 2. NEW: Catch knockout data coming from the opponent!
+	elif payload.get("update_type") == "player_kod":
+		var loser_id = int(payload.get("player_id", -1))
+		
+		# If the board exists and we aren't already resetting the round
+		if active_boards.has(loser_id) and not is_resetting and not game_finished:
+			# Grab the opponent's board reference
+			var knocked_out_board = active_boards[loser_id]
+			
+			# Trigger the exact same logic as if it happened locally!
+			_on_board_knocked_out(knocked_out_board)
+
+func _on_local_garbage_generated(payload: Dictionary) -> void:
+	var attacker_id = int(payload.get("player_id", -1))
+	
+	# Check if this player actually exists in our match
+	if not active_boards.has(attacker_id): return
+	
+	# We only want to spawn local visuals for the board we actually control.
+	# The opponent's attacks are handled by _on_received_board_data above!
+	if active_boards[attacker_id] is LocalBoard:
+		
+		# --- ROBUST AMOUNT EXTRACTION ---
+		var amount: int = 1
+		var raw_val = payload.get("value", 1)
+		
+		if typeof(raw_val) == TYPE_DICTIONARY:
+			# It's a network packet format! Extract 'amount' from inside the dict.
+			amount = int(raw_val.get("amount", 1))
+		elif payload.has("amount"):
+			# Sometimes it's just passed as 'amount' directly
+			amount = int(payload.get("amount", 1))
+		else:
+			# It's a standard integer/float
+			amount = int(raw_val)
+		# --------------------------------
+		
+		# Calculate who the target is based on absolute sides
+		var target_id = p2_id if attacker_id == p1_id else p1_id
+		
+		spawn_garbage_visual(attacker_id, target_id, amount)
 
 func handle_player_disconnect(id: int) -> void:
 	if not active_players.has(id): return

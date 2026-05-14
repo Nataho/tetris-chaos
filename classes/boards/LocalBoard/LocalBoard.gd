@@ -181,11 +181,5 @@ func _send_ko_data(payload: Dictionary) -> void:
 func _dispatch_to_network(data: Dictionary):
 	data["player_id"] = _player_index
 	
-	if NetworkClient.client_active:
-		# If I am a client, send it up to the server
-		NetworkClient.send_signal("send_board_data", data)
-		
-	elif NetworkServer.server_active:
-		# If I am the host, process it locally AND broadcast it to all clients
-		Events.received_board_data.emit(data) # Process it for myself immediately
-		NetworkServer.broadcast_signal("send_board_data", {"data": data}) # Send it to everyone else
+	# Send it to our router, and let the router figure out how to deliver it!
+	NetworkSync.send_board_data(data)

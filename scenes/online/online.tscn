@@ -51,20 +51,36 @@ text = "CONNECTING TO SERVER..."
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="create room" type="Button" parent="." unique_id=1940610602]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=557050766]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -162.0
-offset_top = -29.0
-offset_right = 162.0
-offset_bottom = 29.0
+offset_left = -144.5
+offset_top = -116.5
+offset_right = 144.5
+offset_bottom = 116.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 40
+theme_override_constants/separation = 22
+
+[node name="create room" type="Button" parent="VBoxContainer" unique_id=1940610602]
+layout_mode = 2
+theme_override_font_sizes/font_size = 65
 text = "CREATE ROOM"
 
-[connection signal="pressed" from="create room" to="." method="create_room"]
+[node name="join room" type="Button" parent="VBoxContainer" unique_id=1095389032]
+layout_mode = 2
+theme_override_font_sizes/font_size = 65
+text = "JOIN ROOM"
+
+[node name="ranked" type="Button" parent="VBoxContainer" unique_id=1986567375]
+layout_mode = 2
+theme_override_font_sizes/font_size = 65
+disabled = true
+text = "RANKED"
+
+[connection signal="pressed" from="VBoxContainer/create room" to="." method="create_room"]
+[connection signal="pressed" from="VBoxContainer/join room" to="." method="join_room"]

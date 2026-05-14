@@ -24,6 +24,10 @@ const MAX_RECONNECT_ATTEMPTS: int = 12
 
 @onready var ping_timer: Timer = $ping
 
+## lobby variables
+var _room_id := "000000"
+var _is_host := false
+##
 static func create() -> TCPBridge:
 	var inst = _FILE.instantiate()
 	active_bridge = inst
@@ -83,14 +87,48 @@ func _process(delta: float) -> void:
 			var raw_data := tcp.get_data(available_bytes)
 			if raw_data[0] == OK:
 				var string_data = raw_data[1].get_string_from_utf8()
-				var response_dict = JSON.parse_string(string_data)
-				if response_dict is Dictionary:
-					if response_dict.get("type") != "pong":
-						print("Server Responded: ", string_data)
-					server_response.emit(response_dict)
-					if response_dict.get("type") == "pong":
-						var lag = Time.get_ticks_msec() - _last_ping_time
-						Details.show_ping(lag)
+				
+				# --- THE FIX: SPLIT BY NEWLINE ---
+				var messages = string_data.split("\n", false) 
+				
+				for msg in messages:
+					var response_dict = JSON.parse_string(msg)
+					if response_dict is Dictionary:
+						if response_dict.get("type") != "pong":
+							print("Server Responded: ", msg)
+							
+						# --- INTERCEPT ROOM ACTIONS ---
+						if response_dict.get("type") == "room_action":
+							var sig = response_dict.get("signal")
+							var data = response_dict.get("data", {})
+							
+							match sig:
+								"send_board_data":
+									Events.received_board_data.emit(data)
+								"sync_interaction":
+									Events.sync_interaction.emit(response_dict)
+								"sync_data":
+									Events.sync_data.emit(response_dict)
+								
+								# --- NEW SIGNALS FROM PYTHON ---
+								"join_accepted":
+									Events.server_accepted_join.emit(data)
+								"join_rejected":
+									Events.server_rejected_join.emit(data)
+								"join_lobby":
+									Events.client_joined_lobby.emit(data)
+								"left_lobby":
+									Events.client_left_lobby.emit(data)
+								#"join_lobby":
+									#print("WOHOOO, JOINED THE LOBBY")
+						# -----------------------------------
+						else:
+							# Normal server responses
+							server_response.emit(response_dict)
+					
+						if response_dict.get("type") == "pong":
+							var lag = Time.get_ticks_msec() - _last_ping_time
+							Details.show_ping(lag)
 
 	# 2. Did we disconnect OR fail to connect?
 	elif status == StreamPeerTCP.STATUS_NONE or status == StreamPeerTCP.STATUS_ERROR:
@@ -180,6 +218,23 @@ static func create_room():
 	var data ={
 		"type": "create_room"
 	}
+	active_bridge._is_host = true
+	send_to_server(data)
+
+# Inside TCPBridge.gd (Wherever you put your custom join code)
+static func join_room(roomID: String):
+	if not active_bridge.is_connected_to_server: return
+
+	var data = {
+		"type": "join_room", 
+		"room_id": roomID
+	}
+
+	# --- YOU MUST ADD THIS LINE! ---
+	active_bridge._is_host = false
+	# -------------------------------
+
+	active_bridge._room_id = roomID
 	send_to_server(data)
 
 static func refresh_login(uid:int):
@@ -189,6 +244,16 @@ static func refresh_login(uid:int):
 	var data = {
 		"type" : "refresh_login",
 		"uid": uid
+	}
+	send_to_server(data)
+
+static func check_room_exsistence(roomID: String): # Use String!
+	if not active_bridge.is_connected_to_server:
+		print("failed to connect to server")
+		return
+	var data = {
+		"type" : "check_room_existence", # Spelled correctly!
+		"room_id": roomID # Use "room_id" instead of "uid"!
 	}
 	send_to_server(data)
 
@@ -210,5 +275,29 @@ static func send_to_server(payload:Dictionary):
 	active_bridge._send_to_server(payload)
 
 func _send_to_server(payload: Dictionary) -> void:
-	var json_string := JSON.stringify(payload) # Convert to json
-	tcp.put_data(json_string.to_utf8_buffer()) # Convert to bytes then send to server
+	# Add the newline character here!
+	var json_string := JSON.stringify(payload) + "\n" 
+	tcp.put_data(json_string.to_utf8_buffer())
+
+# ==========================================
+# LOBBY FUNCTIONS
+# ==========================================
+static func set_room_id(roomId: String): # Use String!
+	active_bridge._room_id = roomId
+
+static func get_lobby_id():
+	return active_bridge._room_id
+
+static func get_host_info():
+	return active_bridge._is_host
+
+static func send_player_ready() -> void:
+	if not active_bridge.is_connected_to_server: return
+	var data = {
+		"type": "room_action",
+		"signal": "player_ready",
+		"data": {
+			"room_id": active_bridge._room_id
+		}
+	}
+	send_to_server(data)

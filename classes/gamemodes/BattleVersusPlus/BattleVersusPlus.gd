@@ -39,6 +39,7 @@ var red_team_ids: Array = []
 var blue_team_ids: Array = []
 var alive_red: Array = []
 var alive_blue: Array = []
+var ready_players: Array = []
 
 var my_team: String = "spectator"
 
@@ -54,6 +55,15 @@ var blue_grid: GridContainer
 func _ready():
 	print("VERSUS PLUS SPAWNED: ", get_instance_id())
 	
+	# --- ADD THESE LINES ---
+	Events.sync_data.connect(_on_sync_data_received)
+	#
+	#NetworkSync.sync_data({
+		#"action": "player_ready",
+		#"player_id": _player_id
+	#})
+	# -----------------------
+
 	my_anchor = Control.new()
 	my_anchor.set_anchors_preset(Control.PRESET_CENTER)
 	add_child(my_anchor)
@@ -70,6 +80,26 @@ func _ready():
 	blue_grid.add_theme_constant_override("h_separation", 10)
 	add_child(blue_grid)
 
+func _on_sync_data_received(payload: Dictionary) -> void:
+	var action = payload.get("data", payload).get("action", "")
+	
+	# Check if we are the Host (Online or LAN)
+	var am_i_host: bool = false
+	if NetworkSync.current_mode == NetworkSync.NetMode.ONLINE:
+		am_i_host = TCPBridge.get_host_info()
+	else:
+		am_i_host = NetworkServer.server_active
+	
+	if action == "player_ready" and am_i_host:
+		_handle_host_ready_check(int(payload.get("player_id", -1)))
+		return
+		
+	process_action(action, payload.get("data", payload))
+
+func _handle_host_ready_check(id: int) -> void:
+	if not ready_players.has(id):
+		ready_players.append(id)
+		
 func setup(players: Dictionary, local_id: int, spectator: bool, seed: int, settings: Dictionary) -> void:
 	active_players = players
 	_player_id = local_id
@@ -94,6 +124,11 @@ func setup(players: Dictionary, local_id: int, spectator: bool, seed: int, setti
 		
 	update_scoreboard()
 	_update_grid_layouts()
+	
+	NetworkSync.sync_data({
+		"action": "player_ready",
+		"player_id": _player_id
+	})
 
 func _spawn_player(id: int) -> void:
 	var team = active_players[id].get("team", "red")
@@ -221,6 +256,17 @@ func get_alive_team(target_team_id: int) -> Array:
 # --- NETWORK DATA FEED ---
 func process_action(action: String, data: Dictionary) -> void:
 	match action:
+		"player_ready":
+			if not NetworkServer.server_active: return # Only host manages this
+			
+			var rid = int(data.get("player_id", -1))
+			if not ready_players.has(rid):
+				ready_players.append(rid)
+			
+			# When both p1 and p2 are ready
+			if ready_players.size() >= 2:
+				NetworkSync.sync_data({"action": "start_match"})
+		
 		"start_match":
 			if game_started: return
 			start_boards()
@@ -430,21 +476,9 @@ func spawn_garbage_visual(attacker_id: int, target_id: int, amount: int) -> void
 
 func start_boards() -> void:
 	game_started = true
-	game_finished = false
-	
-	alive_red = red_team_ids.duplicate()
-	alive_blue = blue_team_ids.duplicate()
-	dead_ids.clear()
-	
-	# Restore everyone's original targets for the new round!
-	board_targets = original_targets.duplicate()
-	
-	for id in board_targets.keys():
-		# Add the is_instance_valid check here to prevent crashes from freed nodes!
-		if is_instance_valid(board_targets[id]) and board_targets[id] != my_anchor:
-			board_targets[id].get_parent().show()
-	
-	_update_grid_layouts()
+	# Start ALL boards so both sides see the countdown
+	for board in active_boards.values():
+		board.start(3)
 	
 	for board in active_boards.values():
 		if board is LocalBoard:

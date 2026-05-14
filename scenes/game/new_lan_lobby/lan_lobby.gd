@@ -54,6 +54,8 @@ var versus_plus_team = versus_plus_teams["red"]
 func _ready() -> void:
 	#if GameManager.dev_build: GameManager.change_resolution(500,500)
 	players_in_lobby = [GameManager.player_data]
+	if str(GameManager.player_data["uid"]) not in ["-1","0"]:
+		username_text_box.editable = false
 	
 	connect_signals()
 	setup_ui()

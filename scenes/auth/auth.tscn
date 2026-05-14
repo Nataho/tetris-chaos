@@ -29,6 +29,7 @@ grow_vertical = 2
 script = ExtResource("1_7gy5t")
 
 [node name="login_panel" type="Panel" parent="." unique_id=1909021698]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -143,7 +144,6 @@ horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="signup_panel" type="Panel" parent="." unique_id=1904227905]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

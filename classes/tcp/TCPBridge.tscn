@@ -4,3 +4,7 @@
 
 [node name="TCPBridge" type="Node" unique_id=1692674403]
 script = ExtResource("1_vx674")
+
+[node name="ping" type="Timer" parent="." unique_id=272200666]
+
+[connection signal="timeout" from="ping" to="." method="ping"]

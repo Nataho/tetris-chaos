@@ -1,6 +1,7 @@
 {
     "latest_version": "0.5.7",
     "patch_url": "https://github.com/Nataho/tetris-chaos/releases/download/v0.5.7/patch.pck",
-    "major_update_url": "https://github.com/Nataho/tetris-chaos/releases/tag/v0.5.5"
+    "major_update_url": "https://github.com/Nataho/tetris-chaos/releases/tag/v0.5.5",
+    "zerotier_ip": "10.147.17.203",
+    "tailscale_ip": "100.120.66.37"
 }
-

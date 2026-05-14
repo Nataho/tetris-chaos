@@ -26,7 +26,12 @@ var is_guest: bool = true
 func _ready() -> void:
 	_connect_signals()
 	TCPBridge.active_bridge.start()
-
+	await get_tree().create_timer(1).timeout
+	TCPBridge.get_player_info("nataho")
+	
+	#var response = await TCPBridge.active_bridge.server_response
+	#print(response)
+	
 func _connect_signals() -> void:
 	# UI Signals (Wired up for both login and signup!)
 	login_username_field.text_changed.connect(_username_changed.bind(login_username_field))

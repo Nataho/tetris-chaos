@@ -11,15 +11,22 @@
 font = ExtResource("4_hiibk")
 font_size = 80
 
+[sub_resource type="Theme" id="Theme_swlpu"]
+default_font = ExtResource("4_hiibk")
+default_font_size = 40
+Button/fonts/font = ExtResource("4_hiibk")
+
 [sub_resource type="LabelSettings" id="LabelSettings_bxtry"]
 font = ExtResource("7_nm0l4")
 font_size = 30
 
-[node name="MainMenu" type="Control" unique_id=463708987 node_paths=PackedStringArray("marathon", "zen", "multiplayer_button", "settings", "local_versus", "lan", "ranked", "classic", "controls", "handling", "graphics")]
+[node name="MainMenu" type="Control" unique_id=463708987 node_paths=PackedStringArray("marathon", "zen", "multiplayer_button", "settings", "local_versus", "lan", "online", "classic", "controls", "handling", "graphics", "account")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -1.0
+offset_right = -1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_sd5it")
@@ -29,11 +36,12 @@ multiplayer_button = NodePath("main/empty_space/VBoxContainer/multiplayer")
 settings = NodePath("main/empty_space/VBoxContainer/settings")
 local_versus = NodePath("Multiplayer/empty_space/VBoxContainer/local_versus")
 lan = NodePath("Multiplayer/empty_space/VBoxContainer/lan")
-ranked = NodePath("Multiplayer/empty_space/VBoxContainer/ranked")
+online = NodePath("Multiplayer/empty_space/VBoxContainer/online")
 classic = NodePath("Multiplayer/empty_space/VBoxContainer/classic")
 controls = NodePath("settings/empty_space/controls/controls")
 handling = NodePath("settings/empty_space/controls/handling")
 graphics = NodePath("settings/empty_space/controls/graphics")
+account = NodePath("settings/empty_space/controls/account")
 
 [node name="background" type="ColorRect" parent="." unique_id=1817507213]
 layout_mode = 1
@@ -98,6 +106,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="settings" type="HBoxContainer" parent="." unique_id=1353048682]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -138,17 +147,17 @@ theme = ExtResource("3_byqcc")
 text = "GRAPHICS"
 
 [node name="customize" type="Button" parent="settings/empty_space/controls" unique_id=1741017591]
+visible = false
 layout_mode = 2
 theme = ExtResource("3_byqcc")
 disabled = true
 text = "CUSTOMIZE
 "
 
-[node name="change_server" type="Button" parent="settings/empty_space/controls" unique_id=1613754329]
+[node name="account" type="Button" parent="settings/empty_space/controls" unique_id=1613754329]
 layout_mode = 2
 theme = ExtResource("3_byqcc")
-disabled = true
-text = "CHANGE SERVER"
+text = "ACCOUNT"
 autowrap_mode = 2
 
 [node name="right_side" type="Panel" parent="settings" unique_id=681679251]
@@ -446,8 +455,142 @@ theme_override_fonts/font = ExtResource("7_nm0l4")
 theme_override_font_sizes/font_size = 70
 text = "Windowed"
 
-[node name="Multiplayer" type="HBoxContainer" parent="." unique_id=524118982]
+[node name="account" type="VBoxContainer" parent="settings/right_side" unique_id=461047658]
 visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -528.0
+offset_top = -388.0
+offset_right = 528.0
+offset_bottom = 388.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 22
+alignment = 1
+
+[node name="username" type="Label" parent="settings/right_side/account" unique_id=2120555270]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Username"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="username_edit" type="LineEdit" parent="settings/right_side/account/username" unique_id=700045883]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+placeholder_text = "Guest"
+alignment = 1
+max_length = 20
+
+[node name="password" type="Label" parent="settings/right_side/account" unique_id=1207449267]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Password"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="password_edit" type="LineEdit" parent="settings/right_side/account/password" unique_id=561920810]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+placeholder_text = "strong pass"
+alignment = 1
+secret = true
+
+[node name="uid" type="Label" parent="settings/right_side/account" unique_id=999587596]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+text = "User ID"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="uid_label" type="Label" parent="settings/right_side/account/uid" unique_id=86162097]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 520.0
+offset_right = 1046.0
+offset_bottom = 106.0
+size_flags_horizontal = 0
+text = "-1"
+label_settings = SubResource("LabelSettings_swlpu")
+horizontal_alignment = 1
+
+[node name="status" type="Label" parent="settings/right_side/account" unique_id=1809483051]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Status"
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="status_status" type="Label" parent="settings/right_side/account/status" unique_id=1759522529]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 520.0
+offset_right = 1046.0
+offset_bottom = 106.0
+size_flags_horizontal = 0
+text = "OFFLINE"
+label_settings = SubResource("LabelSettings_swlpu")
+horizontal_alignment = 1
+
+[node name="logout" type="Label" parent="settings/right_side/account" unique_id=42351756]
+layout_mode = 2
+size_flags_horizontal = 0
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="logout_button" type="Button" parent="settings/right_side/account/logout" unique_id=1638230259]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 520.0
+offset_top = -53.0
+offset_right = 1046.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+disabled = true
+text = "LOGOUT"
+
+[node name="note" type="Control" parent="settings/right_side/account" unique_id=2110312045]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+
+[node name="account_note" type="RichTextLabel" parent="settings/right_side/account/note" unique_id=487378801]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_swlpu")
+bbcode_enabled = true
+text = "submit password to login/signup
+no password = guest"
+vertical_alignment = 2
+
+[node name="Multiplayer" type="HBoxContainer" parent="." unique_id=524118982]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -484,15 +627,15 @@ layout_mode = 2
 theme = ExtResource("3_byqcc")
 text = "LAN"
 
-[node name="ranked" type="Button" parent="Multiplayer/empty_space/VBoxContainer" unique_id=741614244]
+[node name="online" type="Button" parent="Multiplayer/empty_space/VBoxContainer" unique_id=741614244]
 layout_mode = 2
 theme = ExtResource("3_byqcc")
-disabled = true
-text = "RANKED"
+text = "ONLINE"
 
 [node name="classic" type="Button" parent="Multiplayer/empty_space/VBoxContainer" unique_id=1482767415]
 layout_mode = 2
 theme = ExtResource("3_byqcc")
+disabled = true
 text = "CLASSIC"
 autowrap_mode = 2
 

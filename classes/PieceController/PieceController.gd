@@ -6,7 +6,8 @@ signal forced_place
 enum PIECE_TYPE{Z, L, O, S, I, J, T}
 const random_7_bag := ["Z", "L", "O", "S", "I", "J", "T"]
 
-#region tile positions
+#region tile positions 
+#tile positions must only be one X
 const i_tile_positions := [
 	"----",
 	"*x**",

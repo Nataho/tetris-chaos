@@ -11,6 +11,7 @@ var patch_manager: PatchManager
 func _ready() -> void:
 	Audio.play_music("title_screen")
 	patch_manager = PatchManager.new()
+	
 	add_child(patch_manager)
 	
 	# 1. Lock the start button so they can't skip the update check

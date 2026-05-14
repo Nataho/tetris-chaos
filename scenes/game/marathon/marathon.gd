@@ -42,7 +42,7 @@ func _ready() -> void:
 	set_ui_node.position = Vector2(0, -1258)
 	board_anchor_point_node.position = Vector2(-498, 540)
 	
-	$set_ui/VBoxContainer/high_schore.text = "High Score:\n%d" % GameManager.player_data["high_score"]
+	$set_ui/VBoxContainer/high_schore.text = "High Score:\n%d" % GameManager.player_data.get("high_score", -1)
 	
 	# 2. Platform Checks
 	if OS.get_name() not in ["Android", "iOS"]:
@@ -142,6 +142,11 @@ func _on_player_kod(payload) -> void:
 		
 	if payload["score"] > GameManager.player_data["high_score"]:
 		GameManager.player_data["high_score"] = payload["score"]
+		if GameManager.player_data["uid"] not in [-1, 0, ""] and GameManager.player_data["status"] not in ["banned", "guest"]:
+			TCPBridge.update_high_score(GameManager.player_data["uid"], payload["score"])
+		else:
+			print("failed to upload high score; reason: guest account")
+		
 	
 	$set_ui/VBoxContainer/high_schore.text = "High Score:\n%d" % GameManager.player_data["high_score"]
 	GameManager.SAVE_GAME()

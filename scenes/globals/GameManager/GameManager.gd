@@ -16,10 +16,11 @@ var server_info := {
 
 var achievements = {}
 var player_data = {
-	"uid": "",
+	"uid": -1,
 	"name": "guest",
 	"high_score": 0,
 	"marathon_level": 1,
+	"status": "guest"
 }
 
 var controls = {}
@@ -57,7 +58,7 @@ func _ready() -> void:
 	_instantiate_singletons()
 
 func _instantiate_singletons():
-	add_child(TCPBridge.new())
+	add_child(TCPBridge.create())
 	add_child(Audio.new())
 
 func _apply_controls_to_engine():

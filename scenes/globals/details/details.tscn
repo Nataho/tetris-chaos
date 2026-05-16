@@ -34,3 +34,12 @@ offset_right = 85.0
 offset_bottom = 82.0
 text = "Ping: "
 label_settings = SubResource("LabelSettings_finkb")
+
+[node name="top" type="Control" parent="." unique_id=888714098]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_top = 151.0
+offset_bottom = 151.0
+grow_horizontal = 2

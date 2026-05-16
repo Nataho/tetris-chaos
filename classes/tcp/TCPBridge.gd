@@ -35,6 +35,7 @@ static func create() -> TCPBridge:
 
 func _enter_tree() -> void:
 	active_bridge = self
+	server_response.connect(_on_server_response)
 
 func _exit_tree() -> void:
 	if tcp:
@@ -159,6 +160,14 @@ func _process(delta: float) -> void:
 				_reconnect_timer = 5.0 # Reset the countdown
 				start()
 
+func _on_server_response(response):
+	#print("response: ")
+	if response.get("type","") == "achievement":
+		var ach_name = response.get("name", "generic")
+		var ach_description = response.get("description", "there was never an achievement")
+		Events.achievement_get.emit(ach_name,ach_description)
+		print("test")
+
 # ==========================================
 # CLIENT REQUESTS TO SERVER
 # ==========================================
@@ -257,6 +266,75 @@ static func check_room_exsistence(roomID: String): # Use String!
 	}
 	send_to_server(data)
 
+static func lookup_user(uid:int):
+	if not active_bridge.is_connected_to_server:
+		print("failed to connect to server")
+		return
+	
+	var data = {
+		"type": "lookup_user",
+		"uid": GameManager.player_data["uid"],
+		"searching_id": uid
+	}
+	send_to_server(data)
+
+static func add_friend(uid:int):
+	if not active_bridge.is_connected_to_server:
+		print("failed to connect to server")
+		return
+	
+	var data = {
+		"type": "add_friend",
+		"uid": GameManager.player_data["uid"],
+		"searching_id": uid
+	}
+	send_to_server(data)
+
+func delete():
+	var prompt := ConfirmPrompt.create("Are you sure? This cannot be undone.")
+	add_child(prompt)
+	var result = await prompt.result
+	if !result: return
+	
+	var prompt2 := ConfirmPrompt.create("Enter password to confirm deletion", ["secret_input"])
+	add_child(prompt2)
+	var result2 = await prompt2.result
+	if !result2.get("result"): return
+	
+	# 1. Re-authenticate to ensure it's the owner
+	TCPBridge.send_login_request(GameManager.player_data["name"], result2.get("value"))
+	
+	# Safety: Wait for the specific login response
+	var response = await TCPBridge.active_bridge.server_response
+	
+	if response.get("status_code") in [200, 201]:
+		# 2. Re-auth passed, send delete command
+		TCPBridge.delete_account()
+		var del_response = await TCPBridge.active_bridge.server_response
+		
+		if del_response.get("success"):
+			# 3. Purge local cache and exit
+			GameManager.player_data = {"name": "Guest", "uid": -1}
+			GameManager.SAVE_GAME()
+			get_tree().change_scene_to_file("res://scenes/main/main_menu.tscn")
+		else:
+			var err := ConfirmPrompt.create("Server error: Could not delete account.", ["no_cancel"])
+			add_child(err)
+	else:
+		var prompt3 := ConfirmPrompt.create("Incorrect password. Access denied.", ["no_cancel"])
+		add_child(prompt3)
+
+# Static helper inside TCPBridge
+static func delete_account():
+	if not active_bridge.is_connected_to_server:
+		print("Connection lost")
+		return
+	
+	var data = {
+		"type": "delete_account",
+		"uid": GameManager.player_data["uid"],
+	}
+	send_to_server(data)
 # ==========================================
 # NETWORK UTILS
 # ==========================================

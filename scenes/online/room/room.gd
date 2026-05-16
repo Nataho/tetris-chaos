@@ -146,7 +146,7 @@ func _on_client_joined(new_player: Dictionary):
 	
 	var joining_name = new_player.get("name", "Unknown")
 	chat.text += "\n[color=green]%s joined the lobby[/color]" % joining_name
-	print(players_in_lobby)
+	print("players_in_lobby: ", players_in_lobby)
 	if is_host: 
 		var payload = {
 			"action": "list_updated",
@@ -470,19 +470,35 @@ func _update_player_list(players_array: Array) -> void:
 		var p_name = str(player.get("name", "Unknown"))
 		var is_spec = player.get("is_spectator", false)
 		var p_team = player.get("team", "red")
+		var p_uid = player.get("uid", -1) # Get the player's unique ID
 		
-		# (Optional) If you want the Host to be Gold again, we can re-add logic for it later,
-		# but right now Python isn't tracking who the host is inside the player_data dict!
 		var color_hex = "white"
-		
 		if is_spec: color_hex = "gray"
 		elif game_mode == BattleManager.VERSUS_PLUS:
 			color_hex = "#cb0000" if p_team == "red" else "#0000cb"
 			
 		var bbcode_text = "[color=" + color_hex + "]" + p_name.to_upper() + "[/color]"
+		
+		# 1. Create the node
 		var new_player_node = player_node_snapshot.duplicate()
 		new_player_node.text = bbcode_text
+		
+		# 2. Setup the Button (Index 1 / Second Child)
+		var profile_btn = new_player_node.get_child(1) as Button
+		if profile_btn:
+			# We "bind" the p_uid so the function knows which player was clicked
+			profile_btn.pressed.connect(_on_view_profile.bind(p_uid))
+		
 		$Control/Players.add_child(new_player_node)
+
+# This function triggers when any of those buttons are clicked
+func _on_view_profile(id: int):
+	if id == -1: return # Safety check
+	print("Opening profile for user ID: ", id)
+	
+	# Create the preview and add it to the scene
+	var profile_view = AccountPreview.create(id)
+	add_child(profile_view)
 
 func toggle_lobby_ui(is_disabled:bool):
 	create_btn.disabled = is_disabled
@@ -493,6 +509,9 @@ func toggle_lobby_ui(is_disabled:bool):
 	team_toggle.disabled = is_disabled
 	# Only allow the host to change gamemode when ui is "enabled"
 	gamemode_selector.disabled = is_disabled if is_host else true 
+
+func search_player(id):
+	pass
 
 func back():
 	GameManager.is_prompt_open = true

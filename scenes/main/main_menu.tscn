@@ -106,7 +106,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="settings" type="HBoxContainer" parent="." unique_id=1353048682]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -160,12 +159,19 @@ theme = ExtResource("3_byqcc")
 text = "ACCOUNT"
 autowrap_mode = 2
 
+[node name="admin" type="Button" parent="settings/empty_space/controls" unique_id=581478370]
+layout_mode = 2
+theme = ExtResource("3_byqcc")
+text = "ADMIN MENU"
+autowrap_mode = 2
+
 [node name="right_side" type="Panel" parent="settings" unique_id=681679251]
 custom_minimum_size = Vector2(1258, 1080)
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="controls" type="VBoxContainer" parent="settings/right_side" unique_id=1863052449]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -456,7 +462,6 @@ theme_override_font_sizes/font_size = 70
 text = "Windowed"
 
 [node name="account" type="VBoxContainer" parent="settings/right_side" unique_id=461047658]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -572,6 +577,26 @@ theme = ExtResource("3_byqcc")
 disabled = true
 text = "LOGOUT"
 
+[node name="delete" type="Label" parent="settings/right_side/account" unique_id=967736896]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+label_settings = SubResource("LabelSettings_swlpu")
+
+[node name="delete_button" type="Button" parent="settings/right_side/account/delete" unique_id=807335960]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 325.0
+offset_top = -53.0
+offset_right = 1058.0
+offset_bottom = 53.0
+grow_vertical = 2
+theme = ExtResource("3_byqcc")
+text = "DELETE ACCOUNT"
+
 [node name="note" type="Control" parent="settings/right_side/account" unique_id=2110312045]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
@@ -591,6 +616,7 @@ no password = guest"
 vertical_alignment = 2
 
 [node name="Multiplayer" type="HBoxContainer" parent="." unique_id=524118982]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

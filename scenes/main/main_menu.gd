@@ -141,6 +141,7 @@ func connect_buttons():
 	%password_edit.text_changed.connect(settings_password_changed)
 	%password_edit.text_submitted.connect(settings_login_signup)
 	%logout_button.pressed.connect(logout)
+	%delete_button.pressed.connect(delete)
 	Events.android_back_pressed.connect(_back)
 
 func load_account():
@@ -215,7 +216,7 @@ func settings_login_signup(text:String):
 		
 		# --- NEW: UPGRADE GUEST ACCOUNT PASSWORD CONFIRMATION ---
 		if info_response.get("status") == "guest" and !password.is_empty():
-			var prompt := ConfirmPrompt.create("Confirm Password to Upgrade", ["input"])
+			var prompt := ConfirmPrompt.create("Confirm Password to Upgrade", ["secret_input"])
 			add_child(prompt)
 			var prompt_result = await prompt.result
 			
@@ -270,7 +271,7 @@ func settings_login_signup(text:String):
 		%status_status.text = "Signing up"
 		
 		if !password.is_empty():
-			var prompt := ConfirmPrompt.create("Confirm Password", ["input"])
+			var prompt := ConfirmPrompt.create("Confirm Password", ["secret_input"])
 			add_child(prompt)
 			var prompt_result = await prompt.result
 			
@@ -304,6 +305,53 @@ func settings_login_signup(text:String):
 		else:
 			%account_note.text = signup_response.get("message", "Signup failed.")
 
+func delete():
+	var prompt := ConfirmPrompt.create("Are you sure? This cannot be undone.")
+	add_child(prompt)
+	var result = await prompt.result
+	if !result: return
+	
+	var prompt2 := ConfirmPrompt.create("Enter password to confirm deletion", ["secret_input"])
+	add_child(prompt2)
+	var result2 = await prompt2.result
+	if !result2.get("result"): return
+	
+	# 1. Re-authenticate
+	TCPBridge.send_login_request(GameManager.player_data["name"], result2.get("value"))
+	
+	# SIFTING LOGIC: Wait for login_response
+	var auth_success = false
+	while true:
+		var res = await TCPBridge.active_bridge.server_response
+		if res.get("type") == "login_response":
+			auth_success = res.get("success", false)
+			break
+	
+	if auth_success:
+		# 2. Re-auth passed, send delete command
+		TCPBridge.delete_account()
+		
+		# SIFTING LOGIC: Wait for delete_response
+		var delete_success = false
+		while true:
+			var del_res = await TCPBridge.active_bridge.server_response
+			if del_res.get("type") == "delete_response":
+				delete_success = del_res.get("success", false)
+				break
+		
+		if delete_success:
+			# 3. Purge local cache and exit
+			GameManager.player_data = {"name": "Guest", "uid": -1}
+			GameManager.SAVE_GAME()
+			get_tree().change_scene_to_file("res://scenes/main/main_menu.tscn")
+		else:
+			var err := ConfirmPrompt.create("Server failed to delete account.", ["no_cancel"])
+			add_child(err)
+	else:
+		var prompt3 := ConfirmPrompt.create("Incorrect password.", ["no_cancel"])
+		add_child(prompt3)
+		
+
 func logout(): 
 	#TCPBridge.get_player_info("Nataho")
 	var player_data = {
@@ -315,6 +363,7 @@ func logout():
 	}
 	GameManager.player_data = player_data
 	%uid.hide(); $settings/right_side/account/password.show()
+	%delete.hide()
 	%username_edit.editable = true
 	%password_edit.editable = true
 	%logout_button.disabled = true
@@ -351,12 +400,15 @@ func logged_in(player_data: Dictionary):
 	if str(GameManager.player_data["uid"]) != "-1":
 		%uid.show()
 		$settings/right_side/account/password.hide()
+		%delete.show()
 		%username_edit.editable = false
 		%password_edit.editable = false
 		%logout_button.disabled = false
+		
 	else:
 		# Keep fields open for guests/new logins
 		%uid.hide()
+		%delete.hide()
 		$settings/right_side/account/password.show()
 		%logout_button.disabled = true
 

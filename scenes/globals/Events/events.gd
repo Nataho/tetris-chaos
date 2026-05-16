@@ -19,6 +19,7 @@ signal garbage_queue_updated(payload: Dictionary)
 #region local signals
 signal local_countdown(time_left:int)
 signal android_back_pressed
+signal achievement_get(achievement, description)
 #endregion
 
 #region multiplayer signals

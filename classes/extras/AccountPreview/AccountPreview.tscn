@@ -1,0 +1,138 @@
+[gd_scene format=3 uid="uid://dnsjptmes1h1h"]
+
+[ext_resource type="FontFile" uid="uid://jsjhgj7uljnr" path="res://assets/fonts/Futura Heavy font.ttf" id="1_34tas"]
+[ext_resource type="Script" uid="uid://cgygu646p2jnr" path="res://classes/extras/AccountPreview/AccountPreview.gd" id="1_pvm2n"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pvm2n"]
+bg_color = Color(0.18431373, 0.627451, 0.5176471, 1)
+border_width_left = 20
+border_width_top = 20
+border_color = Color(0.43529412, 0.8117647, 0.5921569, 1)
+border_blend = true
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_size = 73
+
+[sub_resource type="Theme" id="Theme_mxf4i"]
+Panel/styles/panel = SubResource("StyleBoxFlat_pvm2n")
+
+[sub_resource type="LabelSettings" id="LabelSettings_ongbe"]
+font = ExtResource("1_34tas")
+font_size = 80
+
+[sub_resource type="LabelSettings" id="LabelSettings_iyjhj"]
+font = ExtResource("1_34tas")
+font_size = 80
+font_color = Color(0.12156863, 0.43529412, 0.37254903, 1)
+
+[sub_resource type="Animation" id="Animation_pvm2n"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Panel:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_34tas"]
+resource_name = "open"
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Panel:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(0.07694666, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pvm2n"]
+_data = {
+&"RESET": SubResource("Animation_pvm2n"),
+&"open": SubResource("Animation_34tas")
+}
+
+[node name="AccountPreview" type="Control" unique_id=1039880945]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -730.0
+offset_top = -291.0
+offset_right = 730.0
+offset_bottom = 291.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_pvm2n")
+
+[node name="Panel" type="Panel" parent="." unique_id=1112233324]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 279.0
+offset_top = 174.0
+offset_right = -279.0
+offset_bottom = -174.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(451, 117)
+theme = SubResource("Theme_mxf4i")
+
+[node name="username" type="Label" parent="Panel" unique_id=566779722]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "USERNAME"
+label_settings = SubResource("LabelSettings_ongbe")
+uppercase = true
+
+[node name="status" type="Label" parent="Panel" unique_id=1941074650]
+layout_mode = 0
+offset_top = 111.0
+offset_right = 441.0
+offset_bottom = 208.0
+text = "status"
+label_settings = SubResource("LabelSettings_iyjhj")
+uppercase = true
+
+[node name="add" type="Button" parent="Panel" unique_id=1110272660]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -96.0
+offset_top = -96.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.43529412, 0.8117647, 0.5921569, 1)
+theme_override_colors/font_pressed_color = Color(0.12156863, 0.43529412, 0.37254903, 1)
+theme_override_fonts/font = ExtResource("1_34tas")
+theme_override_font_sizes/font_size = 40
+text = "ADD FRIEND"
+flat = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=904475666]
+libraries/ = SubResource("AnimationLibrary_pvm2n")
+autoplay = &"open"
+
+[connection signal="pressed" from="Panel/add" to="." method="add_friend"]

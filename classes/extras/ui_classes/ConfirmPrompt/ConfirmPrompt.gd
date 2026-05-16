@@ -37,8 +37,10 @@ func _ready() -> void:
 	_connect_signals()
 
 func _check_flags():
+	if _has_secret_input_field: 
+		_has_input_field = true
+		input.secret = true
 	if !_has_input_field: input.hide()
-	if _has_secret_input_field: input.secret = true
 	if _no_cancel: cancel.hide()
 	#if _size_up: _size_up_prompt_box()
 
